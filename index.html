@@ -8855,48 +8855,32 @@ auth.onAuthStateChanged((user) => {
     </div>
   </div>
 </div>
-<script type="module">
-  // 1. Firebase Imports (Firestore)
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  // 2. Apni Firebase Config yahan daalo
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-  };
-
-  // 3. Initialize Firebase & Firestore
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  // 🚀 SAVE SCORE FUNCTION
+<script>
+  // 🚀 SAVE SCORE FUNCTION (Using your existing v8 Firebase setup)
   window.submitToLeaderboard = async function(gameId, score, wpm, accuracy) {
-      // Agar score 0 hai toh save mat karo
       if(score <= 0) return;
 
-      // Player se naam pucho (Tum chaho toh ise settings mein permanent save kara sakte ho)
-      let playerName = localStorage.getItem('DEST_PlayerName');
-      if(!playerName) {
-          playerName = prompt("🏆 New High Score! Enter your name for the Global Leaderboard:", "Guest");
-          if(playerName) localStorage.setItem('DEST_PlayerName', playerName.substring(0,15));
+      // Tumhare LocalStorage se naam lenge (agar Auth se nahi mila)
+      let playerName = localStorage.getItem('dest_playerName') || "Anonymous Ninja";
+      let userId = "guest";
+
+      // 'auth' aur 'db' tumhare code mein pehle se define hain (Line 4614 & 1100)
+      if (typeof auth !== 'undefined' && auth.currentUser) {
+          playerName = auth.currentUser.displayName || auth.currentUser.email.split('@')[0];
+          userId = auth.currentUser.uid;
       }
 
-      if(!playerName) playerName = "Anonymous Ninja";
-
       try {
-          await addDoc(collection(db, "leaderboards", gameId, "scores"), {
+          await db.collection("leaderboards").doc(gameId).collection("scores").add({
               name: playerName,
               score: Number(score),
               wpm: Number(wpm),
               accuracy: Number(accuracy),
-              timestamp: serverTimestamp()
+              uid: userId,
+              timestamp: firebase.firestore.FieldValue.serverTimestamp()
           });
-          console.log("Score saved to global leaderboard!");
+          console.log("Score saved to global leaderboard as: " + playerName);
       } catch (e) {
           console.error("Error saving score: ", e);
       }
@@ -8904,6 +8888,10 @@ auth.onAuthStateChanged((user) => {
 
   // 🚀 FETCH & SHOW LEADERBOARD FUNCTION
   window.showLeaderboard = async function(gameId = 'spaceTyper') {
+      // Tumhara ek purana "local" leaderboard modal bhi tha (Line 1075), usko hide kar dete hain
+      const oldModal = document.getElementById('globalLeaderboardModal');
+      if(oldModal) { oldModal.classList.add('hidden'); oldModal.style.display = 'none'; }
+
       document.getElementById('leaderboard-modal').classList.remove('hidden');
       document.getElementById('leaderboard-game-select').value = gameId;
       const listContainer = document.getElementById('leaderboard-list');
@@ -8911,11 +8899,10 @@ auth.onAuthStateChanged((user) => {
       listContainer.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-secondary);">Scanning Database... ⏳</div>';
 
       try {
-          // Query top 10 scores based on points
-          const q = query(collection(db, "leaderboards", gameId, "scores"), orderBy("score", "desc"), limit(10));
-          const querySnapshot = await getDocs(q);
+          const querySnapshot = await db.collection("leaderboards").doc(gameId).collection("scores")
+              .orderBy("score", "desc").limit(10).get();
           
-          listContainer.innerHTML = ''; // clear loading
+          listContainer.innerHTML = '';
           
           if(querySnapshot.empty) {
               listContainer.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-secondary);">No records found. Be the first!</div>';
@@ -8932,8 +8919,10 @@ auth.onAuthStateChanged((user) => {
               else if(rank === 2) { medal = "🥈"; rankStyle = "color: #e2e8f0; font-size: 1.1rem;"; }
               else if(rank === 3) { medal = "🥉"; rankStyle = "color: #cd7f32; font-size: 1.1rem;"; }
 
+              let isMe = (typeof auth !== 'undefined' && auth.currentUser && auth.currentUser.uid === data.uid) ? 'border-left: 3px solid var(--type-correct);' : '';
+
               listContainer.innerHTML += `
-              <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.05); padding: 12px 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+              <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.05); ${isMe} padding: 12px 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
                   <div style="display: flex; align-items: center; gap: 15px;">
                       <div style="font-weight: 900; width: 30px; text-align: center; ${rankStyle}">${medal}</div>
                       <div>
@@ -8952,6 +8941,11 @@ auth.onAuthStateChanged((user) => {
           console.error("Error fetching leaderboard: ", e);
           listContainer.innerHTML = '<div style="text-align:center; padding:20px; color:#ff3333;">Network Error. Unable to fetch ranks.</div>';
       }
+  };
+
+  // 🔥 MAGIC OVERRIDE: Tumhara purana 🏆 button ab is naye Firebase modal ko kholega!
+  window.openGlobalLeaderboard = function() {
+      window.showLeaderboard('spaceTyper');
   };
 </script>
 
