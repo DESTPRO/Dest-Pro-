@@ -8857,22 +8857,40 @@ auth.onAuthStateChanged((user) => {
 </div>
 
 <script>
-  // 🚀 SAVE SCORE FUNCTION (Using your existing v8 Firebase setup)
+    // 🚀 SAVE SCORE FUNCTION (Smart Update - Best Attempt Only)
   window.submitToLeaderboard = async function(gameId, score, wpm, accuracy) {
       if(score <= 0) return;
 
-      // Tumhare LocalStorage se naam lenge (agar Auth se nahi mila)
       let playerName = localStorage.getItem('dest_playerName') || "Anonymous Ninja";
-      let userId = "guest";
+      
+      // Guest users ke liye ek pseudo-unique ID banayenge unke naam se (taki guests ka bhi multiple add na ho)
+      let userId = "guest_" + playerName.replace(/\s+/g, '').toLowerCase(); 
 
-      // 'auth' aur 'db' tumhare code mein pehle se define hain (Line 4614 & 1100)
+      // Agar Google Auth se logged in hai, toh uski asali Firebase UID use karenge
       if (typeof auth !== 'undefined' && auth.currentUser) {
           playerName = auth.currentUser.displayName || auth.currentUser.email.split('@')[0];
           userId = auth.currentUser.uid;
       }
 
       try {
-          await db.collection("leaderboards").doc(gameId).collection("scores").add({
+          // 'add' ki jagah specific userId ke naam se document ka reference banayenge
+          const scoreRef = db.collection("leaderboards").doc(gameId).collection("scores").doc(userId);
+          
+          // Pehle database se check karenge ki kya is user ka koi purana score hai?
+          const docSnap = await scoreRef.get();
+          
+          if (docSnap.exists) {
+              const existingData = docSnap.data();
+              // Agar naya score purane score se kam ya barabar hai, toh hum database update nahi karenge
+              if (score <= existingData.score) {
+                  console.log("Existing score is higher. No need to update leaderboard.");
+                  return; 
+              }
+          }
+
+          // Agar docSnap exist nahi karta (pehli baar khel raha hai) 
+          // YA naya score purane se bada hai (New High Score), toh usko save/overwrite kar do
+          await scoreRef.set({
               name: playerName,
               score: Number(score),
               wpm: Number(wpm),
@@ -8880,11 +8898,13 @@ auth.onAuthStateChanged((user) => {
               uid: userId,
               timestamp: firebase.firestore.FieldValue.serverTimestamp()
           });
-          console.log("Score saved to global leaderboard as: " + playerName);
+          
+          console.log("New High Score saved/updated in global leaderboard for: " + playerName);
       } catch (e) {
           console.error("Error saving score: ", e);
       }
   };
+
 
   // 🚀 FETCH & SHOW LEADERBOARD FUNCTION
   window.showLeaderboard = async function(gameId = 'spaceTyper') {
