@@ -2343,7 +2343,7 @@ body.light-mode .ultimate-start-btn { background: #0f172a; color: #ffffff !impor
 <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-storage-compat.js"></script>
+
 
 <script>
     // 🔥 FIREBASE SETUP
@@ -8923,41 +8923,32 @@ window.handleDPSelect = function(e) {
     reader.readAsDataURL(file);
 };
 
-// 🔥 SAVE ACCOUNT DETAILS TO FIREBASE
+// 🔥 SAVE ACCOUNT DETAILS (BINA FIREBASE STORAGE KE JUGAAAD)
 window.saveAccountDetails = async function() {
     const user = auth.currentUser;
     const newName = document.getElementById('acc-name-input').value.trim();
     if(!user || !newName) return;
 
     const btn = document.getElementById('acc-save-btn');
-    btn.innerText = "UPLOADING... ⏳";
+    btn.innerText = "SAVING... ⏳";
     btn.disabled = true;
 
     try {
         let finalPhotoUrl = user.photoURL;
 
-        // Agar user ne nayi photo select ki hai, toh usko Firebase Storage me bhejo
+        // Agar user ne nayi photo select ki hai (Compress hui Base64 image)
         if (selectedDPBase64) {
-            const storageRef = firebase.storage().ref();
-            const dpRef = storageRef.child(`profile_pics/${user.uid}.jpg`);
-            
-            // Convert Base64 back to Blob
-            const response = await fetch(selectedDPBase64);
-            const blob = await response.blob();
-            
-            // Upload to Storage
-            await dpRef.put(blob);
-            finalPhotoUrl = await dpRef.getDownloadURL();
+            finalPhotoUrl = selectedDPBase64; // Seedha Text ko Image URL maan lenge
         }
 
-        // Update Firebase Auth Profile
-        await user.updateProfile({ displayName: newName, photoURL: finalPhotoUrl });
+        // Google account ka naam update karo
+        try { await user.updateProfile({ displayName: newName }); } catch(e) {}
 
-        // Update Local Storage
+        // LocalStorage me save kar lo
         localStorage.setItem('dest_playerName', newName);
-        localStorage.setItem('dest_playerDP', finalPhotoUrl);
+        if(finalPhotoUrl) localStorage.setItem('dest_playerDP', finalPhotoUrl);
 
-        // Update Nav Bar immediately
+        // Nav Bar Update
         document.getElementById('navLoginBtn').innerHTML = `<img src="${finalPhotoUrl}" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover;">`;
 
         alert("Account Updated Successfully! 🎉");
@@ -8972,6 +8963,7 @@ window.saveAccountDetails = async function() {
         selectedDPBase64 = null; // reset
     }
 };
+
 
 function logoutGoogle() {
     auth.signOut().then(() => {
@@ -9012,19 +9004,24 @@ function logoutGoogle() {
 </div>
 
 <script>
-    //   // 🚀 SAVE SCORE FUNCTION (With DP & Smart Update)
+  // 🚀 SAVE SCORE FUNCTION (With Local DP Priority)
   window.submitToLeaderboard = async function(gameId, score, wpm, accuracy) {
       if(score <= 0) return;
 
+      // Sabse pehle check karo ki LocalStorage me humari name aur custom DP hai kya
       let playerName = localStorage.getItem('dest_playerName') || "Anonymous Ninja";
       let userId = "guest_" + playerName.replace(/\s+/g, '').toLowerCase(); 
-      // Default DP agar user guest hai (DiceBear ek random avatar deta hai naam ke hisaab se)
-      let userDP = "https://api.dicebear.com/7.x/bottts/svg?seed=" + playerName;
+      let userDP = localStorage.getItem('dest_playerDP') || `https://api.dicebear.com/7.x/bottts/svg?seed=${playerName}`;
 
+      // Agar Google Auth logged in hai
       if (typeof auth !== 'undefined' && auth.currentUser) {
-          playerName = auth.currentUser.displayName || auth.currentUser.email.split('@')[0];
+          playerName = localStorage.getItem('dest_playerName') || auth.currentUser.displayName || auth.currentUser.email.split('@')[0];
           userId = auth.currentUser.uid;
-          if (auth.currentUser.photoURL) userDP = auth.currentUser.photoURL; // Google ki asli DP
+          
+          // Agar LocalStorage me DP nahi hai, tabhi Google ki asli DP (Gmail wali) use karo
+          if (!localStorage.getItem('dest_playerDP') && auth.currentUser.photoURL) {
+              userDP = auth.currentUser.photoURL; 
+          }
       }
 
       try {
@@ -9033,7 +9030,7 @@ function logoutGoogle() {
           
           if (docSnap.exists) {
               const existingData = docSnap.data();
-              if (score <= existingData.score) return; // Ignore if new score is lower
+              if (score <= existingData.score) return; 
           }
 
           await scoreRef.set({
@@ -9042,11 +9039,10 @@ function logoutGoogle() {
               wpm: Number(wpm),
               accuracy: Number(accuracy),
               uid: userId,
-              photoURL: userDP, // 🔥 Photo URL yahan database me save ho rahi hai
+              photoURL: userDP, // 🔥 Ab yahan direct Compressed Image (Text format) jaayegi Database me
               timestamp: firebase.firestore.FieldValue.serverTimestamp()
           });
           
-          // Score save hone ke baad Mini-Leaderboards refresh karo
           if(window.loadMiniLeaderboards) window.loadMiniLeaderboards();
       } catch (e) { console.error("Error saving score: ", e); }
   };
