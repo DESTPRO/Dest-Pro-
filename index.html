@@ -1565,6 +1565,34 @@ body.light-mode .ultimate-start-btn { background: #0f172a; color: #ffffff !impor
 .lb-rank-1 { color: #fbbf24; border-color: rgba(251, 191, 36, 0.5); background: rgba(251, 191, 36, 0.1); box-shadow: 0 4px 15px rgba(251, 191, 36, 0.15); }
 .lb-rank-2 { color: #cbd5e1; border-color: rgba(203, 213, 225, 0.4); background: rgba(203, 213, 225, 0.05); }
 .lb-rank-3 { color: #b45309; border-color: rgba(180, 83, 9, 0.4); background: rgba(180, 83, 9, 0.1); }
+/* 🏆 MINI LEADERBOARD ON GAME CARDS */
+.mini-leaderboard {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.mini-leaderboard:hover {
+    border-color: var(--accent-primary);
+    box-shadow: 0 5px 20px var(--accent-glow), inset 0 0 10px rgba(255,255,255,0.05);
+    transform: translateY(-3px);
+}
+/* Shine effect on hover */
+.mini-leaderboard::before {
+    content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+    transform: skewX(-25deg); transition: 0.5s;
+}
+.mini-leaderboard:hover::before { left: 150%; }
+
+.mini-lb-title { font-size: 0.7rem; color: #fbbf24; text-align: center; font-weight: 800; letter-spacing: 1px; margin-bottom: 8px; text-transform: uppercase; text-shadow: 0 0 5px rgba(251, 191, 36, 0.4); }
+.lb-dp-main { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 2px solid #334155; }
+.lb-dp-mini { width: 18px; height: 18px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.2); }
 
 </style>
 </head>
@@ -2033,7 +2061,12 @@ body.light-mode .ultimate-start-btn { background: #0f172a; color: #ffffff !impor
         <div class="game-card" data-game="spaceTyper">
             <div class="game-card-tag">GAME 01</div>
             <h3>SPACE TYPER 🚀</h3>
-            <p>Type to destroy incoming enemies.</p>
+            <p>Type to destroy incoming enemies.</p>    <div class="mini-leaderboard" onclick="window.showLeaderboard('spaceTyper')">
+                <div class="mini-lb-title">🏆 Top 3 Global 🏆</div>
+                <div id="mini-lb-spaceTyper">
+                    <div style="text-align:center; font-size:0.75rem; color:#64748b;">Loading Live Ranks...</div>
+                </div>
+            </div>
             <div class="game-stats-preview">
                 <span>Best Score: <b class="stat-score">0</b></span>
                 <span>Best WPM: <b class="stat-wpm">0</b></span>
@@ -2053,7 +2086,13 @@ body.light-mode .ultimate-start-btn { background: #0f172a; color: #ffffff !impor
         <div class="game-card" data-game="wordRush">
             <div class="game-card-tag">GAME 02</div>
             <h3>WORD RUSH ⚡</h3>
-            <p>Type words before they disappear.</p>
+            <p>Type words before they disappear.</p><div class="mini-leaderboard" onclick="window.showLeaderboard('wordRush')">
+    <div class="mini-lb-title">🏆 Top 3 Global 🏆</div>
+    <div id="mini-lb-wordRush">
+        <div style="text-align:center; font-size:0.75rem; color:#64748b;">Loading Live Ranks...</div>
+    </div>
+</div>
+
             <div class="game-stats-preview">
                 <span>Best Score: <b class="stat-score">0</b></span>
                 <span>Best WPM: <b class="stat-wpm">0</b></span>
@@ -2073,7 +2112,13 @@ body.light-mode .ultimate-start-btn { background: #0f172a; color: #ffffff !impor
         <div class="game-card" data-game="typingRacer">
             <div class="game-card-tag">GAME 03</div>
             <h3>TYPING RACER 🏎️</h3>
-            <p>Type faster to reach the finish line.</p>
+            <p>Type faster to reach the finish line.</p><div class="mini-leaderboard" onclick="window.showLeaderboard('typingRacer')">
+    <div class="mini-lb-title">🏆 Top 3 Global 🏆</div>
+    <div id="mini-lb-typingRacer">
+        <div style="text-align:center; font-size:0.75rem; color:#64748b;">Loading Live Ranks...</div>
+    </div>
+</div>
+
             <div class="game-stats-preview">
                 <span>Best Distance: <b class="stat-score">0m</b></span>
                 <span>Best WPM: <b class="stat-wpm">0</b></span>
@@ -2093,7 +2138,13 @@ body.light-mode .ultimate-start-btn { background: #0f172a; color: #ffffff !impor
         <div class="game-card" data-game="keyboardNinja">
             <div class="game-card-tag">GAME 04</div>
             <h3>KEYBOARD NINJA ⚔️</h3>
-            <p>Type falling words before they hit bottom.</p>
+            <p>Type falling words before they hit bottom.</p><div class="mini-leaderboard" onclick="window.showLeaderboard('keyboardNinja')">
+    <div class="mini-lb-title">🏆 Top 3 Global 🏆</div>
+    <div id="mini-lb-keyboardNinja">
+        <div style="text-align:center; font-size:0.75rem; color:#64748b;">Loading Live Ranks...</div>
+    </div>
+</div>
+
             <div class="game-stats-preview">
                 <span>Best Score: <b class="stat-score">0</b></span>
                 <span>Best WPM: <b class="stat-wpm">0</b></span>
@@ -2113,7 +2164,13 @@ body.light-mode .ultimate-start-btn { background: #0f172a; color: #ffffff !impor
         <div class="game-card" data-game="typingSurvivor">
             <div class="game-card-tag">GAME 05</div>
             <h3>TYPING SURVIVOR 🛡️</h3>
-            <p>Survive incoming enemy waves with typing.</p>
+            <p>Survive incoming enemy waves with typing.</p><div class="mini-leaderboard" onclick="window.showLeaderboard('typingSurvivor')">
+    <div class="mini-lb-title">🏆 Top 3 Global 🏆</div>
+    <div id="mini-lb-typingSurvivor">
+        <div style="text-align:center; font-size:0.75rem; color:#64748b;">Loading Live Ranks...</div>
+    </div>
+</div>
+
             <div class="game-stats-preview">
                 <span>Best Score: <b class="stat-score">0</b></span>
                 <span>Best WPM: <b class="stat-wpm">0</b></span>
@@ -8236,6 +8293,9 @@ class TypingGamesModule {
         const dash = document.getElementById('typingGamesModule');
         dash.classList.remove('hidden'); dash.style.display = 'block';
         this.loadPersistentStats();
+        // Add this line inside showGamesDashboard()
+if(window.loadMiniLeaderboards) window.loadMiniLeaderboards();
+
     }
 
     hideGamesDashboard() {
@@ -8857,58 +8917,47 @@ auth.onAuthStateChanged((user) => {
 </div>
 
 <script>
-    // 🚀 SAVE SCORE FUNCTION (Smart Update - Best Attempt Only)
+    //   // 🚀 SAVE SCORE FUNCTION (With DP & Smart Update)
   window.submitToLeaderboard = async function(gameId, score, wpm, accuracy) {
       if(score <= 0) return;
 
       let playerName = localStorage.getItem('dest_playerName') || "Anonymous Ninja";
-      
-      // Guest users ke liye ek pseudo-unique ID banayenge unke naam se (taki guests ka bhi multiple add na ho)
       let userId = "guest_" + playerName.replace(/\s+/g, '').toLowerCase(); 
+      // Default DP agar user guest hai (DiceBear ek random avatar deta hai naam ke hisaab se)
+      let userDP = "https://api.dicebear.com/7.x/bottts/svg?seed=" + playerName;
 
-      // Agar Google Auth se logged in hai, toh uski asali Firebase UID use karenge
       if (typeof auth !== 'undefined' && auth.currentUser) {
           playerName = auth.currentUser.displayName || auth.currentUser.email.split('@')[0];
           userId = auth.currentUser.uid;
+          if (auth.currentUser.photoURL) userDP = auth.currentUser.photoURL; // Google ki asli DP
       }
 
       try {
-          // 'add' ki jagah specific userId ke naam se document ka reference banayenge
           const scoreRef = db.collection("leaderboards").doc(gameId).collection("scores").doc(userId);
-          
-          // Pehle database se check karenge ki kya is user ka koi purana score hai?
           const docSnap = await scoreRef.get();
           
           if (docSnap.exists) {
               const existingData = docSnap.data();
-              // Agar naya score purane score se kam ya barabar hai, toh hum database update nahi karenge
-              if (score <= existingData.score) {
-                  console.log("Existing score is higher. No need to update leaderboard.");
-                  return; 
-              }
+              if (score <= existingData.score) return; // Ignore if new score is lower
           }
 
-          // Agar docSnap exist nahi karta (pehli baar khel raha hai) 
-          // YA naya score purane se bada hai (New High Score), toh usko save/overwrite kar do
           await scoreRef.set({
               name: playerName,
               score: Number(score),
               wpm: Number(wpm),
               accuracy: Number(accuracy),
               uid: userId,
+              photoURL: userDP, // 🔥 Photo URL yahan database me save ho rahi hai
               timestamp: firebase.firestore.FieldValue.serverTimestamp()
           });
           
-          console.log("New High Score saved/updated in global leaderboard for: " + playerName);
-      } catch (e) {
-          console.error("Error saving score: ", e);
-      }
+          // Score save hone ke baad Mini-Leaderboards refresh karo
+          if(window.loadMiniLeaderboards) window.loadMiniLeaderboards();
+      } catch (e) { console.error("Error saving score: ", e); }
   };
 
-
-  // 🚀 FETCH & SHOW LEADERBOARD FUNCTION
+  // 🚀 FETCH & SHOW MAIN LEADERBOARD
   window.showLeaderboard = async function(gameId = 'spaceTyper') {
-      // Tumhara ek purana "local" leaderboard modal bhi tha (Line 1075), usko hide kar dete hain
       const oldModal = document.getElementById('globalLeaderboardModal');
       if(oldModal) { oldModal.classList.add('hidden'); oldModal.style.display = 'none'; }
 
@@ -8919,9 +8968,7 @@ auth.onAuthStateChanged((user) => {
       listContainer.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-secondary);">Scanning Database... ⏳</div>';
 
       try {
-          const querySnapshot = await db.collection("leaderboards").doc(gameId).collection("scores")
-              .orderBy("score", "desc").limit(10).get();
-          
+          const querySnapshot = await db.collection("leaderboards").doc(gameId).collection("scores").orderBy("score", "desc").limit(10).get();
           listContainer.innerHTML = '';
           
           if(querySnapshot.empty) {
@@ -8940,11 +8987,14 @@ auth.onAuthStateChanged((user) => {
               else if(rank === 3) { medal = "🥉"; rankStyle = "color: #cd7f32; font-size: 1.1rem;"; }
 
               let isMe = (typeof auth !== 'undefined' && auth.currentUser && auth.currentUser.uid === data.uid) ? 'border-left: 3px solid var(--type-correct);' : '';
+              let dpPic = data.photoURL || `https://api.dicebear.com/7.x/bottts/svg?seed=${data.name}`;
 
+              // 🔥 MAIN LIST HTML WITH DP
               listContainer.innerHTML += `
               <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.05); ${isMe} padding: 12px 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
-                  <div style="display: flex; align-items: center; gap: 15px;">
+                  <div style="display: flex; align-items: center; gap: 12px;">
                       <div style="font-weight: 900; width: 30px; text-align: center; ${rankStyle}">${medal}</div>
+                      <img src="${dpPic}" class="lb-dp-main">
                       <div>
                           <div style="color: #ffffff; font-weight: 700; font-size: 1rem;">${data.name}</div>
                           <div style="color: #94a3b8; font-size: 0.75rem;">Acc: <span style="color:var(--type-correct);">${data.accuracy}%</span></div>
@@ -8958,10 +9008,54 @@ auth.onAuthStateChanged((user) => {
               rank++;
           });
       } catch (e) {
-          console.error("Error fetching leaderboard: ", e);
-          listContainer.innerHTML = '<div style="text-align:center; padding:20px; color:#ff3333;">Network Error. Unable to fetch ranks.</div>';
+          listContainer.innerHTML = '<div style="text-align:center; padding:20px; color:#ff3333;">Network Error.</div>';
       }
   };
+
+  // 🚀 NAYA FUNCTION: MINI LEADERBOARDS ON GAME CARDS
+  window.loadMiniLeaderboards = async function() {
+      const games = ['spaceTyper', 'wordRush', 'typingRacer', 'keyboardNinja', 'typingSurvivor'];
+      
+      for(let game of games) {
+          const container = document.getElementById('mini-lb-' + game);
+          if(!container) continue;
+          
+          try {
+              const snap = await db.collection("leaderboards").doc(game).collection("scores").orderBy("score", "desc").limit(3).get();
+              
+              if(snap.empty) {
+                  container.innerHTML = '<div style="text-align:center; font-size:0.7rem; color:#64748b;">No records yet. Be the first!</div>';
+                  continue;
+              }
+
+              let html = '';
+              let rank = 1;
+              snap.forEach(doc => {
+                  let d = doc.data();
+                  let medal = rank === 1 ? '🥇' : (rank === 2 ? '🥈' : '🥉');
+                  let color = rank === 1 ? '#fbbf24' : (rank === 2 ? '#cbd5e1' : '#b45309');
+                  let dpPic = d.photoURL || `https://api.dicebear.com/7.x/bottts/svg?seed=${d.name}`;
+
+                  html += `
+                  <div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-bottom:4px; align-items:center;">
+                      <div style="display:flex; align-items:center; gap:6px; width:65%; overflow:hidden;">
+                          <span style="font-size: 0.85rem;">${medal}</span>
+                          <img src="${dpPic}" class="lb-dp-mini">
+                          <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#e2e8f0; font-weight:600;">${d.name}</span>
+                      </div>
+                      <div style="color:${color}; font-weight:900; font-family:'JetBrains Mono',monospace; text-shadow: 0 0 5px ${color}66;">
+                          ${d.score.toLocaleString()}
+                      </div>
+                  </div>`;
+                  rank++;
+              });
+              container.innerHTML = html;
+          } catch(e) {
+              console.log("Mini LB Error: ", e);
+          }
+      }
+  };
+
 
   // 🔥 MAGIC OVERRIDE: Tumhara purana 🏆 button ab is naye Firebase modal ko kholega!
   window.openGlobalLeaderboard = function() {
