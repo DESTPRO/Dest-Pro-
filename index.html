@@ -8923,7 +8923,7 @@ window.handleDPSelect = function(e) {
     reader.readAsDataURL(file);
 };
 
-// 🔥 SAVE ACCOUNT DETAILS (BINA FIREBASE STORAGE KE JUGAAAD)
+// 🔥 SAVE ACCOUNT DETAILS (Instant Leaderboard Sync)
 window.saveAccountDetails = async function() {
     const user = auth.currentUser;
     const newName = document.getElementById('acc-name-input').value.trim();
@@ -8936,22 +8936,46 @@ window.saveAccountDetails = async function() {
     try {
         let finalPhotoUrl = user.photoURL;
 
-        // Agar user ne nayi photo select ki hai (Compress hui Base64 image)
+        // Agar nayi photo select ki hai (Base64 compress string)
         if (selectedDPBase64) {
-            finalPhotoUrl = selectedDPBase64; // Seedha Text ko Image URL maan lenge
+            finalPhotoUrl = selectedDPBase64;
         }
 
-        // Google account ka naam update karo
-        try { await user.updateProfile({ displayName: newName }); } catch(e) {}
+        // 1. Update Firebase Auth Profile
+        try { 
+            await user.updateProfile({ displayName: newName }); 
+        } catch(e) {}
 
-        // LocalStorage me save kar lo
+        // 2. LocalStorage mein save karo
         localStorage.setItem('dest_playerName', newName);
         if(finalPhotoUrl) localStorage.setItem('dest_playerDP', finalPhotoUrl);
 
-        // Nav Bar Update
-        document.getElementById('navLoginBtn').innerHTML = `<img src="${finalPhotoUrl}" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover;">`;
+        // 3. Update Nav Bar Icon
+        const navBtn = document.getElementById('navLoginBtn');
+        if(navBtn) {
+            navBtn.innerHTML = `<img src="${finalPhotoUrl}" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover;">`;
+        }
 
-        alert("Account Updated Successfully! 🎉");
+        // 4. 🔥 INSTANT LEADERBOARD SYNC: Saare games mein DP aur Name update karo
+        const games = ['spaceTyper', 'wordRush', 'typingRacer', 'keyboardNinja', 'typingSurvivor'];
+        
+        for (let gameId of games) {
+            const userScoreRef = db.collection("leaderboards").doc(gameId).collection("scores").doc(user.uid);
+            const docSnap = await userScoreRef.get();
+            
+            // Agar is game me user ka pehle se koi score save hai, toh uski DP aur Name update kar do
+            if (docSnap.exists) {
+                await userScoreRef.update({
+                    name: newName,
+                    photoURL: finalPhotoUrl
+                });
+            }
+        }
+
+        // Mini Leaderboards aur Main Leaderboard refresh karo
+        if(window.loadMiniLeaderboards) window.loadMiniLeaderboards();
+
+        alert("Account & Leaderboards Updated Successfully! 🎉");
         document.getElementById('account-modal').classList.add('hidden');
 
     } catch (e) {
@@ -8960,7 +8984,7 @@ window.saveAccountDetails = async function() {
     } finally {
         btn.innerText = "SAVE CHANGES";
         btn.disabled = false;
-        selectedDPBase64 = null; // reset
+        selectedDPBase64 = null; // Reset selection
     }
 };
 
