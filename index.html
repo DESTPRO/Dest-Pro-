@@ -10326,114 +10326,98 @@ function logoutGoogle() {
       } catch (e) { console.error("Error saving score: ", e); }
   };
 
-  // 🚀 FETCH & SHOW MAIN LEADERBOARD (WITH "ALL GAMES" SUPPORT)
-  window.showLeaderboard = async function(gameId = 'all') { // Default 'all' rakha hai
-      const oldModal = document.getElementById('globalLeaderboardModal');
-      if(oldModal) { oldModal.classList.add('hidden'); oldModal.style.display = 'none'; }
+// ==========================================
+// 🏆 OVERRIDE: GLOBAL LEADERBOARD (NOW DISPLAYS LEVEL ON DP)
+// ==========================================
+window.showLeaderboard = async function(gameId = 'all') {
+    const oldModal = document.getElementById('globalLeaderboardModal');
+    if(oldModal) { oldModal.classList.add('hidden'); oldModal.style.display = 'none'; }
 
-      document.getElementById('leaderboard-modal').classList.remove('hidden');
-      document.getElementById('leaderboard-game-select').value = gameId;
-      const listContainer = document.getElementById('leaderboard-list');
-      
-      listContainer.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-secondary);">Scanning Database... ⏳</div>';
+    document.getElementById('leaderboard-modal').classList.remove('hidden');
+    document.getElementById('leaderboard-game-select').value = gameId;
+    const listContainer = document.getElementById('leaderboard-list');
+    listContainer.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-secondary);">Scanning Database... ⏳</div>';
 
-      // 🎮 Game UI Meta Data (Colors & Icons)
-      const gameMeta = {
-          'spaceTyper': { name: 'Space Typer', icon: '🚀', color: '#3b82f6' },
-          'wordRush': { name: 'Word Rush', icon: '⚡', color: '#eab308' },
-          'typingRacer': { name: 'Typing Racer', icon: '🏎️', color: '#ec4899' },
-          'keyboardNinja': { name: 'Keyboard Ninja', icon: '⚔️', color: '#10b981' },
-          'typingSurvivor': { name: 'Typing Survivor', icon: '🛡️', color: '#00e5ff' }
-      };
+    const gameMeta = {
+        'spaceTyper': { name: 'Space Typer', icon: '🚀', color: '#3b82f6' },
+        'wordRush': { name: 'Word Rush', icon: '⚡', color: '#eab308' },
+        'typingRacer': { name: 'Typing Racer', icon: '🏎️', color: '#ec4899' },
+        'keyboardNinja': { name: 'Keyboard Ninja', icon: '⚔️', color: '#10b981' },
+        'typingSurvivor': { name: 'Typing Survivor', icon: '🛡️', color: '#00e5ff' }
+    };
 
-      try {
-          let leaderboardData = [];
+    try {
+        let leaderboardData = [];
+        if (gameId === 'all') {
+            const games = Object.keys(gameMeta);
+            const promises = games.map(gId => db.collection("leaderboards").doc(gId).collection("scores").orderBy("score", "desc").limit(10).get());
+            const snapshots = await Promise.all(promises);
+            snapshots.forEach((snap, index) => {
+                const gId = games[index];
+                snap.forEach(doc => { let data = doc.data(); data.gameId = gId; leaderboardData.push(data); });
+            });
+            leaderboardData.sort((a, b) => b.score - a.score);
+            leaderboardData = leaderboardData.slice(0, 10);
+        } else {
+            const snap = await db.collection("leaderboards").doc(gameId).collection("scores").orderBy("score", "desc").limit(10).get();
+            snap.forEach(doc => { let data = doc.data(); data.gameId = gameId; leaderboardData.push(data); });
+        }
 
-          if (gameId === 'all') {
-              // 🌟 ALL GAMES LOGIC: Firebase se ek sath paancho games ka data fetch karo
-              const games = Object.keys(gameMeta);
-              const promises = games.map(gId =>
-                  db.collection("leaderboards").doc(gId).collection("scores").orderBy("score", "desc").limit(10).get()
-              );
+        listContainer.innerHTML = '';
+        if(leaderboardData.length === 0) {
+            listContainer.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-secondary);">No records found. Be the first!</div>';
+            return;
+        }
 
-              const snapshots = await Promise.all(promises);
+        let rank = 1;
+        leaderboardData.forEach((data) => {
+            let rankStyle = "color: var(--text-secondary);";
+            let medal = `#${rank}`;
+            if(rank === 1) { medal = "🥇"; rankStyle = "color: #ffd700; text-shadow: 0 0 10px rgba(255,215,0,0.5); font-size: 1.2rem;"; }
+            else if(rank === 2) { medal = "🥈"; rankStyle = "color: #e2e8f0; font-size: 1.1rem;"; }
+            else if(rank === 3) { medal = "🥉"; rankStyle = "color: #cd7f32; font-size: 1.1rem;"; }
 
-              snapshots.forEach((snap, index) => {
-                  const gId = games[index];
-                  snap.forEach(doc => {
-                      let data = doc.data();
-                      data.gameId = gId; // Data mein game ka naam tag kar diya
-                      leaderboardData.push(data);
-                  });
-              });
+            let isMe = (typeof auth !== 'undefined' && auth.currentUser && auth.currentUser.uid === data.uid) ? 'border-left: 3px solid var(--type-correct);' : '';
+            let dpPic = data.photoURL || `https://api.dicebear.com/7.x/bottts/svg?seed=${data.name}`;
 
-              // Combine kiye hue saare scores ko Highest to Lowest sort karo
-              leaderboardData.sort((a, b) => b.score - a.score);
-              
-              // Sirf Top 10 nikaal lo
-              leaderboardData = leaderboardData.slice(0, 10);
+            let meta = gameMeta[data.gameId];
+            let gameBadgeHtml = '';
+            if (gameId === 'all') {
+                gameBadgeHtml = `<div style="color: ${meta.color}; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; margin-top: 4px; letter-spacing: 0.5px;">${meta.icon} ${meta.name}</div>`;
+            }
 
-          } else {
-              // 🎮 SINGLE GAME LOGIC (Pehle jaisa)
-              const snap = await db.collection("leaderboards").doc(gameId).collection("scores").orderBy("score", "desc").limit(10).get();
-              snap.forEach(doc => {
-                  let data = doc.data();
-                  data.gameId = gameId;
-                  leaderboardData.push(data);
-              });
-          }
+            // 🔥 NEW: Floating Level Badge on Top of Profile Picture
+            let dpWithLevelBadge = `
+                <div style="position:relative; display:inline-flex; align-items:center; justify-content:center; flex-shrink: 0;">
+                    <img src="${dpPic}" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 2px solid #334155;">
+                    ${data.level ? `<span style="position:absolute; bottom:-4px; right:-6px; background:#fbbf24; color:#000; font-size:0.6rem; font-weight:900; padding:1px 4px; border-radius:6px; border:1px solid #000; box-shadow: 0 0 5px rgba(251,191,36,0.8);">${data.level}</span>` : ''}
+                </div>
+            `;
 
-          listContainer.innerHTML = '';
-          
-          if(leaderboardData.length === 0) {
-              listContainer.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-secondary);">No records found. Be the first!</div>';
-              return;
-          }
+            listContainer.innerHTML += `
+            <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.05); ${isMe} padding: 12px 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+                <div style="display: flex; align-items: center; gap: 10px; width: 65%;">
+                    <div style="font-weight: 900; width: 25px; text-align: center; ${rankStyle}">${medal}</div>
+                    
+                    <!-- Profile Pic + Badge -->
+                    ${dpWithLevelBadge}
+                    
+                    <div style="overflow: hidden; text-align: left;">
+                        <div style="color: #ffffff; font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${data.name}</div>
+                        <div style="color: #94a3b8; font-size: 0.75rem;">Acc: <span style="color:var(--type-correct);">${data.accuracy}%</span></div>
+                        ${gameBadgeHtml}
+                    </div>
+                </div>
+                <div style="text-align: right; width: 35%;">
+                    <div style="color: var(--accent-primary); font-weight: 800; font-size: 1.05rem; white-space: nowrap;">${data.score.toLocaleString()} <span style="font-size: 0.6rem; color: #94a3b8;">PTS</span></div>
+                    <div style="color: #a855f7; font-size: 0.8rem; font-weight: bold; white-space: nowrap;">${data.wpm} WPM</div>
+                </div>
+            </div>`;
+            rank++;
+        });
+    } catch (e) { console.error(e); listContainer.innerHTML = '<div style="text-align:center; padding:20px; color:#ff3333;">Network Error.</div>'; }
+};
 
-          let rank = 1;
-          leaderboardData.forEach((data) => {
-              let rankStyle = "color: var(--text-secondary);";
-              let medal = `#${rank}`;
-              
-              if(rank === 1) { medal = "🥇"; rankStyle = "color: #ffd700; text-shadow: 0 0 10px rgba(255,215,0,0.5); font-size: 1.2rem;"; }
-              else if(rank === 2) { medal = "🥈"; rankStyle = "color: #e2e8f0; font-size: 1.1rem;"; }
-              else if(rank === 3) { medal = "🥉"; rankStyle = "color: #cd7f32; font-size: 1.1rem;"; }
-
-              let isMe = (typeof auth !== 'undefined' && auth.currentUser && auth.currentUser.uid === data.uid) ? 'border-left: 3px solid var(--type-correct);' : '';
-              let dpPic = data.photoURL || `https://api.dicebear.com/7.x/bottts/svg?seed=${data.name}`;
-
-              // 🎯 GAME BADGE: Agar 'All' selected hai, toh player ke naam ke niche game ka badge dikhao
-              let meta = gameMeta[data.gameId];
-              let gameBadgeHtml = '';
-              if (gameId === 'all') {
-                  gameBadgeHtml = `<div style="color: ${meta.color}; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; margin-top: 4px; letter-spacing: 0.5px;">${meta.icon} ${meta.name}</div>`;
-              }
-
-              // 🔥 MAIN LIST HTML WITH DP & GAME BADGE
-              listContainer.innerHTML += `
-              <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.05); ${isMe} padding: 12px 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
-                  <div style="display: flex; align-items: center; gap: 10px; width: 65%;">
-                      <div style="font-weight: 900; width: 25px; text-align: center; ${rankStyle}">${medal}</div>
-                      <img src="${dpPic}" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 2px solid #334155; flex-shrink: 0;">
-                      <div style="overflow: hidden; text-align: left;">
-                          <div style="color: #ffffff; font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${data.name}</div>
-                          <div style="color: #94a3b8; font-size: 0.75rem;">Acc: <span style="color:var(--type-correct);">${data.accuracy}%</span></div>
-                          ${gameBadgeHtml}
-                      </div>
-                  </div>
-                  <div style="text-align: right; width: 35%;">
-                      <div style="color: var(--accent-primary); font-weight: 800; font-size: 1.05rem; white-space: nowrap;">${data.score.toLocaleString()} <span style="font-size: 0.6rem; color: #94a3b8;">PTS</span></div>
-                      <div style="color: #a855f7; font-size: 0.8rem; font-weight: bold; white-space: nowrap;">${data.wpm} WPM</div>
-                  </div>
-              </div>`;
-
-              rank++;
-          });
-      } catch (e) {
-          console.error(e);
-          listContainer.innerHTML = '<div style="text-align:center; padding:20px; color:#ff3333;">Network Error.</div>';
-      }
-  };
 
   // 🚀 NAYA FUNCTION: MINI LEADERBOARDS ON GAME CARDS
   window.loadMiniLeaderboards = async function() {
