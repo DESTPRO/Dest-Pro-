@@ -2273,6 +2273,35 @@ body.light-mode .random-btn .vs-icon { background: rgba(255, 255, 255, 0.2) !imp
 
 
 </style>
+    <!-- 📱 MOBILE FIX: SINGLE COLUMN GAME GRID -->
+    <style>
+        @media (max-width: 768px) {
+            /* Game grid ko mobile par ek column me set karna */
+            .games-grid, #games-grid, .game-cards-container, #typingGamesModule .grid {
+                display: grid !important;
+                grid-template-columns: 1fr !important; /* Ek line me sirf 1 box */
+                gap: 20px !important;
+                padding: 10px !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+            
+            /* Box ko screen ke andar lock karna */
+            .game-card, .module-card {
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+            }
+            
+            /* Poori screen ka horizontal scroll (kattna) band karna */
+            body, html {
+                overflow-x: hidden !important;
+            }
+        }
+    </style>
+
 </head>
 <body>
 
