@@ -1182,7 +1182,7 @@ body.light-mode .arena-stats span { color: #475569 !important; }
 #liveCombo { color: #f59e0b !important; text-shadow: 0 0 10px rgba(245,158,11,0.6) !important; }
 
 /* Pause aur Exit Buttons ko sleek, pill-shape banaya */
-#pauseGameBtn, #quitGameBtn {
+#pauseGameBtn, #quitGameBtn, #exitGameBtn  {
     background: rgba(255, 255, 255, 0.1) !important;
     border: 1px solid rgba(255, 255, 255, 0.2) !important;
     border-radius: 20px !important;
@@ -1236,9 +1236,11 @@ body.light-mode #pauseGameBtn, body.light-mode #quitGameBtn {
     flex-wrap: nowrap !important; /* Strictly no wrapping */
 }
 
-/* Faltu Text Hide Karna */
-#liveAcc { display: none !important; }
+/* Faltu Text Hide Karna aur WPM (Electric) hatana */
+#liveAcc, #liveWpm { display: none !important; }
+.arena-stats span:has(#liveWpm) { display: none !important; }
 .arena-title { display: none !important; }
+
 
 /* Numbers aur Text ka size bohot chhota (compact) kar diya */
 #liveScore, #liveWpm, #liveCombo, #liveLives {
@@ -2212,6 +2214,63 @@ body.light-mode .magic-particle {
         opacity: 0;
     }
 }
+/* ⚔️ 1v1 MODAL STYLES (PREMIUM FIX) */
+.modal-game-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.vs-game-btn { 
+    background: rgba(0,0,0,0.2); 
+    border: 1px solid var(--glass-border); 
+    padding: 15px 10px; 
+    border-radius: 16px; 
+    cursor: pointer; 
+    color: var(--text-primary); 
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1); 
+    display: flex; 
+    flex-direction: column; /* Icon upar, text neeche */
+    align-items: center; 
+    justify-content: center;
+    gap: 10px; 
+    font-weight: 800; 
+    text-align: center; 
+    font-size: 0.95rem;
+}
+.vs-icon { 
+    background: rgba(255,255,255,0.05); 
+    padding: 10px; 
+    border-radius: 12px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+}
+
+.vs-game-btn:hover { 
+    background: rgba(239, 68, 68, 0.1); 
+    border-color: #ef4444; 
+    transform: translateY(-4px); 
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.2); 
+}
+.vs-game-btn:hover .vs-icon { background: rgba(239, 68, 68, 0.2); }
+
+/* 🔴 Random Button Fix (Forced Red in All Modes) */
+.random-btn { 
+    background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%) !important; 
+    border: 1px solid #f87171 !important; 
+    color: #ffffff !important; 
+    box-shadow: 0 5px 15px rgba(239,68,68,0.4); 
+}
+.random-btn .vs-icon { background: rgba(255,255,255,0.2); color: #fff !important; }
+.random-btn:hover { 
+    background: linear-gradient(135deg, #f87171 0%, #dc2626 100%) !important; 
+    box-shadow: 0 10px 25px rgba(239,68,68,0.6); 
+}
+/* ☀️ Light Mode Overrides */
+body.light-mode .vs-game-btn { background: #ffffff; border-color: #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.04); }
+body.light-mode .vs-game-btn:hover { background: #fef2f2; border-color: #ef4444; box-shadow: 0 8px 20px rgba(239, 68, 68, 0.15); }
+body.light-mode .vs-icon { background: #f1f5f9; }
+
+/* 🔥 YEH LINE FIX KAREGI UGLE WHITE DABBE KO 🔥 */
+body.light-mode .random-btn .vs-icon { background: rgba(255, 255, 255, 0.2) !important; color: #ffffff !important; }
+
 
 </style>
 </head>
@@ -2266,9 +2325,10 @@ body.light-mode .magic-particle {
       </div>
 
     </div>
- 
-    <!-- Modern Bento Grid System -->
+     <!-- Modern Bento Grid System -->
     <div class="bento-grid fade-in stagger-1">
+      
+      <!-- 1. Tutor Card -->
       <button class="bento-card" onclick="openTutorDashboard()">
         <div class="bento-icon">
           <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
@@ -2278,6 +2338,8 @@ body.light-mode .magic-particle {
             <span class="bento-desc">Learn typing</span>
         </div>
       </button>
+      
+      <!-- 2. Games Card -->
       <button class="bento-card" onclick="typingGamesModule.showGamesDashboard()">
         <div class="bento-icon">
           <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"></rect><path d="M6 12h4M8 10v4M15 13h.01M18 11h.01"></path></svg>
@@ -2287,16 +2349,40 @@ body.light-mode .magic-particle {
             <span class="bento-desc">Play & practice</span>
         </div>
       </button>
-      <button class="bento-card full-width" onclick="DataEntryApp.openDashboard()">
+
+      <!-- 3. Data Entry Card -->
+      <button class="bento-card" onclick="DataEntryApp.openDashboard()">
         <div class="bento-icon">
           <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
         </div>
         <div class="bento-info">
-            <span class="bento-title">Data Entry Training</span>
-            <span class="bento-desc">Official spreadsheet simulation</span>
+            <span class="bento-title">Data Entry</span>
+            <span class="bento-desc">Spreadsheet test</span>
         </div>
       </button>
+
+      <!-- 4. 1v1 Battle Card -->
+      <button class="bento-card" onclick="openChallengeModal()" style="border-color: rgba(239, 68, 68, 0.3);">
+        <div class="bento-icon" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"></polyline>
+            <line x1="13" y1="19" x2="19" y2="13"></line>
+            <line x1="16" y1="16" x2="20" y2="20"></line>
+            <line x1="19" y1="21" x2="21" y2="19"></line>
+            <polyline points="14.5 6.5 18 3 21 3 21 6 17.5 9.5"></polyline>
+            <line x1="5" y1="14" x2="9" y2="18"></line>
+            <line x1="7" y1="17" x2="4" y2="20"></line>
+            <line x1="3" y1="19" x2="5" y2="21"></line>
+          </svg>
+        </div>
+        <div class="bento-info">
+            <span class="bento-title">1v1 Battle</span>
+            <span class="bento-desc">Online Multiplayer</span>
+        </div>
+      </button>
+
     </div>
+
 
     <!-- Test Configuration Section -->
     <div class="config-card fade-in stagger-2">
@@ -2692,7 +2778,7 @@ body.light-mode .magic-particle {
         <div class="header-subtitle">"Improve your typing speed while playing."</div>
         <div class="games-controls-bar">
             <button id="backToMainFromGames" class="dest-btn-secondary">← Back to Main Menu</button>
-            <button id="toggleAudioBtn" class="dest-btn-secondary">🔊 Sound: ON</button>
+            <button id="toggleAudioBtn" class="dest-btn-secondary"> Sound: ON</button>
         </div>
     </div>
 
@@ -2701,9 +2787,9 @@ body.light-mode .magic-particle {
         <!-- GAME 01 -->
         <div class="game-card" data-game="spaceTyper">
             <div class="game-card-tag">GAME 01</div>
-            <h3>SPACE TYPER 🚀</h3>
+            <h3>SPACE TYPER </h3>
             <p>Type to destroy incoming enemies.</p>    <div class="mini-leaderboard" onclick="window.showLeaderboard('spaceTyper')">
-                <div class="mini-lb-title">🏆 Top 3 Global 🏆</div>
+                <div class="mini-lb-title"> Top 3 Global </div>
                 <div id="mini-lb-spaceTyper">
                     <div style="text-align:center; font-size:0.75rem; color:#64748b;">Loading Live Ranks...</div>
                 </div>
@@ -2726,9 +2812,9 @@ body.light-mode .magic-particle {
         <!-- GAME 02 -->
         <div class="game-card" data-game="wordRush">
             <div class="game-card-tag">GAME 02</div>
-            <h3>WORD RUSH ⚡</h3>
+            <h3>WORD RUSH </h3>
             <p>Type words before they disappear.</p><div class="mini-leaderboard" onclick="window.showLeaderboard('wordRush')">
-    <div class="mini-lb-title">🏆 Top 3 Global 🏆</div>
+    <div class="mini-lb-title"> Top 3 Global</div>
     <div id="mini-lb-wordRush">
         <div style="text-align:center; font-size:0.75rem; color:#64748b;">Loading Live Ranks...</div>
     </div>
@@ -2752,9 +2838,9 @@ body.light-mode .magic-particle {
         <!-- GAME 03 -->
         <div class="game-card" data-game="typingRacer">
             <div class="game-card-tag">GAME 03</div>
-            <h3>TYPING RACER 🏎️</h3>
+            <h3>TYPING RACER </h3>
             <p>Type faster to reach the finish line.</p><div class="mini-leaderboard" onclick="window.showLeaderboard('typingRacer')">
-    <div class="mini-lb-title">🏆 Top 3 Global 🏆</div>
+    <div class="mini-lb-title"> Top 3 Global </div>
     <div id="mini-lb-typingRacer">
         <div style="text-align:center; font-size:0.75rem; color:#64748b;">Loading Live Ranks...</div>
     </div>
@@ -2778,9 +2864,9 @@ body.light-mode .magic-particle {
         <!-- GAME 04 -->
         <div class="game-card" data-game="keyboardNinja">
             <div class="game-card-tag">GAME 04</div>
-            <h3>KEYBOARD NINJA ⚔️</h3>
+            <h3>KEYBOARD NINJA </h3>
             <p>Type falling words before they hit bottom.</p><div class="mini-leaderboard" onclick="window.showLeaderboard('keyboardNinja')">
-    <div class="mini-lb-title">🏆 Top 3 Global 🏆</div>
+    <div class="mini-lb-title"> Top 3 Global </div>
     <div id="mini-lb-keyboardNinja">
         <div style="text-align:center; font-size:0.75rem; color:#64748b;">Loading Live Ranks...</div>
     </div>
@@ -2804,9 +2890,9 @@ body.light-mode .magic-particle {
         <!-- GAME 05 -->
         <div class="game-card" data-game="typingSurvivor">
             <div class="game-card-tag">GAME 05</div>
-            <h3>TYPING SURVIVOR 🛡️</h3>
+            <h3>TYPING SURVIVOR </h3>
             <p>Survive incoming enemy waves with typing.</p><div class="mini-leaderboard" onclick="window.showLeaderboard('typingSurvivor')">
-    <div class="mini-lb-title">🏆 Top 3 Global 🏆</div>
+    <div class="mini-lb-title"> Top 3 Global </div>
     <div id="mini-lb-typingSurvivor">
         <div style="text-align:center; font-size:0.75rem; color:#64748b;">Loading Live Ranks...</div>
     </div>
@@ -2839,6 +2925,9 @@ body.light-mode .magic-particle {
             <span>Accuracy: <strong id="liveAcc">100%</strong></span>
             <span>Combo: <strong id="liveCombo">0x</strong></span>
             <span>Lives/HP: <strong id="liveLives">❤️ 3</strong></span>
+                 <span id="arena-opp-score-ui" style="display: none; background: rgba(239, 68, 68, 0.2); padding: 2px 10px; border-radius: 6px; border: 1px solid rgba(239, 68, 68, 0.5);">
+                ⚔️ <span id="arena-opp-name" style="color: #ef4444; margin-right: 5px;">Opp</span>: <strong id="arena-opp-score" style="color:#fff;">0</strong>
+            </span>
         </div>
         <div class="arena-buttons">
             <button id="pauseGameBtn" class="dest-btn-secondary">⏸ PAUSE</button>
@@ -2896,8 +2985,129 @@ body.light-mode .magic-particle {
     </div>
 </div>
 
+<!-- ⚔️ 1v1 MULTIPLAYER RESULT MODAL -->
+<div id="vs-result-modal" class="dest-modal hidden" style="z-index: 9999999;">
+    <div class="dest-modal-content" style="border-color: #fbbf24; box-shadow: 0 0 50px rgba(251, 191, 36, 0.3); max-width: 450px;">
+        <h2 id="vs-res-title" style="font-size: 2.5rem; font-weight: 900; letter-spacing: 2px; margin-bottom: 5px;">VICTORY!</h2>
+        <p id="vs-res-status" style="color: #94a3b8; margin-bottom: 5px; font-weight: bold; letter-spacing: 1px;">You Dominated the Arena!</p>
+        
+        <!-- EXP Reward Text -->
+        <p id="vs-res-exp" style="color: #fbbf24; font-weight: 900; font-size: 1.2rem; margin-bottom: 25px; text-shadow: 0 0 10px rgba(251,191,36,0.5); display: none;">+50 EXP 🌟</p>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 25px;">
+            <!-- YOU -->
+            <div style="text-align: center; width: 40%;">
+                <div style="font-size: 0.8rem; color: #00ffcc; text-transform: uppercase; font-weight: bold; margin-bottom: 5px;">YOU</div>
+                <div id="vs-res-my-score" style="font-size: 2.2rem; font-weight: 900; color: #fff; font-family: 'JetBrains Mono', monospace;">0</div>
+            </div>
+            
+            <div style="font-size: 1.5rem; font-weight: 900; color: #ef4444; width: 20%;">VS</div>
+            
+            <!-- OPPONENT -->
+            <div style="text-align: center; width: 40%;">
+                <div id="vs-res-opp-name-ui" style="font-size: 0.8rem; color: #3b82f6; text-transform: uppercase; font-weight: bold; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Opponent</div>
+                <div id="vs-res-opp-score" style="font-size: 2.2rem; font-weight: 900; color: #fff; font-family: 'JetBrains Mono', monospace;">0</div>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+            <button onclick="MultiplayerEngine.playAgain()" class="dest-btn-primary" style="flex: 1; border-color: #00ffcc; color: #00ffcc; box-shadow: inset 0 0 15px rgba(0,255,204,0.2);">PLAY AGAIN</button>
+            <button onclick="MultiplayerEngine.closeResultAndExit()" class="dest-btn-secondary" style="flex: 1;">EXIT ARENA</button>
+        </div>
+    </div>
+</div>
 
     
+<!-- ⚔️ 1v1 CHALLENGE SELECTION MODAL -->
+<div id="vs-challenge-modal" class="modal-overlay hidden" onclick="if(event.target===this) closeChallengeModal()">
+  <div class="modal-box" style="max-width: 480px;">
+    <div class="flex-between mb-2">
+      <h3 style="color:var(--text-primary);font-size:1.4rem;font-weight:800;">1v1 <span style="color:#ef4444;">BATTLE ARENA</span></h3>
+    <button class="btn btn-outline btn-sm" style="margin-top: 25px;" onclick="cancelMatchmaking()">Cancel Search</button>
+
+    </div>
+    <p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom: 20px;">Select a game mode to challenge a random opponent globally.</p>
+
+    <!-- Games Grid -->
+    <div class="modal-game-grid" id="vs-games-grid">
+      <button class="vs-game-btn" onclick="start1v1Challenge('spaceTyper')">
+        <div class="vs-icon" style="color: #3b82f6;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 14.899A7 7 0 1 1 15.62 3.514a7 7 0 0 0 -11.62 11.385z"></path><path d="M8 12a4 4 0 1 0 8 0 4 4 0 1 0 -8 0"></path></svg></div>
+        Space Typer
+      </button>
+      
+      <button class="vs-game-btn" onclick="start1v1Challenge('wordRush')">
+        <div class="vs-icon" style="color: #eab308;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 3l0 7l6 0l-8 11l0 -7l-6 0l8 -11"></path></svg></div>
+        Word Rush
+      </button>
+
+      <button class="vs-game-btn" onclick="start1v1Challenge('typingRacer')">
+        <div class="vs-icon" style="color: #ec4899;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="7" cy="17" r="2"></circle><circle cx="17" cy="17" r="2"></circle><path d="M5 17h-2v-6l2 -5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0h-6m-6 -6h15m-6 0v-5"></path></svg></div>
+        Typing Racer
+      </button>
+
+      <button class="vs-game-btn" onclick="start1v1Challenge('keyboardNinja')">
+        <div class="vs-icon" style="color: #10b981;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 17.5l-11.5 -11.5l3 -3l11.5 11.5z"></path><path d="M13 19l6 -6"></path><path d="M16 16l4 4"></path><path d="M19 21l2 -2"></path></svg></div>
+        Ninja Strike
+      </button>
+
+      <button class="vs-game-btn" onclick="start1v1Challenge('typingSurvivor')">
+        <div class="vs-icon" style="color: #00e5ff;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3"></path></svg></div>
+        T. Survivor
+      </button>
+
+      <button class="vs-game-btn random-btn" onclick="start1v1Challenge('random')">
+        <div class="vs-icon" style="color: #ffffff;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 4l3 3l-3 3"></path><path d="M18 20l3 -3l-3 -3"></path><path d="M3 7h3a5 5 0 0 1 5 5a5 5 0 0 0 5 5h5"></path><path d="M21 7h-5a5 5 0 0 0 -5 5a5 5 0 0 1 -5 5h-3"></path></svg></div>
+        RANDOM ARENA
+      </button>
+    </div>
+    <!-- 🎲 Random Game Spinner UI (Hidden by default) -->
+    <div id="vs-spinner-ui" class="hidden" style="text-align: center; padding: 40px 0;">
+        <div style="color: var(--text-secondary); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 25px; font-weight: 700;">Rolling Arena...</div>
+        
+        <div id="spinner-box" style="background: rgba(0,0,0,0.3); border: 2px solid var(--glass-border); width: 140px; height: 140px; margin: 0 auto; border-radius: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: all 0.1s cubic-bezier(0.25, 0.8, 0.25, 1);">
+            <div id="spinner-icon" style="display: flex; align-items: center; justify-content: center;">
+                <svg width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2"><path d="M18 4l3 3l-3 3"></path><path d="M18 20l3 -3l-3 -3"></path><path d="M3 7h3a5 5 0 0 1 5 5a5 5 0 0 0 5 5h5"></path><path d="M21 7h-5a5 5 0 0 0 -5 5a5 5 0 0 1 -5 5h-3"></path></svg>
+            </div>
+            <div id="spinner-text" style="font-weight: 900; font-size: 1.1rem; color: #fff; text-transform: uppercase;">RANDOM</div>
+        </div>
+    </div>
+
+     <!-- Matchmaking Loading Screen (Hidden by default) -->
+    <style>@keyframes globalArenaSpin { 100% { transform: rotate(360deg); } }</style>
+    <div id="vs-matchmaking-ui" class="hidden" style="text-align: center; padding: 30px 0;">
+        
+        <!-- Searching State UI -->
+        <div id="vs-searching-state">
+            <div style="width: 50px; height: 50px; border: 4px solid rgba(239, 68, 68, 0.2); border-top-color: #ef4444; border-radius: 50%; animation: globalArenaSpin 1s linear infinite; margin: 0 auto 20px;"></div>
+            <div style="color: var(--text-primary); font-weight: 800; font-size: 1.1rem; letter-spacing: 2px;">SEARCHING OPPONENT...</div>
+            <div style="color: #ef4444; font-size: 0.85rem; margin-top: 8px; font-weight: 600;" id="vs-game-selected-text">Arena: Loading</div>
+            <button class="btn btn-outline btn-sm" style="margin-top: 25px;" onclick="cancelMatchmaking()">Cancel Search</button>
+        </div>
+
+        <!-- Match Found Premium UI (Hidden by default) -->
+        <div id="vs-match-found-ui" class="hidden" style="text-align: center; padding: 10px 0; animation: elegantSlideUp 0.5s;">
+            <div style="color: #10b981; font-weight: 900; font-size: 1.8rem; letter-spacing: 1px; margin-bottom: 15px; text-shadow: 0 0 15px rgba(16, 185, 129, 0.4);">MATCH FOUND! ⚔️</div>
+            
+            <div style="background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 12px; padding: 15px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                <div style="text-align: center; width: 40%;">
+                    <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">YOU</div>
+                    <div style="font-weight: 800; color: var(--text-primary); font-size: 1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" id="vs-my-name">Player</div>
+                </div>
+                
+                <div style="font-size: 1.5rem; font-weight: 900; color: #ef4444; width: 20%; text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);">VS</div>
+                
+                <div style="text-align: center; width: 40%;">
+                    <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">OPPONENT</div>
+                    <div style="font-weight: 800; color: #3b82f6; font-size: 1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" id="vs-opp-name">Loading...</div>
+                </div>
+            </div>
+            
+            <div style="color: #fbbf24; font-size: 0.9rem; font-weight: bold; font-family: 'JetBrains Mono', monospace;" id="vs-starting-timer">PREPARING ARENA IN 3...</div>
+        </div>
+    </div>
+  </div>
+</div>
+
 
 <!-- 🚀 PREMIUM SETTINGS MODAL -->
 <div id="settings-modal" class="modal-overlay hidden" onclick="if(event.target===this) closeSettingsModal()">
@@ -5006,11 +5216,74 @@ class SpaceTyperGame {
         this.sonicWaves = []; 
         
         this.words = {
-            easy: ["cat", "book", "road", "time", "work", "fast", "space", "light", "fire", "moon"],
-            medium: ["planet", "rocket", "future", "school", "typing", "system", "energy", "meteor", "shield", "laser"],
-            hard: ["technology", "adventure", "challenge", "important", "beautiful", "satellite", "gravity", "universe"],
-            extreme: ["determination", "responsibility", "extraordinary", "concentration", "achievement", "interstellar"]
-        };
+    easy: [
+        "apple", "book", "cat", "dog", "egg",
+        "fish", "game", "home", "ice", "jump",
+        "kite", "lamp", "moon", "name", "open",
+        "pen", "quick", "rain", "sun", "tree",
+        "use", "very", "water", "box", "yellow",
+        "zoo", "time", "work", "play", "good",
+        "fast", "slow", "light", "dark", "right",
+        "left", "hand", "world", "day", "night",
+        "friend", "school", "learn", "type", "key"
+    ],
+
+    medium: [
+        "about", "between", "computer", "different",
+        "energy", "future", "great", "health",
+        "internet", "journey", "keyboard", "language",
+        "morning", "number", "outside", "people",
+        "question", "quickly", "reason", "system",
+        "technology", "understand", "value", "world",
+        "example", "young", "zero", "practice",
+        "problem", "answer", "change", "create",
+        "develop", "family", "important", "learning",
+        "program", "project", "strong", "together",
+        "beautiful", "challenge", "knowledge", "success"
+    ],
+
+    hard: [
+        "achievement", "background", "communication",
+        "concentration", "determination", "environment",
+        "experience", "foundation", "government",
+        "information", "knowledge", "management",
+        "opportunity", "performance", "professional",
+        "qualification", "responsibility", "successful",
+        "technology", "understanding", "development",
+        "excellent", "flexibility", "organization",
+        "productive", "relationship", "significant",
+        "transformation", "valuable", "workplace",
+        "yesterday", "amazing", "objective", "creative",
+        "experience", "confidence", "discipline",
+        "improvement", "motivation", "accuracy",
+        "keyboard", "practice", "quickness", "complex"
+    ],
+
+    extreme: [
+        "acknowledgement", "biotechnology",
+        "characterization", "communication",
+        "determination", "electromagnetic",
+        "extraordinary", "flexibility",
+        "globalization", "hypercommunication",
+        "implementation", "interdisciplinary",
+        "justification", "knowledgeable",
+        "misunderstanding", "neuroscience",
+        "organizational", "personalization",
+        "qualification", "recommendation",
+        "responsibility", "synchronization",
+        "transformation", "unpredictable",
+        "visualization", "workstation",
+        "xenobiology", "youthfulness", "zigzag",
+        "accessibility", "configuration",
+        "administration", "investigation",
+        "identification", "representation",
+        "professionalism", "productivity",
+        "concentration", "international",
+        "technological", "extraordinary",
+        "characteristic", "comprehensive",
+        "compatibility", "independence"
+    ]
+};
 
         this.config = this.getDifficultyConfig(difficulty);
         
@@ -5731,11 +6004,64 @@ class WordRushGame {
         };
         
         this.words = {
-            easy: ["fast", "run", "zap", "bolt", "rush", "time", "quick", "flash", "spark", "wire"],
-            medium: ["electric", "thunder", "energy", "charge", "strike", "voltage", "speed", "panic", "storm"],
-            hard: ["lightning", "adrenaline", "velocity", "generator", "shockwave", "reaction", "overload"],
-            extreme: ["electromagnetic", "instantaneous", "hyperactive", "supercharged", "acceleration"]
-        };
+    easy: [
+        "code", "data", "byte", "pixel", "screen",
+        "mouse", "file", "folder", "click", "save",
+        "load", "robot", "cyber", "digital", "signal",
+        "server", "cloud", "app", "web", "link",
+        "scan", "drive", "chip", "tech", "hack",
+        "sync", "upload", "download", "online", "user",
+        "input", "output", "host", "node", "port",
+        "tab", "shift", "job", "quiz", "xray",
+        "zinc"
+    ],
+
+    medium: [
+        "database", "software", "hardware", "network",
+        "browser", "website", "account", "password",
+        "security", "firewall", "wireless", "storage",
+        "monitor", "processor", "memory", "virtual",
+        "console", "terminal", "command", "interface",
+        "developer", "coding", "function", "variable",
+        "element", "protocol", "connection", "gateway",
+        "scanner", "backup", "archive", "device",
+        "mobile", "desktop", "application", "platform",
+        "jungle", "quartz"
+    ],
+
+    hard: [
+        "encryption", "cybersecurity", "architecture",
+        "programming", "algorithm", "automation",
+        "authentication", "verification", "intelligence",
+        "cyberspace", "infrastructure", "virtualization",
+        "optimization", "integration", "deployment",
+        "repository", "framework", "transmission",
+        "credentials", "permission", "protection",
+        "malware", "debugging", "execution", "operation",
+        "navigation", "resolution", "simulation",
+        "networking", "jacket", "jovial",
+        "xylophone", "zookeeper"
+    ],
+
+    extreme: [
+        "cryptographic", "decentralization",
+        "microarchitecture", "telecommunication",
+        "interoperability", "computational",
+        "electromagnetism", "nanotechnology",
+        "programmatically", "synchronization",
+        "authorization", "classification",
+        "digitalization", "reconstruction",
+        "compatibility", "multidimensional",
+        "cryptocurrency", "biocomputation",
+        "quantization", "decryption", "cybernetic",
+        "interconnection", "programmability",
+        "vortex", "knockdown", "cyberpunk",
+        "xenotransplant", "zoological",
+        "misconfiguration", "underutilized",
+        "juxtaposition", "knowledgeable",
+        "workflow", "expansion"
+    ]
+};
 
         this.config = this.getDifficultyConfig(difficulty);
         this.loopBind = this.gameLoop.bind(this);
@@ -6273,11 +6599,69 @@ class TypingRacerGame {
         };
 
         this.words = {
-            easy: ["fast", "road", "type", "drive", "speed", "city", "car", "boost", "neon", "gear"],
-            medium: ["rapid", "typing", "future", "engine", "highway", "motion", "clutch", "drift", "chase"],
-            hard: ["velocity", "challenge", "precision", "reaction", "keyboard", "performance", "overtake"],
-            extreme: ["electromagnetic", "acceleration", "transmission", "aerodynamic", "turbocharger"]
-        };
+    easy: [
+        "ant", "ball", "chair", "door", "ear",
+        "frog", "green", "hat", "islandic", "juice",
+        "king", "lake", "milk", "nest", "orange",
+        "queen", "river", "star", "train", "unit",
+        "vase", "window", "boxer", "yard", "zip",
+        "music", "bread", "cloudy", "dream", "garden",
+        "house", "idea", "jeans", "kind", "lemon",
+        "magic", "paper", "quiet", "road", "smile",
+        "table", "under", "visit", "warm", "xenon",
+        "youngster", "zone", "friends"
+    ],
+
+    medium: [
+        "animal", "bridge", "camera", "danger",
+        "engine", "forest", "golden", "hammer",
+        "jungle", "kitchen", "laptop", "market",
+        "nature", "object", "quality", "random",
+        "silver", "travel", "unique", "voice",
+        "weather", "oxygen", "youthful", "amazing",
+        "balance", "curious", "dynamic", "freedom",
+        "graphic", "honest", "logical", "maximum",
+        "normal", "powerful", "quickest", "reliable",
+        "special", "ultimate", "vibrant", "wizard",
+        "xylitol", "zodiac", "frequent", "boldness"
+    ],
+
+    hard: [
+        "abundance", "blueprint", "circulation",
+        "dictionary", "efficient", "frequency",
+        "geography", "hypothesis", "journalism",
+        "kilometer", "leadership", "mechanical",
+        "observation", "philosophy", "questionnaire",
+        "revolution", "scientific", "thoroughly",
+        "universal", "vocabulary", "whenever",
+        "xenophobia", "youngster", "zoology",
+        "ambitious", "breakthrough", "complexity",
+        "diversity", "explanation", "generation",
+        "hierarchy", "judgment", "landscape",
+        "mysterious", "precision", "remarkable",
+        "strategy", "technique", "wonderful",
+        "direction", "wisdom", "purpose"
+    ],
+
+    extreme: [
+        "abstraction", "benchmarking", "circumstantial",
+        "discrimination", "encyclopedic", "fragmentation",
+        "geometrically", "hypothetical", "jurisdiction",
+        "lexicographical", "metamorphosis", "nonlinear",
+        "orthographic", "pharmaceutical", "questioning",
+        "revolutionary", "subsequently", "transcendental",
+        "unquestionably", "voluminous", "wholesomeness",
+        "xenogenesis", "youthfulness", "zoologically",
+        "acknowledgment", "bureaucratically",
+        "conceptualization", "diversification",
+        "extraordinarily", "generalization",
+        "hierarchical", "justification", "legislative",
+        "multilingual", "normalization",
+        "phenomenological", "quantitative",
+        "recontextualization", "systematically",
+        "unprecedented", "worldwide"
+    ]
+};
 
         this.config = this.getDifficultyConfig(difficulty);
         this.loopBind = this.gameLoop.bind(this);
@@ -7245,11 +7629,57 @@ class KeyboardNinjaGame {
         };
         
         this.words = {
-            easy: ["cyber", "ninja", "blade", "slash", "ghost", "dark", "neon", "steel", "mask", "swift"],
-            medium: ["katana", "stealth", "shuriken", "sensei", "scroll", "strike", "combat", "spirit", "venom"],
-            hard: ["assassin", "invisible", "warrior", "precision", "discipline", "jujutsu", "chakra", "vengeance"],
-            extreme: ["assassination", "infiltrator", "concentration", "masterpiece", "merciless", "supernatural"]
-        };
+    easy: [
+        "ash", "blade", "coin", "dash", "echo",
+        "fox", "glove", "hero", "ink", "jewel",
+        "kick", "lock", "map", "ninja", "owl",
+        "punch", "quest", "crest", "shadow", "target",
+        "up", "van", "wave", "brick", "yarn",
+        "summit", "swift", "grip", "tap", "focus",
+        "zen", "dojo", "mark", "step", "skill", "speed"
+    ],
+
+    medium: [
+        "agile", "bounce", "combo", "deflect", "evasion",
+        "alert", "guardian", "hidden", "impact", "juggle",
+        "karate", "legend", "master", "samurai", "opponent",
+        "exact", "quickstep", "reflex", "stealth", "timing",
+        "upgrade", "victory", "warrior", "kindred", "yawning",
+        "zenith", "poise", "counter", "dodge", "force",
+        "flash", "grace", "motion", "rhythm", "strike",
+        "training", "velocity", "whirl", "zippy"
+    ],
+
+    hard: [
+        "acrobatics", "blitzkrieg", "coordination",
+        "dexterity", "executioner", "footwork",
+        "grappling", "handwork", "infiltration",
+        "javelin", "knuckle", "lightning", "maneuver",
+        "nightfall", "obstacle", "parrying", "rapidfire",
+        "retaliation", "sidestep", "method", "unbreakable",
+        "vigilance", "wavelength", "xenolith", "yonder",
+        "zigzagging", "awareness", "trial", "drill",
+        "evasive", "fearless", "query", "reaction",
+        "stamina", "tactical", "wariness", "mastery",
+        "momentum"
+    ],
+
+    extreme: [
+        "ambidextrous", "battlefield", "counterattack",
+        "defensiveness", "exhilaration", "ferocious",
+        "gymnastics", "hypervelocity", "improvisation",
+        "jittery", "kinematics", "lightningfast",
+        "multitasking", "neutralization", "overwhelming",
+        "perseverance", "quickfire", "reconnaissance",
+        "synchrony", "transcendence", "unpredictability",
+        "versatility", "whirlwind", "xenodochy",
+        "yesteryear", "serpentine", "anticipation",
+        "counterbalance", "resolve", "fluidity",
+        "hyperactive", "masterful", "exactness",
+        "reactionary", "strategically", "unconventional",
+        "weaponless", "xylophonic", "zestful"
+    ]
+};
 
         this.config = this.getDifficultyConfig(difficulty);
         this.loopBind = this.gameLoop.bind(this);
@@ -7996,12 +8426,67 @@ class TypingSurvivorGame {
         }
 
 
-        this.CONFIG = {
+                this.CONFIG = {
             maxHP: 5, startZ: 1000, meleeRange: 250, damageZ: 20, focalLength: 400,
             baseSpeed: this.getSpeed(difficulty), speedCap: 300, 
             pointsPerLetter: 10, pointsPerKill: 50, killsForHeal: 20, killsForGrenade: 10,
-            words: ["DILIGENT", "PRAGMATIC", "OBSCURE", "CANDID", "LUCID", "VITAL", "EFFICIENT", "ABANDON", "OMNIPRESENT", "INEVITABLE", "GULLIBLE", "FASTIDIOUS", "BELLIGERENT", "CAPRICIOUS", "DEFAMATION", "EMANCIPATE", "FRIVOLOUS", "GARRULOUS"]
+            words: {
+                easy: [
+                    "alarm", "blast", "crash", "enemy", "flee",
+                    "guard", "hazard", "injury", "jolt", "knock",
+                    "lifeline", "medic", "noise", "panic", "rapid",
+                    "rescue", "safe", "threat", "uphill", "vault",
+                    "warning", "xray", "yell", "zone", "ammo",
+                    "battle", "cover", "drift", "escape", "fight",
+                    "grenade", "hide", "shock", "leap", "knife",
+                    "last", "armor", "survive", "trap", "quilt"
+                ],
+                medium: [
+                    "ambush", "barricade", "critical", "defense",
+                    "emergency", "fortify", "gunfire", "hostile",
+                    "incoming", "jamming", "knockout", "lifeboat",
+                    "mission", "outpost", "patrol", "quicksand",
+                    "reinforce", "survival", "tremor", "unstable",
+                    "vulnerable", "watchtower", "xenon", "yielding",
+                    "zealous", "airdrop", "checkpoint", "caution",
+                    "evacuate", "flanking", "gearbox", "hunger",
+                    "isolate", "wilderness", "landmine", "nightmare",
+                    "overrun", "resistant", "shelter"
+                ],
+                hard: [
+                    "adversary", "breakthrough", "catastrophic",
+                    "disastrous", "evacuation", "firestorm",
+                    "groundzero", "hostility", "insurgency",
+                    "jeopardize", "knifework", "lockdown",
+                    "mayhem", "neutralize", "overpower",
+                    "quarantine", "counterstrike", "safeguard",
+                    "turbulence", "unarmed", "vulnerability",
+                    "watchfulness", "xenolith", "yearning",
+                    "zealotry", "aftershock", "battleground",
+                    "containment", "desperate", "extraction",
+                    "hazardous", "impenetrable", "nightfall",
+                    "perilous", "reinforcement", "resilience",
+                    "standpoint", "warzone"
+                ],
+                extreme: [
+                    "annihilation", "catastrophe", "countermeasure",
+                    "decontamination", "extermination", "fortification",
+                    "gravitational", "hypersensitive", "immobilization",
+                    "rationale", "kryptonite", "lifethreatening",
+                    "maneuverability", "neutralization", "overwhelming",
+                    "psychological", "quicksilver", "scouting",
+                    "selfpreservation", "territorial", "unrecoverable",
+                    "vindication", "weaponization", "xenograft",
+                    "yielding", "zerohour", "adaptability",
+                    "breathlessness", "counteroffensive",
+                    "disorientation", "environmental", "fragmentation",
+                    "groundbreaking", "hypervigilance", "incapacitated",
+                    "multifunctional", "overwhelmingly",
+                    "revolutionary", "jagged"
+                ]
+            }
         };
+
 
         this.STATE = { 
             isPlaying: false, score: 0, 
@@ -8340,10 +8825,20 @@ class TypingSurvivorGame {
         spawn() {
         if (!this.STATE.isPlaying) return;
         
-        // 🔥 UPPERCASE FIX
-        let wordList = (this.CONFIG.words && this.CONFIG.words.length > 0) ? this.CONFIG.words : ['SURVIVE'];
-        let word = wordList[Math.floor(Math.random() * wordList.length)].toUpperCase();
+                // 🔥 MULTI-DIFFICULTY & TUTOR MODE FIX
+        let wordList = ['SURVIVE'];
         
+        // Agar array hai (Tutor mode direct array bhejta hai)
+        if (Array.isArray(this.CONFIG.words)) {
+            wordList = this.CONFIG.words.length > 0 ? this.CONFIG.words : wordList;
+        } 
+        // Agar naya object wala config hai (Normal play mode)
+        else if (this.CONFIG.words && typeof this.CONFIG.words === 'object') {
+            wordList = this.CONFIG.words[this.difficulty] || this.CONFIG.words.medium;
+        }
+
+        let word = wordList[Math.floor(Math.random() * wordList.length)].toUpperCase();
+
         const el = document.createElement('div');
         el.className = 'ts-zombie';
         
@@ -9768,15 +10263,17 @@ function logoutGoogle() {
     </div>
     
     <!-- Game Selector -->
-    <div class="input-group mb-3">
+     <div class="input-group mb-3">
       <select id="leaderboard-game-select" class="search-input" onchange="window.showLeaderboard(this.value)">
-        <option value="spaceTyper">Space Typer 🚀</option>
-        <option value="wordRush">Word Rush ⚡</option>
-        <option value="typingRacer">Typing Racer 🏎️</option>
-        <option value="keyboardNinja">Keyboard Ninja ⚔️</option>
-        <option value="typingSurvivor">Typing Survivor 🛡️</option>
+        <option value="all" style="color: #fbbf24; font-weight: bold;"> All Games (Global Top)</option>
+        <option value="spaceTyper">Space Typer </option>
+        <option value="wordRush">Word Rush </option>
+        <option value="typingRacer">Typing Racer </option>
+        <option value="keyboardNinja">Keyboard Ninja </option>
+        <option value="typingSurvivor">Typing Survivor </option>
       </select>
     </div>
+
 
     <!-- Leaderboard List -->
     <div id="leaderboard-list" style="display:flex; flex-direction:column; gap:10px; max-height: 400px; overflow-y:auto; padding-right: 5px;">
@@ -9829,8 +10326,8 @@ function logoutGoogle() {
       } catch (e) { console.error("Error saving score: ", e); }
   };
 
-  // 🚀 FETCH & SHOW MAIN LEADERBOARD
-  window.showLeaderboard = async function(gameId = 'spaceTyper') {
+  // 🚀 FETCH & SHOW MAIN LEADERBOARD (WITH "ALL GAMES" SUPPORT)
+  window.showLeaderboard = async function(gameId = 'all') { // Default 'all' rakha hai
       const oldModal = document.getElementById('globalLeaderboardModal');
       if(oldModal) { oldModal.classList.add('hidden'); oldModal.style.display = 'none'; }
 
@@ -9840,18 +10337,61 @@ function logoutGoogle() {
       
       listContainer.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-secondary);">Scanning Database... ⏳</div>';
 
+      // 🎮 Game UI Meta Data (Colors & Icons)
+      const gameMeta = {
+          'spaceTyper': { name: 'Space Typer', icon: '🚀', color: '#3b82f6' },
+          'wordRush': { name: 'Word Rush', icon: '⚡', color: '#eab308' },
+          'typingRacer': { name: 'Typing Racer', icon: '🏎️', color: '#ec4899' },
+          'keyboardNinja': { name: 'Keyboard Ninja', icon: '⚔️', color: '#10b981' },
+          'typingSurvivor': { name: 'Typing Survivor', icon: '🛡️', color: '#00e5ff' }
+      };
+
       try {
-          const querySnapshot = await db.collection("leaderboards").doc(gameId).collection("scores").orderBy("score", "desc").limit(10).get();
+          let leaderboardData = [];
+
+          if (gameId === 'all') {
+              // 🌟 ALL GAMES LOGIC: Firebase se ek sath paancho games ka data fetch karo
+              const games = Object.keys(gameMeta);
+              const promises = games.map(gId =>
+                  db.collection("leaderboards").doc(gId).collection("scores").orderBy("score", "desc").limit(10).get()
+              );
+
+              const snapshots = await Promise.all(promises);
+
+              snapshots.forEach((snap, index) => {
+                  const gId = games[index];
+                  snap.forEach(doc => {
+                      let data = doc.data();
+                      data.gameId = gId; // Data mein game ka naam tag kar diya
+                      leaderboardData.push(data);
+                  });
+              });
+
+              // Combine kiye hue saare scores ko Highest to Lowest sort karo
+              leaderboardData.sort((a, b) => b.score - a.score);
+              
+              // Sirf Top 10 nikaal lo
+              leaderboardData = leaderboardData.slice(0, 10);
+
+          } else {
+              // 🎮 SINGLE GAME LOGIC (Pehle jaisa)
+              const snap = await db.collection("leaderboards").doc(gameId).collection("scores").orderBy("score", "desc").limit(10).get();
+              snap.forEach(doc => {
+                  let data = doc.data();
+                  data.gameId = gameId;
+                  leaderboardData.push(data);
+              });
+          }
+
           listContainer.innerHTML = '';
           
-          if(querySnapshot.empty) {
+          if(leaderboardData.length === 0) {
               listContainer.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-secondary);">No records found. Be the first!</div>';
               return;
           }
 
           let rank = 1;
-          querySnapshot.forEach((doc) => {
-              const data = doc.data();
+          leaderboardData.forEach((data) => {
               let rankStyle = "color: var(--text-secondary);";
               let medal = `#${rank}`;
               
@@ -9862,7 +10402,14 @@ function logoutGoogle() {
               let isMe = (typeof auth !== 'undefined' && auth.currentUser && auth.currentUser.uid === data.uid) ? 'border-left: 3px solid var(--type-correct);' : '';
               let dpPic = data.photoURL || `https://api.dicebear.com/7.x/bottts/svg?seed=${data.name}`;
 
-                         // 🔥 MAIN LIST HTML WITH DP (Fixed Layout)
+              // 🎯 GAME BADGE: Agar 'All' selected hai, toh player ke naam ke niche game ka badge dikhao
+              let meta = gameMeta[data.gameId];
+              let gameBadgeHtml = '';
+              if (gameId === 'all') {
+                  gameBadgeHtml = `<div style="color: ${meta.color}; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; margin-top: 4px; letter-spacing: 0.5px;">${meta.icon} ${meta.name}</div>`;
+              }
+
+              // 🔥 MAIN LIST HTML WITH DP & GAME BADGE
               listContainer.innerHTML += `
               <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.05); ${isMe} padding: 12px 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
                   <div style="display: flex; align-items: center; gap: 10px; width: 65%;">
@@ -9871,6 +10418,7 @@ function logoutGoogle() {
                       <div style="overflow: hidden; text-align: left;">
                           <div style="color: #ffffff; font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${data.name}</div>
                           <div style="color: #94a3b8; font-size: 0.75rem;">Acc: <span style="color:var(--type-correct);">${data.accuracy}%</span></div>
+                          ${gameBadgeHtml}
                       </div>
                   </div>
                   <div style="text-align: right; width: 35%;">
@@ -9882,6 +10430,7 @@ function logoutGoogle() {
               rank++;
           });
       } catch (e) {
+          console.error(e);
           listContainer.innerHTML = '<div style="text-align:center; padding:20px; color:#ff3333;">Network Error.</div>';
       }
   };
@@ -9983,6 +10532,959 @@ document.addEventListener('pointerdown', function(e) {
         }, 600);
     }
 });
+// ==========================================
+// ⚔️ 1v1 CHALLENGE LOGIC (WITH SPIN ANIMATION)
+// ==========================================
+let matchmakingTimeout = null;
+let spinTimeout = null;
+
+const vsGameMeta = [
+    { id: 'spaceTyper', name: 'Space Typer', color: '#3b82f6', icon: '<svg width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.62 3.514a7 7 0 0 0 -11.62 11.385z"></path><path d="M8 12a4 4 0 1 0 8 0 4 4 0 1 0 -8 0"></path></svg>' },
+    { id: 'wordRush', name: 'Word Rush', color: '#eab308', icon: '<svg width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3l0 7l6 0l-8 11l0 -7l-6 0l8 -11"></path></svg>' },
+    { id: 'typingRacer', name: 'Typing Racer', color: '#ec4899', icon: '<svg width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="17" r="2"></circle><circle cx="17" cy="17" r="2"></circle><path d="M5 17h-2v-6l2 -5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0h-6m-6 -6h15m-6 0v-5"></path></svg>' },
+    { id: 'keyboardNinja', name: 'Ninja Strike', color: '#10b981', icon: '<svg width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5l-11.5 -11.5l3 -3l11.5 11.5z"></path><path d="M13 19l6 -6"></path><path d="M16 16l4 4"></path><path d="M19 21l2 -2"></path></svg>' },
+    { id: 'typingSurvivor', name: 'T. Survivor', color: '#00e5ff', icon: '<svg width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3"></path></svg>' }
+];
+
+function openChallengeModal() {
+    document.body.classList.add('modal-open');
+    document.getElementById('vs-matchmaking-ui').classList.add('hidden');
+    document.getElementById('vs-spinner-ui').classList.add('hidden');
+    document.getElementById('vs-games-grid').style.display = 'grid';
+    document.getElementById('vs-challenge-modal').classList.remove('hidden');
+}
+
+function closeChallengeModal() {
+    document.body.classList.remove('modal-open');
+    document.getElementById('vs-challenge-modal').classList.add('hidden');
+    if(matchmakingTimeout) clearTimeout(matchmakingTimeout);
+    if(spinTimeout) clearTimeout(spinTimeout);
+}
+
+function start1v1Challenge(gameId) {
+    if(matchmakingTimeout) clearTimeout(matchmakingTimeout);
+    if(spinTimeout) clearTimeout(spinTimeout);
+
+    document.getElementById('vs-games-grid').style.display = 'none';
+
+    if (gameId === 'random') {
+        // 🔥 SPIN ANIMATION LOGIC
+        document.getElementById('vs-spinner-ui').classList.remove('hidden');
+        
+        const box = document.getElementById('spinner-box');
+        const iconDiv = document.getElementById('spinner-icon');
+        const textDiv = document.getElementById('spinner-text');
+        
+        let spinsCount = 0;
+        let maxSpins = 25; // Kitni baar ghume ga
+        let delay = 60; // Shuru ki speed (tezz)
+        let lastIndex = -1;
+
+        // Reset box style for spin
+        box.style.transform = 'scale(1)';
+        box.style.boxShadow = '0 10px 30px rgba(0,0,0,0.2)';
+
+        function spinWheel() {
+            // Naya random game uthao (purane wale se alag)
+            let newIndex = Math.floor(Math.random() * vsGameMeta.length);
+            while(newIndex === lastIndex) { newIndex = Math.floor(Math.random() * vsGameMeta.length); }
+            lastIndex = newIndex;
+            
+            let game = vsGameMeta[newIndex];
+            
+            // UI Update
+            iconDiv.innerHTML = game.icon;
+            iconDiv.style.color = game.color;
+            textDiv.innerText = game.name;
+            textDiv.style.color = game.color;
+            box.style.borderColor = game.color;
+            
+            // Pop effect
+            box.style.transform = 'scale(1.05)';
+            setTimeout(() => { box.style.transform = 'scale(1)'; }, delay / 2);
+
+            spinsCount++;
+
+            if (spinsCount < maxSpins) {
+                // Jaise-jaise spin end ke paas aayega, speed slow (delay zyada) hoti jayegi
+                if (spinsCount > maxSpins - 8) { delay += 40; } 
+                spinTimeout = setTimeout(spinWheel, delay);
+            } else {
+                // 🛑 SPINNER STOPS!
+                box.style.transform = 'scale(1.1)';
+                box.style.boxShadow = `0 0 40px ${game.color}60, inset 0 0 15px ${game.color}30`;
+                
+                // 1.5 second ruka rahega taaki user apna game dekh le, fir matchmaking shuru
+                spinTimeout = setTimeout(() => {
+                    document.getElementById('vs-spinner-ui').classList.add('hidden');
+                    proceedToMatchmaking(game.id);
+                }, 1500);
+            }
+        }
+        
+        spinWheel(); // Spin chalu karo
+        
+    } else {
+        // Agar direct koi game select kiya hai bina random ke
+        proceedToMatchmaking(gameId);
+    }
+}
+// ==========================================
+// ⚔️ REAL-TIME MULTIPLAYER ENGINE (RANK MINUS SYSTEM)
+// ==========================================
+const MultiplayerEngine = {
+    active: false, isBot: false, roomRef: null, gameId: null,
+    myRole: null, oppRole: null, oppName: '',
+    myScore: 0, oppScore: 0,
+    myStatus: 'playing', oppStatus: 'playing', 
+    syncInterval: null, botInterval: null, botTimeout: null, unsubscribe: null,
+    timeLeft: 60, timerInt: null,
+
+    startMatch: function(roomRef, role, oppName, isBot, gameId) {
+        this.active = true; this.roomRef = roomRef; this.gameId = gameId;
+        this.myRole = role; this.oppRole = role === 'player1' ? 'player2' : 'player1';
+        this.oppName = oppName; this.isBot = isBot;
+        this.myStatus = 'playing'; this.oppStatus = 'playing';
+        this.myScore = 0; this.oppScore = 0;
+        this.timeLeft = 60;
+
+        const p1 = document.getElementById('pauseGameBtn'); if (p1) p1.style.display = 'none';
+        const p2 = document.getElementById('ts-btn-pause'); 
+        if (p2) { p2.dataset.originalText = p2.innerText; p2.innerText = "EXIT"; p2.onclick = () => { if(window.typingGamesModule) window.typingGamesModule.exitToDashboard(); }; }
+
+        let vsStyle = document.getElementById('vs-nano-style');
+        if(!vsStyle) {
+            vsStyle = document.createElement('style');
+            vsStyle.id = 'vs-nano-style';
+            vsStyle.innerHTML = `
+                .arena-top-bar { justify-content: space-between !important; overflow: hidden !important; }
+                .arena-stats, .arena-buttons { min-width: 0 !important; }
+                @media (max-width: 450px) {
+                    .arena-top-bar { padding: 4px 4px !important; gap: 2px !important; }
+                    .arena-stats { gap: 4px !important; flex-shrink: 1 !important; }
+                    #liveScore, #liveCombo { font-size: 0.7rem !important; }
+                    #liveScore::before, #liveCombo::before { font-size: 0.7rem !important; margin-right: 2px !important; }
+                    #liveLives { font-size: 0.65rem !important; letter-spacing: -3px !important; }
+                    .arena-buttons { gap: 3px !important; flex-shrink: 0 !important; }
+                    #vs-timer-container { padding: 2px 4px !important; font-size: 0.6rem !important; flex-shrink: 0 !important; white-space: nowrap !important; }
+                    #arena-opp-score-ui { padding: 2px 4px !important; font-size: 0.6rem !important; flex-shrink: 1 !important; min-width: 0 !important; white-space: nowrap !important; }
+                    #arena-opp-name { max-width: 30px !important; overflow: hidden !important; text-overflow: ellipsis !important; display: inline-block !important; vertical-align: bottom !important; margin-right: 2px !important; }
+                    #exitGameBtn { padding: 2px 6px !important; font-size: 0.6rem !important; letter-spacing: 0 !important; margin-left: 2px !important; min-width: auto !important; flex-shrink: 0 !important; white-space: nowrap !important; }
+                }
+            `;
+            document.head.appendChild(vsStyle);
+        }
+
+        const oppUI = document.getElementById('arena-opp-score-ui');
+        const statsBar = document.getElementById('arenaLiveStats');
+        const btnBar = document.querySelector('.arena-buttons');
+        const exitBtn = document.getElementById('exitGameBtn');
+
+        if (statsBar) {
+            statsBar.style.flexWrap = 'nowrap'; statsBar.style.gap = '4px';
+            const children = statsBar.children;
+            if(children.length >= 3) {
+                children[1].style.setProperty('display', 'none', 'important'); 
+                children[2].style.setProperty('display', 'none', 'important'); 
+            }
+        }
+
+        if(oppUI) {
+            oppUI.style.display = 'flex'; oppUI.style.alignItems = 'center';
+            oppUI.style.padding = '2px 4px'; oppUI.style.fontSize = '0.65rem'; oppUI.style.whiteSpace = 'nowrap';
+            const oppNameEl = document.getElementById('arena-opp-name');
+            const oppScoreEl = document.getElementById('arena-opp-score');
+            
+            if(oppNameEl) oppNameEl.innerText = oppName.length > 4 ? oppName.substring(0, 3) + '.' : oppName;
+            if(oppScoreEl) oppScoreEl.innerText = '0';
+
+            let timerUI = document.getElementById('vs-timer-container');
+            if(!timerUI) {
+                timerUI = document.createElement('span');
+                timerUI.id = 'vs-timer-container';
+                timerUI.style.cssText = 'background: rgba(255, 234, 0, 0.15); padding: 2px 4px; border-radius: 4px; border: 1px solid rgba(255, 234, 0, 0.5); display: flex; align-items: center; gap: 2px; font-size: 0.65rem; white-space: nowrap; flex-shrink: 0;';
+                timerUI.innerHTML = `⏱️<strong id="vs-timer-text" style="color:#ffea00; font-family:'JetBrains Mono',monospace;">01:00</strong>`;
+            } else {
+                const timerText = document.getElementById('vs-timer-text');
+                if(timerText) { timerText.innerText = '01:00'; timerText.style.color = '#ffea00'; }
+            }
+
+            if (btnBar && exitBtn) {
+                btnBar.style.display = 'flex'; btnBar.style.flexWrap = 'nowrap'; btnBar.style.gap = '3px'; btnBar.style.alignItems = 'center';
+                btnBar.insertBefore(timerUI, exitBtn);
+                btnBar.insertBefore(oppUI, exitBtn);
+
+                exitBtn.style.padding = '2px 6px'; exitBtn.style.fontSize = '0.65rem';
+                exitBtn.style.backgroundColor = 'rgba(239, 68, 68, 0.15)'; exitBtn.style.borderColor = '#ef4444';
+                exitBtn.style.color = '#ef4444'; exitBtn.innerHTML = 'EXIT'; exitBtn.style.flexShrink = '0'; 
+            } else {
+                oppUI.parentNode.insertBefore(timerUI, oppUI);
+            }
+        }
+
+        if(isBot) { this.runBot(); } else { this.listenRoom(); this.startSync(); }
+        this.timerInt = setInterval(() => this.tickTimer(), 1000);
+        
+        setTimeout(() => {
+            if(window.typingGamesModule && window.typingGamesModule.activeGameInstance) {
+                const gameInst = window.typingGamesModule.activeGameInstance;
+                const isSurvivor = typeof gameInst.updateUI === 'function';
+                
+                if (isSurvivor) {
+                    const origUpdateUI = gameInst.updateUI.bind(gameInst);
+                    gameInst.updateUI = function() {
+                        try { origUpdateUI(); } catch(e) { }
+                        if(MultiplayerEngine.active && MultiplayerEngine.myStatus === 'playing') {
+                            MultiplayerEngine.updateMyScore(this.STATE.score || 0);
+                        }
+                    };
+                } else if (typeof gameInst.updateHUD === 'function') {
+                    const origUpdateHUD = gameInst.updateHUD.bind(gameInst);
+                    gameInst.updateHUD = function() {
+                        try { origUpdateHUD(); } catch(e) { }
+                        if(MultiplayerEngine.active && MultiplayerEngine.myStatus === 'playing') {
+                            let s = this.score !== undefined ? this.score : Math.floor(this.distance || 0);
+                            MultiplayerEngine.updateMyScore(s);
+                        }
+                    };
+                }
+
+                if (typeof gameInst.gameOver === 'function') {
+                    const origGameOver = gameInst.gameOver.bind(gameInst);
+                    gameInst.gameOver = function() {
+                        if(MultiplayerEngine.active) {
+                            MultiplayerEngine.stopLocalGame();
+                            let s = isSurvivor ? (this.STATE.score || 0) : (this.score !== undefined ? this.score : Math.floor(this.distance || 0));
+                            MultiplayerEngine.setGameOver(s); 
+                        } else {
+                            origGameOver();
+                        }
+                    };
+                }
+            }
+        }, 1000);
+    },
+
+    tickTimer: function() {
+        if(this.myStatus !== 'playing') return;
+        this.timeLeft--;
+        const timerUI = document.getElementById('vs-timer-text');
+        if(timerUI) {
+            let m = Math.floor(this.timeLeft / 60).toString().padStart(2, '0');
+            let s = (this.timeLeft % 60).toString().padStart(2, '0');
+            timerUI.innerText = `${m}:${s}`;
+            if(this.timeLeft <= 10) { timerUI.style.color = '#ff1744'; }
+        }
+        if(this.timeLeft <= 0) { this.handleTimeout(); }
+    },
+
+    handleTimeout: function() {
+        clearInterval(this.timerInt); this.myStatus = 'timeout'; this.stopLocalGame();
+        if(window.typingGamesModule && window.typingGamesModule.activeGameInstance) {
+            let inst = window.typingGamesModule.activeGameInstance;
+            let s = typeof inst.updateUI === 'function' ? (inst.STATE.score || 0) : (inst.score !== undefined ? inst.score : Math.floor(inst.distance || 0));
+            this.myScore = s;
+        }
+
+        const statsBar = document.getElementById('arenaLiveStats');
+        if(statsBar && !document.getElementById('vs-wait-msg')) {
+            const msg = document.createElement('span'); msg.id = 'vs-wait-msg';
+            msg.style.cssText = 'color:#fbbf24; font-size:0.8rem; margin-left:10px; font-weight:bold; flex-shrink:0;';
+            msg.innerHTML = `TIME'S UP! ⏳`; statsBar.appendChild(msg);
+        }
+
+        if(!this.isBot && this.roomRef) {
+            this.roomRef.update({ [`${this.myRole}.score`]: this.myScore, [`${this.myRole}.status`]: 'timeout' }).catch(()=>{});
+        } else if (this.isBot) {
+            this.oppStatus = 'timeout'; clearInterval(this.botInterval);
+        }
+        this.checkMatchEnd();
+    },
+
+    stopLocalGame: function() {
+        if(window.typingGamesModule && window.typingGamesModule.activeGameInstance) {
+            let inst = window.typingGamesModule.activeGameInstance;
+            if (typeof inst.updateUI === 'function') { inst.STATE.isPlaying = false; if(inst.loopId) cancelAnimationFrame(inst.loopId); } 
+            else { inst.state = 'GAMEOVER'; if(inst.loopReq) cancelAnimationFrame(inst.loopReq); }
+        }
+    },
+
+    updateMyScore: function(score) {
+        if(!this.active || this.myStatus !== 'playing') return;
+        this.myScore = score;
+    },
+
+    startSync: function() {
+        this.syncInterval = setInterval(() => {
+            if(this.roomRef && this.myStatus === 'playing') {
+                this.roomRef.update({ [`${this.myRole}.score`]: this.myScore }).catch(()=>{});
+            }
+        }, 1500);
+    },
+
+    listenRoom: function() {
+        this.unsubscribe = this.roomRef.onSnapshot((doc) => {
+            if(doc.exists) {
+                const data = doc.data(); const oppData = data[this.oppRole];
+                if(oppData) {
+                    this.oppScore = oppData.score || 0;
+                    const oppScoreEl = document.getElementById('arena-opp-score');
+                    if(oppScoreEl) oppScoreEl.innerText = this.oppScore;
+                    if(oppData.status !== 'playing') { this.oppStatus = oppData.status; this.checkMatchEnd(); }
+                }
+            } else {
+                if(this.myStatus === 'playing') { this.oppStatus = 'surrendered'; this.checkMatchEnd(true); }
+            }
+        });
+    },
+
+    runBot: function() {
+        this.botTimeout = setTimeout(() => {
+            if(!this.active || this.myStatus !== 'playing') return;
+            this.botInterval = setInterval(() => {
+                if(this.myStatus !== 'playing') return;
+                this.oppScore += Math.floor(Math.random() * 60) + 20; 
+                const oppScoreEl = document.getElementById('arena-opp-score');
+                if(oppScoreEl) oppScoreEl.innerText = this.oppScore;
+                if(Math.random() < 0.02 && this.oppScore > 500) {
+                    this.oppStatus = 'dead'; clearInterval(this.botInterval); this.checkMatchEnd();
+                }
+            }, 1500);
+        }, 3000); 
+    },
+
+    surrender: function() {
+        if(!this.active) return;
+        this.myStatus = 'surrendered'; clearInterval(this.timerInt);
+        if(!this.isBot && this.roomRef) { this.roomRef.update({ [`${this.myRole}.status`]: 'surrendered' }).catch(()=>{}); }
+        this.stopLocalGame(); this.showResultModal(false);
+    },
+
+    setGameOver: function(finalScore) { 
+        if(!this.active || this.myStatus !== 'playing') return;
+        this.myScore = finalScore; this.myStatus = 'dead'; clearInterval(this.timerInt);
+        
+        const statsBar = document.getElementById('arenaLiveStats');
+        if(statsBar && !document.getElementById('vs-wait-msg')) {
+            const msg = document.createElement('span'); msg.id = 'vs-wait-msg';
+            msg.style.cssText = 'color:#ef4444; font-size:0.8rem; margin-left:10px; font-weight:bold; flex-shrink:0;';
+            msg.innerHTML = `YOU DIED! 💀`; statsBar.appendChild(msg);
+        }
+        
+        if(!this.isBot && this.roomRef) { this.roomRef.update({ [`${this.myRole}.score`]: this.myScore, [`${this.myRole}.status`]: 'dead' }).catch(()=>{}); } 
+        else if (this.isBot) { this.oppStatus = 'timeout'; clearInterval(this.botInterval); }
+        this.checkMatchEnd();
+    },
+
+    checkMatchEnd: function(oppDisconnected = false) {
+        if (this.myStatus === 'playing') {
+            if (oppDisconnected || this.oppStatus === 'surrendered' || this.oppStatus === 'dead') {
+                this.myStatus = 'timeout'; clearInterval(this.timerInt); this.stopLocalGame();
+                this.showResultModal(oppDisconnected); return;
+            }
+        }
+        if (this.myStatus === 'surrendered' || this.myStatus === 'dead') {
+            this.stopLocalGame(); this.showResultModal(false); return;
+        }
+        if (this.myStatus === 'timeout' && this.oppStatus === 'timeout') {
+            this.showResultModal(false);
+        }
+    },
+
+    showResultModal: function(oppDisconnected) {
+        const waitMsg = document.getElementById('vs-wait-msg'); if (waitMsg) waitMsg.remove();
+        
+        const ls = document.getElementById('liveScore'); if(ls) ls.innerText = '0';
+        const lc = document.getElementById('liveCombo'); if(lc) lc.innerText = '0x';
+        const ll = document.getElementById('liveLives'); if(ll) ll.innerText = '❤️ 3';
+        const oppS = document.getElementById('arena-opp-score'); if(oppS) oppS.innerText = '0';
+
+        const vsModal = document.getElementById('vs-result-modal');
+        if(vsModal) { vsModal.classList.remove('hidden'); vsModal.style.display = 'flex'; }
+        
+        const title = document.getElementById('vs-res-title');
+        const status = document.getElementById('vs-res-status');
+        const expLabel = document.getElementById('vs-res-exp');
+        
+        if(document.getElementById('vs-res-my-score')) document.getElementById('vs-res-my-score').innerText = this.myScore;
+        if(document.getElementById('vs-res-opp-score')) document.getElementById('vs-res-opp-score').innerText = this.oppScore;
+        if(document.getElementById('vs-res-opp-name-ui')) document.getElementById('vs-res-opp-name-ui').innerText = this.oppName;
+
+        let isWin = false; let isDraw = false;
+
+        if (this.myStatus === 'surrendered') {
+            if(title) { title.innerText = "DEFEAT!"; title.style.color = "#ef4444"; }
+            if(status) status.innerText = "You Surrendered! 🏳️";
+            isWin = false;
+        } else if (this.myStatus === 'dead') {
+            if(title) { title.innerText = "DEFEAT!"; title.style.color = "#ef4444"; }
+            if(status) status.innerText = "You Died in Combat! 💀";
+            isWin = false;
+        } else if (oppDisconnected || this.oppStatus === 'surrendered') {
+            if(title) { title.innerText = "VICTORY!"; title.style.color = "#10b981"; }
+            if(status) status.innerText = "Opponent Fled the Arena! 🏃💨";
+            isWin = true;
+        } else if (this.oppStatus === 'dead') {
+            if(title) { title.innerText = "VICTORY!"; title.style.color = "#10b981"; }
+            if(status) status.innerText = "Opponent Died in Combat! 💀👑";
+            isWin = true;
+        } else if (this.myScore > this.oppScore) {
+            if(title) { title.innerText = "TIME'S UP! VICTORY!"; title.style.color = "#10b981"; }
+            if(status) status.innerText = "You Dominated the Arena! 👑";
+            isWin = true;
+        } else if (this.myScore < this.oppScore) {
+            if(title) { title.innerText = "TIME'S UP! DEFEAT!"; title.style.color = "#ef4444"; }
+            if(status) status.innerText = "Better luck next time.";
+            isWin = false;
+        } else {
+            if(title) { title.innerText = "DRAW!"; title.style.color = "#fbbf24"; }
+            if(status) status.innerText = "A Legendary Tie! ⚔️";
+            isDraw = true;
+        }
+
+        // 🔥 RANK PENALTY SYSTEM (MINUS LOGIC)
+        let expChange = isWin ? 50 : (isDraw ? 10 : -25); // Defeat pe sidha -25!
+
+        if(expLabel) { 
+            if (expChange > 0) {
+                expLabel.innerText = `+${expChange} EXP 🌟`; 
+                expLabel.style.color = '#fbbf24';
+                expLabel.style.textShadow = '0 0 10px rgba(251,191,36,0.5)';
+            } else {
+                // Red text with Skull for Minus EXP
+                expLabel.innerText = `${expChange} EXP 💀`; 
+                expLabel.style.color = '#ef4444';
+                expLabel.style.textShadow = '0 0 10px rgba(239,68,68,0.5)';
+            }
+            expLabel.style.display = 'block'; 
+        }
+
+        if (window.tutorData) { 
+            // Save EXP but never let it go below 0
+            window.tutorData.xp = Math.max(0, (window.tutorData.xp || 0) + expChange); 
+            if (typeof window.saveTutorData === 'function') window.saveTutorData(); 
+        }
+    },
+
+    playAgain: function() {
+        let gameToPlay = this.gameId;
+        const vsModal = document.getElementById('vs-result-modal');
+        if(vsModal) vsModal.classList.add('hidden');
+        this.cleanup();
+        
+        if (window.typingGamesModule) window.typingGamesModule.exitToDashboard(true);
+        setTimeout(() => { if(typeof proceedToMatchmaking === 'function') proceedToMatchmaking(gameToPlay); }, 500);
+    },
+
+    closeResultAndExit: function() {
+        const vsModal = document.getElementById('vs-result-modal');
+        if(vsModal) vsModal.classList.add('hidden');
+        this.cleanup();
+        if(window.typingGamesModule) window.typingGamesModule.exitToDashboard(true);
+    },
+
+    cleanup: function() {
+        this.active = false;
+        if(this.timerInt) clearInterval(this.timerInt);
+        if(this.syncInterval) clearInterval(this.syncInterval);
+        if(this.botInterval) clearInterval(this.botInterval);
+        if(this.botTimeout) clearTimeout(this.botTimeout);
+        if(this.unsubscribe) this.unsubscribe();
+        
+        let vsStyle = document.getElementById('vs-nano-style');
+        if (vsStyle) vsStyle.remove();
+
+        const statsBar = document.getElementById('arenaLiveStats');
+        if (statsBar) {
+            statsBar.style.flexWrap = ''; statsBar.style.gap = '';
+            const children = statsBar.children;
+            if(children.length >= 3) {
+                children[1].style.removeProperty('display');
+                children[2].style.removeProperty('display');
+            }
+        }
+
+        const btnBar = document.querySelector('.arena-buttons');
+        const exitBtn = document.getElementById('exitGameBtn');
+        if (btnBar && exitBtn) {
+            btnBar.style.display = ''; btnBar.style.flexWrap = ''; btnBar.style.gap = '';
+            exitBtn.style.padding = ''; exitBtn.style.fontSize = ''; exitBtn.style.backgroundColor = '';
+            exitBtn.style.borderColor = ''; exitBtn.style.color = ''; exitBtn.innerHTML = 'EXIT';
+            exitBtn.style.marginLeft = ''; exitBtn.style.minWidth = ''; exitBtn.style.flexShrink = '';
+        }
+
+        const oppUI = document.getElementById('arena-opp-score-ui');
+        if (oppUI) {
+            oppUI.style.display = 'none'; 
+            if (statsBar && oppUI.parentNode !== statsBar) { statsBar.appendChild(oppUI); }
+        }
+
+        const p1 = document.getElementById('pauseGameBtn'); if (p1) p1.style.display = '';
+        const p2 = document.getElementById('ts-btn-pause'); 
+        if (p2 && p2.dataset.originalText) { 
+            p2.innerText = p2.dataset.originalText; 
+            p2.onclick = () => {
+                const tsPauseOverlay = document.getElementById('ts-pause-overlay');
+                if(tsPauseOverlay) tsPauseOverlay.classList.add('active'); 
+                if(window.typingGamesModule && window.typingGamesModule.activeGameInstance) { window.typingGamesModule.activeGameInstance.STATE.isPlaying = false; }
+            }; 
+        }
+
+        const tUI = document.getElementById('vs-timer-container'); if(tUI) tUI.remove();
+        if(this.roomRef && this.myRole === 'player1') { this.roomRef.delete().catch(()=>{}); }
+        this.roomRef = null;
+    }
+};
+// 🛡️ MONKEY PATCH: Intercept Exit Button
+if (!window._exitPatchApplied) {
+    window._exitPatchApplied = true;
+    setTimeout(() => {
+        if(window.typingGamesModule) {
+            const origExit = window.typingGamesModule.exitToDashboard.bind(window.typingGamesModule);
+            window.typingGamesModule.exitToDashboard = function(forceSilent = false) {
+                if (MultiplayerEngine.active && !forceSilent) {
+                    if (confirm("Surrender the match? You will lose instantly and drop your rank! 🏳️")) { MultiplayerEngine.surrender(); }
+                    return; 
+                }
+                origExit(forceSilent);
+            };
+        }
+    }, 2000);
+}
+
+// ==========================================
+// ⚔️ MATCHMAKING LOGIC (WITH COUNTDOWN UI)
+// ==========================================
+let currentMatchmakingListener = null;
+let currentRoomRef = null;
+let matchCountdownInt = null;
+const botNames = ["Rahul99", "PriyaSharma", "VikasK", "Sneha2024", "AmanG", "KaranXD", "AnjaliS", "AdityaKing"];
+
+function showMatchFoundScreen(oppName, gameId, roomRef, role, isBot) {
+    // Hide cancel buttons so user doesn't interrupt countdown
+    document.querySelectorAll('#vs-challenge-modal button').forEach(b => b.style.display = 'none');
+    
+    // Hide searching spinner & show Match Found UI
+    const searchState = document.getElementById('vs-searching-state');
+    const matchFoundUI = document.getElementById('vs-match-found-ui');
+    
+    if(searchState) searchState.classList.add('hidden');
+    if(matchFoundUI) matchFoundUI.classList.remove('hidden');
+    
+    let myName = localStorage.getItem('dest_playerName') || 'Anonymous Ninja';
+    document.getElementById('vs-my-name').innerText = myName;
+    document.getElementById('vs-opp-name').innerText = oppName;
+
+    let count = 3;
+    const timerEl = document.getElementById('vs-starting-timer');
+    timerEl.innerText = `PREPARING ARENA IN ${count}...`;
+
+    // Start 3 second countdown before launching game
+    matchCountdownInt = setInterval(() => {
+        count--;
+        if(count > 0) {
+            timerEl.innerText = `PREPARING ARENA IN ${count}...`;
+        } else {
+            clearInterval(matchCountdownInt);
+            
+            // Restore UI for the next time they search
+            if(matchFoundUI) matchFoundUI.classList.add('hidden');
+            if(searchState) searchState.classList.remove('hidden');
+            document.querySelectorAll('#vs-challenge-modal button').forEach(b => b.style.display = '');
+            
+            closeChallengeModal();
+
+            if(window.typingGamesModule) window.typingGamesModule.startGame(gameId, 'medium');
+            MultiplayerEngine.startMatch(roomRef, role, oppName, isBot, gameId);
+        }
+    }, 1000);
+}
+
+async function proceedToMatchmaking(selectedGame) {
+    // Prepare UI correctly for searching
+    document.getElementById('vs-matchmaking-ui').classList.remove('hidden');
+    document.getElementById('vs-searching-state').classList.remove('hidden');
+    document.getElementById('vs-match-found-ui').classList.add('hidden');
+    
+    let gameNames = {
+        'spaceTyper': 'SPACE TYPER 🚀', 'wordRush': 'WORD RUSH ⚡', 
+        'typingRacer': 'TYPING RACER 🏎️', 'keyboardNinja': 'KEYBOARD NINJA ⚔️', 
+        'typingSurvivor': 'TYPING SURVIVOR 🛡️'
+    };
+    document.getElementById('vs-game-selected-text').innerText = "Arena: " + gameNames[selectedGame];
+
+    let playerName = localStorage.getItem('dest_playerName') || 'Anonymous Ninja';
+    let playerId = (typeof auth !== 'undefined' && auth.currentUser) ? auth.currentUser.uid : 'guest_' + Date.now();
+    let playerDP = localStorage.getItem('dest_playerDP') || `https://api.dicebear.com/7.x/bottts/svg?seed=${playerName}`;
+
+    const roomsRef = db.collection("matchmaking").doc(selectedGame).collection("rooms");
+    let matchFound = false; 
+
+    try {
+        const waitingRooms = await roomsRef.where("status", "==", "waiting").limit(1).get();
+
+        if (!waitingRooms.empty) {
+            matchFound = true;
+            const roomDoc = waitingRooms.docs[0];
+            currentRoomRef = roomDoc.ref;
+            let oppName = roomDoc.data().player1.name;
+
+            await currentRoomRef.update({
+                player2: { id: playerId, name: playerName, dp: playerDP, score: 0, status: 'playing' },
+                status: 'playing' 
+            });
+
+            // 🚀 Call visually stunning countdown UI!
+            showMatchFoundScreen(oppName, selectedGame, currentRoomRef, 'player2', false);
+
+        } else {
+            currentRoomRef = await roomsRef.add({
+                gameId: selectedGame, status: 'waiting',
+                player1: { id: playerId, name: playerName, dp: playerDP, score: 0, status: 'playing' },
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            currentMatchmakingListener = currentRoomRef.onSnapshot((doc) => {
+                const data = doc.data();
+                if (data && data.status === 'playing' && data.player2 && !matchFound) {
+                    matchFound = true;
+                    if (matchmakingTimeout) clearTimeout(matchmakingTimeout); 
+                    if (currentMatchmakingListener) currentMatchmakingListener(); 
+                    
+                    // 🚀 Call visually stunning countdown UI!
+                    showMatchFoundScreen(data.player2.name, selectedGame, currentRoomRef, 'player1', false);
+                }
+            });
+
+            // 🤖 BOT FALLBACK
+            matchmakingTimeout = setTimeout(async () => {
+                if (!matchFound) {
+                    matchFound = true; 
+                    if (currentMatchmakingListener) currentMatchmakingListener();
+                    if (currentRoomRef) { await currentRoomRef.delete().catch(e => console.log(e)); currentRoomRef = null; }
+
+                    let randomBotName = botNames[Math.floor(Math.random() * botNames.length)];
+                    
+                    // 🚀 Call visually stunning countdown UI!
+                    showMatchFoundScreen(randomBotName, selectedGame, null, 'player1', true);
+                }
+            }, 5000); 
+        }
+    } catch (error) {
+        console.error("Matchmaking Error: ", error);
+        alert("Server connection failed. Try again.");
+        closeChallengeModal();
+    }
+}
+
+async function cancelMatchmaking() {
+    if (matchmakingTimeout) clearTimeout(matchmakingTimeout);
+    if (typeof spinTimeout !== 'undefined' && spinTimeout) clearTimeout(spinTimeout);
+    if (matchCountdownInt) clearInterval(matchCountdownInt);
+
+    document.querySelectorAll('#vs-challenge-modal button').forEach(b => b.style.display = '');
+
+    if (currentMatchmakingListener) { currentMatchmakingListener(); currentMatchmakingListener = null; }
+
+    if (currentRoomRef) {
+        try {
+            const doc = await currentRoomRef.get();
+            if (doc.exists && doc.data().status === 'waiting') { await currentRoomRef.delete(); }
+        } catch (e) {}
+        currentRoomRef = null;
+    }
+    closeChallengeModal();
+}
+
+// 🛡️ MONKEY PATCH: Intercept Exit Button to trigger Surrender in 1v1
+setTimeout(() => {
+    if(window.typingGamesModule) {
+        const origExit = window.typingGamesModule.exitToDashboard.bind(window.typingGamesModule);
+        window.typingGamesModule.exitToDashboard = function(forceSilent = false) {
+            if (MultiplayerEngine.active && !forceSilent) {
+                if (confirm("Surrender the match? You will lose instantly! 🏳️")) {
+                    MultiplayerEngine.surrender();
+                }
+                return; // Stop normal exit
+            }
+            origExit();
+        };
+    }
+}, 2000);
+
+
+// Ensure functions are global
+window.openChallengeModal = openChallengeModal;
+window.closeChallengeModal = closeChallengeModal;
+window.start1v1Challenge = start1v1Challenge;
+window.cancelMatchmaking = cancelMatchmaking;
+
+// ==========================================
+// 🚀 MASTER OVERRIDE: REMOVE 3..2..1 DEFAULT IN-GAME TIMER
+// ==========================================
+const skipDefaultTimer = function() {
+    // Timer wale kaale dhabbe (overlay) ko hamesha ke liye chhipa do
+    const overlay = document.getElementById('gameCountdownOverlay');
+    if(overlay) { 
+        overlay.classList.add('hidden'); 
+        overlay.style.display = 'none'; 
+    }
+    // Bina wait kiye seedha game start karo!
+    this.beginGameplay();
+};
+
+// Ye rule chaaro games par ek sath apply kar do
+if(typeof SpaceTyperGame !== 'undefined') SpaceTyperGame.prototype.startCountdown = skipDefaultTimer;
+if(typeof WordRushGame !== 'undefined') WordRushGame.prototype.startCountdown = skipDefaultTimer;
+if(typeof TypingRacerGame !== 'undefined') TypingRacerGame.prototype.startCountdown = skipDefaultTimer;
+if(typeof KeyboardNinjaGame !== 'undefined') KeyboardNinjaGame.prototype.startCountdown = skipDefaultTimer;
+// ==========================================
+// 🏎️ TYPING RACER SCORE FIX (FAIR MULTIPLAYER) - FIXED NAN BUG
+// ==========================================
+if (typeof TypingRacerGame !== 'undefined') {
+    // 1. Reset score jab game start ho
+    const origStart = TypingRacerGame.prototype.start;
+    TypingRacerGame.prototype.start = function() {
+        this.score = 0;
+        origStart.call(this);
+    };
+
+    // 2. Score sirf tab badhega jab word type hoga!
+    const origDestroy = TypingRacerGame.prototype.destroyObstacle;
+    TypingRacerGame.prototype.destroyObstacle = function(obs, isSuccess) {
+        if (isSuccess) {
+            if (this.score === undefined || isNaN(this.score)) this.score = 0;
+            
+            let currentCombo = this.combo || 0;
+            let comboMult = Math.min(5, 1 + Math.floor(currentCombo / 5));
+            
+            // 🔥 BUG FIX: TypingRacer ki config mein 'multiplier' nahi tha, isliye ab manual set kar diya
+            let diffMult = 1;
+            if (this.difficulty === 'medium') diffMult = 2;
+            else if (this.difficulty === 'hard') diffMult = 3.5;
+            else if (this.difficulty === 'extreme') diffMult = 5;
+
+            let pointsEarned = Math.round(obs.text.length * 10 * diffMult * comboMult);
+            this.score += pointsEarned;
+        }
+        origDestroy.call(this, obs, isSuccess); 
+    };
+
+    // 3. Top bar mein "m" hata kar Asli Score dikhao
+    TypingRacerGame.prototype.updateHUD = function() {
+        if (this.score === undefined || isNaN(this.score)) this.score = 0;
+        
+        const ls = document.getElementById('liveScore');
+        if(ls) ls.innerText = this.score; // Pure score, no 'm'
+        
+        const ll = document.getElementById('liveLives');
+        if(ll) ll.innerText = '❤️ '.repeat(Math.max(0, this.lives));
+        
+        const lc = document.getElementById('liveCombo');
+        if(lc) lc.innerText = this.combo + 'x';
+        
+        let mins = (Date.now() - this.startTime) / 60000;
+        if(mins > 0) this.wpm = Math.max(0, Math.round((this.correctKeystrokes / 5) / mins));
+        
+        const lw = document.getElementById('liveWpm');
+        if(lw) lw.innerText = this.wpm;
+    };
+
+    // 4. Result Screen aur Leaderboard mein bhi Asli Score save karo
+    const origGameOver = TypingRacerGame.prototype.gameOver;
+    TypingRacerGame.prototype.gameOver = function() {
+        if (this.score === undefined || isNaN(this.score)) this.score = 0;
+        this.distance = this.score; // Database save hone se pehle distance ko score se replace kar do
+        origGameOver.call(this);
+        const resScore = document.getElementById('resScore');
+        if(resScore) resScore.innerText = this.score.toLocaleString(); 
+    };
+}
+// ==========================================
+// 🌟 MASTER LEVEL & EXP ENGINE
+// ==========================================
+window.LevelEngine = {
+    getStats: function() {
+        let xp = 0;
+        // Fetch XP from Tutor Data (Updated by Tutor Missions & 1v1 Matches)
+        if(window.tutorData && window.tutorData.xp) xp = window.tutorData.xp;
+        
+        // Smooth scaling level formula
+        let level = Math.floor(Math.sqrt(xp / 50)) + 1;
+        
+        let currentLevelBaseXp = Math.pow(level - 1, 2) * 50;
+        let nextLevelBaseXp = Math.pow(level, 2) * 50;
+        let xpIntoLevel = xp - currentLevelBaseXp;
+        let xpNeeded = nextLevelBaseXp - currentLevelBaseXp;
+        let progress = Math.round((xpIntoLevel / xpNeeded) * 100);
+
+        // Awesome Ranks Titles
+        let title = "Bronze Tier";
+        if(level >= 5) title = "Silver Tier";
+        if(level >= 10) title = "Gold Tier";
+        if(level >= 20) title = "Diamond Tier";
+        if(level >= 30) title = "Conqueror";
+        if(level >= 50) title = "Grandmaster";
+
+        return { level, xp, progress, nextLevelBaseXp, title };
+    },
+    
+    updateUI: function() {
+        let stats = this.getStats();
+        
+        // 1. Update Account Modal UI
+        let lvlTxt = document.getElementById('acc-level-text');
+        if(lvlTxt) lvlTxt.innerText = `LVL ${stats.level} - ${stats.title}`;
+        
+        let xpTxt = document.getElementById('acc-xp-text');
+        if(xpTxt) xpTxt.innerText = `${stats.xp} / ${stats.nextLevelBaseXp} EXP`;
+        
+        let bar = document.getElementById('acc-xp-bar');
+        if(bar) bar.style.width = `${stats.progress}%`;
+
+        // 2. Update Nav Bar Profile Button (Dynamic Level Badge)
+        const navLoginBtn = document.getElementById('navLoginBtn');
+        if(navLoginBtn && (localStorage.getItem('dest_playerName') || (typeof auth !== 'undefined' && auth.currentUser))) {
+            let currentDP = localStorage.getItem('dest_playerDP') || `https://api.dicebear.com/7.x/bottts/svg?seed=${localStorage.getItem('dest_playerName')||'Guest'}`;
+            if (typeof auth !== 'undefined' && auth.currentUser && !localStorage.getItem('dest_playerDP')) {
+                currentDP = auth.currentUser.photoURL || currentDP;
+            }
+            
+            // Injecting the Profile Pic with a tiny floating Level Badge!
+            navLoginBtn.innerHTML = `
+                <div style="position:relative; display:inline-flex; align-items:center; justify-content:center;">
+                    <img src="${currentDP}" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent-primary);">
+                    <span style="position:absolute; bottom:-6px; right:-6px; background:#fbbf24; color:#000; font-size:0.6rem; font-weight:900; padding:1px 4px; border-radius:6px; border:1px solid #000; box-shadow: 0 0 5px rgba(251,191,36,0.8);">${stats.level}</span>
+                </div>
+            `;
+        }
+    }
+};
+
+// Auto-sync UI every 2 seconds to catch EXP updates instantly!
+setInterval(() => { if(window.LevelEngine) window.LevelEngine.updateUI(); }, 2000);
+
+// ==========================================
+// 🏆 OVERRIDE: FIREBASE SAVE SCORE (NOW INCLUDES LEVEL)
+// ==========================================
+window.submitToLeaderboard = async function(gameId, score, wpm, accuracy) {
+    if(score <= 0) return;
+    let playerName = localStorage.getItem('dest_playerName') || "Anonymous Ninja";
+    let userId = "guest_" + playerName.replace(/\s+/g, '').toLowerCase(); 
+    let userDP = localStorage.getItem('dest_playerDP') || `https://api.dicebear.com/7.x/bottts/svg?seed=${playerName}`;
+
+    if (typeof auth !== 'undefined' && auth.currentUser) {
+        playerName = localStorage.getItem('dest_playerName') || auth.currentUser.displayName || auth.currentUser.email.split('@')[0];
+        userId = auth.currentUser.uid;
+        if (!localStorage.getItem('dest_playerDP') && auth.currentUser.photoURL) {
+            userDP = auth.currentUser.photoURL; 
+        }
+    }
+
+    try {
+        const scoreRef = db.collection("leaderboards").doc(gameId).collection("scores").doc(userId);
+        const docSnap = await scoreRef.get();
+        if (docSnap.exists) {
+            const existingData = docSnap.data();
+            if (score <= existingData.score) return; 
+        }
+        await scoreRef.set({
+            name: playerName,
+            score: Number(score),
+            wpm: Number(wpm),
+            accuracy: Number(accuracy),
+            uid: userId,
+            photoURL: userDP,
+            level: window.LevelEngine.getStats().level, // 🔥 LEVEL PUSHED TO FIREBASE!
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        if(window.loadMiniLeaderboards) window.loadMiniLeaderboards();
+    } catch (e) { console.error("Error saving score: ", e); }
+};
+
+// ==========================================
+// 🏆 OVERRIDE: GLOBAL LEADERBOARD (NOW DISPLAYS LEVEL BADGES)
+// ==========================================
+window.showLeaderboard = async function(gameId = 'all') {
+    const oldModal = document.getElementById('globalLeaderboardModal');
+    if(oldModal) { oldModal.classList.add('hidden'); oldModal.style.display = 'none'; }
+
+    document.getElementById('leaderboard-modal').classList.remove('hidden');
+    document.getElementById('leaderboard-game-select').value = gameId;
+    const listContainer = document.getElementById('leaderboard-list');
+    listContainer.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-secondary);">Scanning Database... ⏳</div>';
+
+    const gameMeta = {
+        'spaceTyper': { name: 'Space Typer', icon: '🚀', color: '#3b82f6' },
+        'wordRush': { name: 'Word Rush', icon: '⚡', color: '#eab308' },
+        'typingRacer': { name: 'Typing Racer', icon: '🏎️', color: '#ec4899' },
+        'keyboardNinja': { name: 'Keyboard Ninja', icon: '⚔️', color: '#10b981' },
+        'typingSurvivor': { name: 'Typing Survivor', icon: '🛡️', color: '#00e5ff' }
+    };
+
+    try {
+        let leaderboardData = [];
+        if (gameId === 'all') {
+            const games = Object.keys(gameMeta);
+            const promises = games.map(gId => db.collection("leaderboards").doc(gId).collection("scores").orderBy("score", "desc").limit(10).get());
+            const snapshots = await Promise.all(promises);
+            snapshots.forEach((snap, index) => {
+                const gId = games[index];
+                snap.forEach(doc => { let data = doc.data(); data.gameId = gId; leaderboardData.push(data); });
+            });
+            leaderboardData.sort((a, b) => b.score - a.score);
+            leaderboardData = leaderboardData.slice(0, 10);
+        } else {
+            const snap = await db.collection("leaderboards").doc(gameId).collection("scores").orderBy("score", "desc").limit(10).get();
+            snap.forEach(doc => { let data = doc.data(); data.gameId = gameId; leaderboardData.push(data); });
+        }
+
+        listContainer.innerHTML = '';
+        if(leaderboardData.length === 0) {
+            listContainer.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-secondary);">No records found. Be the first!</div>';
+            return;
+        }
+
+        let rank = 1;
+        leaderboardData.forEach((data) => {
+            let rankStyle = "color: var(--text-secondary);";
+            let medal = `#${rank}`;
+            if(rank === 1) { medal = "🥇"; rankStyle = "color: #ffd700; text-shadow: 0 0 10px rgba(255,215,0,0.5); font-size: 1.2rem;"; }
+            else if(rank === 2) { medal = "🥈"; rankStyle = "color: #e2e8f0; font-size: 1.1rem;"; }
+            else if(rank === 3) { medal = "🥉"; rankStyle = "color: #cd7f32; font-size: 1.1rem;"; }
+
+            let isMe = (typeof auth !== 'undefined' && auth.currentUser && auth.currentUser.uid === data.uid) ? 'border-left: 3px solid var(--type-correct);' : '';
+            let dpPic = data.photoURL || `https://api.dicebear.com/7.x/bottts/svg?seed=${data.name}`;
+
+            let meta = gameMeta[data.gameId];
+            let gameBadgeHtml = '';
+            if (gameId === 'all') {
+                gameBadgeHtml = `<div style="color: ${meta.color}; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; margin-top: 4px; letter-spacing: 0.5px;">${meta.icon} ${meta.name}</div>`;
+            }
+
+            // 🔥 NEW: LEVEL BADGE HTML INJECTED NEXT TO NAME
+            let playerLevelBadge = data.level ? `<span style="background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.4); font-size: 0.55rem; padding: 2px 4px; border-radius: 4px; margin-left: 6px; font-weight: 900; vertical-align: middle; box-shadow: 0 0 5px rgba(251,191,36,0.2);">LVL ${data.level}</span>` : '';
+
+            listContainer.innerHTML += `
+            <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.05); ${isMe} padding: 12px 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+                <div style="display: flex; align-items: center; gap: 10px; width: 65%;">
+                    <div style="font-weight: 900; width: 25px; text-align: center; ${rankStyle}">${medal}</div>
+                    <img src="${dpPic}" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 2px solid #334155; flex-shrink: 0;">
+                    <div style="overflow: hidden; text-align: left;">
+                        <div style="color: #ffffff; font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center;">${data.name} ${playerLevelBadge}</div>
+                        <div style="color: #94a3b8; font-size: 0.75rem;">Acc: <span style="color:var(--type-correct);">${data.accuracy}%</span></div>
+                        ${gameBadgeHtml}
+                    </div>
+                </div>
+                <div style="text-align: right; width: 35%;">
+                    <div style="color: var(--accent-primary); font-weight: 800; font-size: 1.05rem; white-space: nowrap;">${data.score.toLocaleString()} <span style="font-size: 0.6rem; color: #94a3b8;">PTS</span></div>
+                    <div style="color: #a855f7; font-size: 0.8rem; font-weight: bold; white-space: nowrap;">${data.wpm} WPM</div>
+                </div>
+            </div>`;
+            rank++;
+        });
+    } catch (e) { console.error(e); listContainer.innerHTML = '<div style="text-align:center; padding:20px; color:#ff3333;">Network Error.</div>'; }
+};
 
 </script>
 <!-- 👤 MY ACCOUNT MODAL -->
@@ -10004,6 +11506,16 @@ document.addEventListener('pointerdown', function(e) {
             <input type="file" id="acc-dp-upload" accept="image/*" style="display: none;" onchange="handleDPSelect(event)">
         </div>
         <div style="font-size: 0.7rem; color: var(--text-secondary);">Image will auto-compress to < 100KB</div>
+        <!-- 🔥 NEW: LEVEL & EXP PROGRESS BAR -->
+        <div style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); border-radius: 12px; padding: 15px; margin-bottom: 15px; text-align: left;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span id="acc-level-text" style="color: #fbbf24; font-weight: 900; font-size: 1.1rem; letter-spacing: 1px; text-shadow: 0 0 10px rgba(251,191,36,0.5);">LVL 1 - Bronze Tier</span>
+                <span id="acc-xp-text" style="color: var(--text-secondary); font-size: 0.75rem; font-weight: bold; font-family: 'JetBrains Mono', monospace;">0 / 50 EXP</span>
+            </div>
+            <div style="width: 100%; height: 8px; background: rgba(0,0,0,0.6); border-radius: 4px; overflow: hidden; box-shadow: inset 0 0 5px rgba(0,0,0,0.5);">
+                <div id="acc-xp-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #fbbf24, #f59e0b); box-shadow: 0 0 10px #fbbf24; transition: width 0.5s ease-out;"></div>
+            </div>
+        </div>
 
         <!-- Name Edit -->
         <div class="input-group w-full" style="text-align: left;">
