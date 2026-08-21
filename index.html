@@ -1485,73 +1485,124 @@ body:not(.focus-mode-active) .t-char.active {
     text-transform: uppercase; 
     box-shadow: 0 4px 10px rgba(59,130,246,0.3); 
 }
-.setup-title p { 
-    font-size: 0.85rem; 
-    color: var(--text-secondary); 
-    font-weight: 500; 
-    margin: 0; 
+/* ==============================================================
+   ✨ PREMIUM SETUP SCREEN CSS (REPLACE OLD BENTO/SETUP STYLES)
+============================================================== */
+
+/* 1. Header & Utility Icons (Sleek SVGs) */
+.setup-title h3 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+.util-icon-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: rgba(128,128,128,0.05);
+    border: 1px solid rgba(128,128,128,0.1);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: inset 0 2px 4px rgba(255,255,255,0.02);
+}
+.util-icon-btn:hover {
+    background: var(--bg-card);
+    transform: translateY(-3px);
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.05);
 }
 
-.utils-group { 
-    display: flex; 
-    gap: 8px; 
+/* 2. Soft & Deep Bento Cards (Glass Depth) */
+.bento-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 20px;
+    border-radius: 20px;
+    background: rgba(128,128,128,0.03);
+    border: 1px solid rgba(128,128,128,0.08);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    text-align: left;
 }
-.util-icon-btn { 
-    width: 42px; 
-    height: 42px; 
-    padding: 0; /* Faltu padding hatayi */
-    border-radius: 12px; 
-    background: rgba(128,128,128,0.08); 
-    border: 1px solid rgba(128,128,128,0.15); 
-    color: var(--text-primary); 
-    font-size: 1.2rem; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    cursor: pointer; 
-    transition: all 0.2s ease; 
-    outline: none; 
-    flex-shrink: 0; /* Button ko sikudne se rokega */
-}
-.util-icon-btn:hover { 
-    background: rgba(128,128,128,0.15); 
-    transform: translateY(-2px); 
-    border-color: var(--accent-primary); 
-    color: var(--accent-primary); 
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+.bento-card:hover {
+    border-color: rgba(59,130,246,0.3);
+    background: rgba(59,130,246,0.03);
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.05);
 }
 
+/* 3. Tinted Icons inside Cards */
+.bento-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.bento-icon svg { width: 24px; height: 24px; }
+/* Premium Color Tints */
+.bento-card:nth-child(1) .bento-icon { background: rgba(251, 191, 36, 0.15); color: #fbbf24; } 
+.bento-card:nth-child(2) .bento-icon { background: rgba(59, 130, 246, 0.15); color: #3b82f6; } 
+.bento-card:nth-child(3) .bento-icon { background: rgba(16, 185, 129, 0.15); color: #10b981; } 
 
-/* Bento Grid System */
-.bento-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
-.bento-card { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 16px; background: rgba(128,128,128,0.05); border: 1px solid rgba(128,128,128,0.1); cursor: pointer; transition: all 0.3s ease; text-align: left; }
-.bento-card.full-width { grid-column: 1 / -1; }
-.bento-card:hover { border-color: var(--accent-primary); background: rgba(59,130,246,0.05); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
-.bento-icon { font-size: 1.6rem; background: rgba(255,255,255,0.08); width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 2px 4px rgba(255,255,255,0.05); }
-.bento-info { display: flex; flex-direction: column; }
-.bento-title { font-weight: 700; font-size: 0.95rem; color: var(--text-primary); letter-spacing: 0.3px; }
-.bento-desc { font-size: 0.7rem; color: var(--text-secondary); margin-top: 2px; }
+/* 4. Sleek Input Fields */
+.search-input {
+    background: rgba(128,128,128,0.05);
+    border: 1.5px solid rgba(128,128,128,0.15);
+    border-radius: 14px;
+    padding: 16px 20px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+    transition: all 0.2s ease;
+}
+.search-input:focus, .search-input:hover {
+    border-color: var(--accent-primary);
+    background: rgba(128,128,128,0.08);
+    box-shadow: 0 0 0 4px rgba(59,130,246,0.15);
+}
 
-/* Clean Config Card */
-.config-card { background: transparent; border: 1px solid rgba(128,128,128,0.15); border-radius: 16px; padding: 20px; margin-bottom: 24px; }
-.config-header { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 800; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
-.config-header::after { content: ''; flex: 1; height: 1px; background: rgba(128,128,128,0.15); }
+/* 5. Irresistible Premium Button */
+.ultimate-start-btn {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    color: #ffffff !important;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 18px;
+    padding: 18px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.1);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.ultimate-start-btn:hover {
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.2);
+}
+.ultimate-start-btn span {
+    transition: transform 0.2s;
+    display: inline-block;
+}
+.ultimate-start-btn:hover span {
+    transform: translateX(6px);
+}
 
-.search-input { width: 100%; padding: 14px 16px; border-radius: 12px; background: rgba(128,128,128,0.06); border: 1px solid rgba(128,128,128,0.2); color: var(--text-primary); font-size: 0.95rem; font-weight: 600; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill="%23888" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>'); background-repeat: no-repeat; background-position: right 14px center; transition: all 0.2s; }
-.search-input:focus { border-color: var(--accent-primary); background: rgba(128,128,128,0.1); box-shadow: 0 0 0 4px rgba(59,130,246,0.15); outline: none; }
+/* Light Mode Overrides for Crisp Display */
+body.light-mode .util-icon-btn { background: #ffffff; border-color: #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+body.light-mode .util-icon-btn:hover { box-shadow: 0 8px 20px rgba(59,130,246,0.15); }
+body.light-mode .bento-card { background: #ffffff; border-color: #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+body.light-mode .bento-card:hover { background: #f8fafc; box-shadow: 0 15px 35px rgba(59,130,246,0.1); }
+body.light-mode .search-input { background: #f8fafc; border-color: #e2e8f0; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
+body.light-mode .ultimate-start-btn { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); box-shadow: 0 10px 25px rgba(15,23,42,0.25); }
 
-/* The Solid Invert CTA Button */
-.ultimate-start-btn { width: 100%; background: var(--text-primary); color: var(--bg-base) !important; border: none; padding: 18px; font-size: 1.1rem; border-radius: 14px; font-weight: 800; letter-spacing: 1px; cursor: pointer; transition: all 0.3s ease; display: flex; justify-content: center; align-items: center; gap: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); outline: none; }
-.ultimate-start-btn:hover { transform: translateY(-3px); opacity: 0.9; box-shadow: 0 12px 25px rgba(0,0,0,0.3); }
-
-/* LIGHT MODE OVERRIDES FOR CRISP LOOK */
-body.light-mode .bento-card { background: #ffffff; border-color: rgba(0,0,0,0.08); box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
-body.light-mode .bento-card:hover { border-color: var(--accent-primary); box-shadow: 0 10px 25px rgba(59,130,246,0.1); background: #f8fafc; }
-body.light-mode .bento-icon { background: #f1f5f9; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
-body.light-mode .util-icon-btn { background: #ffffff; border-color: rgba(0,0,0,0.1); box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-body.light-mode .config-card { background: #ffffff; border-color: rgba(0,0,0,0.08); box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
-body.light-mode .search-input { background: #f8fafc; border-color: rgba(0,0,0,0.1); }
-body.light-mode .ultimate-start-btn { background: #0f172a; color: #ffffff !important; box-shadow: 0 8px 20px rgba(15,23,42,0.2); }
 /* Leaderboard Custom Styles */
 #leaderboardContainer::-webkit-scrollbar { width: 6px; }
 #leaderboardContainer::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 4px; }
@@ -1596,6 +1647,417 @@ body.light-mode .ultimate-start-btn { background: #0f172a; color: #ffffff !impor
 .mini-lb-title { font-size: 0.7rem; color: #fbbf24; text-align: center; font-weight: 800; letter-spacing: 1px; margin-bottom: 8px; text-transform: uppercase; text-shadow: 0 0 5px rgba(251, 191, 36, 0.4); }
 .lb-dp-main { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 2px solid #334155; }
 .lb-dp-mini { width: 18px; height: 18px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.2); }
+/* ==============================================================
+   🛠️ QUICK FIX: MOBILE ALIGNMENT & TEXT HIERARCHY
+============================================================== */
+
+/* 1. Icons ko wapas ek horizontal line mein lana */
+.utils-group {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+}
+
+/* 2. Card ke text ko properly Title aur Description mein divide karna */
+.bento-info {
+    display: flex;
+    flex-direction: column;
+}
+.bento-title {
+    font-weight: 800;
+    font-size: 1.05rem;
+    color: var(--text-primary);
+    letter-spacing: 0.3px;
+}
+.bento-desc {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+/* 3. Mobile Screens ke liye Perfect Spacing */
+@media (max-width: 768px) {
+    .bento-grid {
+        grid-template-columns: 1fr; /* Mobile pe cards vertically aayenge taaki padhne me aasan ho */
+        gap: 15px;
+    }
+    .setup-header {
+        flex-direction: column;
+        gap: 15px;
+    }
+    .utils-group {
+        justify-content: flex-start;
+    }
+}
+/* ==============================================================
+   🛠️ FINAL FIX: FULL WIDTH CARDS & BUTTON
+============================================================== */
+.bento-card {
+    width: 100%;
+}
+
+.ultimate-start-btn {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+/* ==============================================================
+   🛠️ SPACING & ALIGNMENT FIX (Force Margins)
+============================================================== */
+.bento-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    margin-bottom: 24px !important;
+    width: 100%;
+}
+
+.config-card {
+    margin-bottom: 24px !important;
+}
+
+.setup-header {
+    margin-bottom: 24px !important;
+}
+/* ==============================================================
+   👆 PREMIUM TOUCH FEEDBACK (MOBILE ACTIVE STATES)
+============================================================== */
+
+/* Faltu blue tap-highlight hatane ke liye (Premium apps me nahi hota) */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* 1. Bento Cards Press Effect */
+.bento-card:active {
+    transform: scale(0.96) !important; /* Andar ki taraf dabega */
+    background: rgba(59, 130, 246, 0.08) !important; /* Halka blue highlight */
+    border-color: var(--accent-primary) !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05) !important;
+}
+
+/* 2. Top Utility Icons Press Effect */
+.util-icon-btn:active {
+    transform: scale(0.90) !important; /* Thoda zyada squish hoga */
+    background: rgba(59, 130, 246, 0.15) !important;
+    color: var(--accent-primary) !important;
+    border-color: var(--accent-primary) !important;
+}
+body.light-mode .util-icon-btn:active {
+    background: #eff6ff !important; /* Light mode ke liye soft blue */
+}
+
+/* 3. Main Start Button Press Effect */
+.ultimate-start-btn:active {
+    transform: scale(0.96) !important;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2) !important;
+    opacity: 0.9;
+}
+/* ==============================================================
+   👆 GLOBAL PREMIUM TOUCH FEEDBACK (FOR ENTIRE SOFTWARE)
+============================================================== */
+
+/* 1. Universal Tap Highlight Removal (Faltu blue box hatane ke liye) */
+* {
+    -webkit-tap-highlight-color: transparent !important;
+}
+
+/* 2. ALL Standard & Premium Buttons (Main, Games, Data Entry, Survivor) */
+.btn:active,
+.dest-btn-primary:active,
+.dest-btn-secondary:active,
+.de-btn-main:active,
+.ultimate-start-btn:active,
+.ts-menu-btn:active,
+.ts-pause-btn:active {
+    transform: scale(0.95) !important; /* Button 5% chhota hoga */
+    opacity: 0.85 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+    transition: transform 0.05s ease !important; /* Ekdum instant dabega */
+}
+
+/* 3. ALL Clickable Cards (Setup, Games Dashboard, Tutor Roadmap) */
+.bento-card:active,
+.game-card:active,
+.tutor-lesson-card:active:not(.locked) {
+    transform: scale(0.97) !important;
+    border-color: var(--accent-primary) !important;
+    background: rgba(59, 130, 246, 0.08) !important; /* Soft blue tint */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+    transition: transform 0.05s ease !important;
+}
+
+/* 4. Small Utility Icons & Mini Elements (Top Icons, Mini Leaderboards) */
+.util-icon-btn:active,
+.mini-leaderboard:active {
+    transform: scale(0.88) !important; /* Chhote icons thode zyada dabenge */
+    border-color: var(--accent-primary) !important;
+    color: var(--accent-primary) !important;
+    background: rgba(59, 130, 246, 0.15) !important;
+    transition: transform 0.05s ease !important;
+}
+
+/* 5. Light Mode Exceptions (Light mode mein white/blue glow) */
+body.light-mode .bento-card:active,
+body.light-mode .game-card:active,
+body.light-mode .tutor-lesson-card:active:not(.locked) {
+    background: #eff6ff !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05) !important;
+}
+body.light-mode .util-icon-btn:active,
+body.light-mode .mini-leaderboard:active {
+    background: #e0f2fe !important;
+}
+/* ==============================================================
+   🚀 2026 SPATIAL UI UPGRADE (ULTRA PREMIUM LIGHT MODE)
+============================================================== */
+
+/* 1. App Container Background (Subtle Mesh Gradient) */
+body.light-mode {
+    background-color: #f1f5f9 !important;
+    background-image: 
+        radial-gradient(at 0% 0%, rgba(219, 234, 254, 0.8) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(243, 232, 255, 0.8) 0px, transparent 50%) !important;
+}
+
+/* 2. Main Box (Frosted Glass with Rim Light) */
+body.light-mode .app-container {
+    background: rgba(255, 255, 255, 0.55) !important;
+    backdrop-filter: blur(30px) saturate(150%) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(150%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.8) !important;
+    box-shadow: 
+        0 30px 60px rgba(0, 0, 0, 0.05), 
+        inset 0 1px 0 rgba(255,255,255,1) !important; /* Top light reflection */
+}
+
+/* 3. Bento Cards (3D Pillowed Effect) */
+body.light-mode .bento-card {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 1) 0%, rgba(248, 250, 252, 0.6) 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.8) !important;
+    box-shadow: 
+        0 4px 10px rgba(0, 0, 0, 0.02), 
+        0 15px 25px rgba(59, 130, 246, 0.05), /* Soft colored shadow below */
+        inset 0 2px 5px rgba(255, 255, 255, 1) !important; /* Inner glow */
+    border-radius: 22px !important;
+}
+
+/* 4. Top Utility Icons (Mac Style Buttons) */
+body.light-mode .util-icon-btn {
+    background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%) !important;
+    border: 1px solid #ffffff !important;
+    box-shadow: 
+        0 4px 10px rgba(0,0,0,0.04), 
+        inset 0 2px 4px rgba(255,255,255,1), 
+        inset 0 -2px 4px rgba(0,0,0,0.02) !important;
+    border-radius: 16px !important;
+}
+
+/* 5. Assessment Dropdowns (Sleek Deep Inset) */
+body.light-mode .search-input {
+    background: rgba(255, 255, 255, 0.4) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.7) !important;
+    box-shadow: 
+        inset 0 2px 6px rgba(0, 0, 0, 0.04), 
+        0 2px 5px rgba(0,0,0,0.01) !important;
+    border-radius: 16px !important;
+}
+
+/* 6. The "Start Assessment" CTA (Liquid Dark Glass + Shine Animation) */
+.ultimate-start-btn {
+    background: linear-gradient(135deg, #020617 0%, #1e293b 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 20px !important;
+    box-shadow: 
+        0 15px 35px rgba(15, 23, 42, 0.3), 
+        inset 0 1px 1px rgba(255, 255, 255, 0.2), /* Top edge reflection */
+        inset 0 -4px 15px rgba(0, 0, 0, 0.4) !important; /* Bottom depth */
+    position: relative;
+    overflow: hidden;
+}
+
+/* Shimmer Light Reflection Animation */
+.ultimate-start-btn::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 50%; height: 100%;
+    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0) 100%);
+    transform: skewX(-25deg);
+    animation: premiumShine 4s infinite;
+}
+
+@keyframes premiumShine {
+    0% { left: -100%; }
+    20% { left: 200%; }
+    100% { left: 200%; }
+}
+/* ==============================================================
+   💎 ULTIMATE 2026 LUXURY UI (HOLOGRAPHIC GLASS & NEON BLOOM)
+============================================================== */
+
+/* 1. Base Cards - Frosted Glassmorphism */
+.bento-card, .config-card, .search-input {
+    background: rgba(20, 20, 30, 0.4) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important; /* Spring Bounce */
+}
+
+/* Light Mode Base */
+body.light-mode .bento-card, body.light-mode .config-card, body.light-mode .search-input {
+    background: rgba(255, 255, 255, 0.6) !important;
+    border: 1px solid rgba(255, 255, 255, 1) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* 2. Holographic Glow on Select/Tap (The "Premium" Feel) */
+.bento-card:active, 
+.search-input:focus, 
+.search-input:active,
+.util-icon-btn:active {
+    transform: scale(0.96) translateY(-2px) !important;
+    background: rgba(30, 30, 50, 0.8) !important;
+    border-color: #00e5ff !important; /* Cyan Holographic Border */
+    /* 3-Layer Neon Bloom Effect */
+    box-shadow: 
+        0 0 0 2px rgba(0, 229, 255, 0.1),
+        0 15px 35px rgba(0, 229, 255, 0.25),
+        inset 0 0 20px rgba(0, 229, 255, 0.15) !important;
+}
+
+/* Light Mode Select */
+body.light-mode .bento-card:active, 
+body.light-mode .search-input:focus {
+    background: #ffffff !important;
+    border-color: #3b82f6 !important;
+    box-shadow: 
+        0 0 0 3px rgba(59, 130, 246, 0.1),
+        0 15px 35px rgba(59, 130, 246, 0.2),
+        inset 0 0 15px rgba(59, 130, 246, 0.05) !important;
+}
+
+/* ==============================================================
+   🚀 FIXED: PREMIUM WHITE START BUTTON (CLEAN & MINIMAL)
+============================================================== */
+
+.ultimate-start-btn {
+    /* Pure White Background with Black Text */
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid rgba(255, 255, 255, 0.9) !important;
+    border-radius: 20px !important;
+    padding: 18px !important;
+    font-weight: 900 !important;
+    letter-spacing: 1.5px !important;
+    text-transform: uppercase !important;
+    /* Soft white outer glow + subtle inner shadow for 3D depth */
+    box-shadow: 
+        0 10px 30px rgba(255, 255, 255, 0.15),
+        inset 0 -4px 10px rgba(0, 0, 0, 0.1) !important;
+    position: relative !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 10px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    z-index: 10 !important;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+
+/* Hover Effect - Stronger White Glow */
+.ultimate-start-btn:hover {
+    background: #f8fafc !important; /* Slightly off-white on hover */
+    transform: translateY(-3px) scale(1.02) !important;
+    box-shadow: 
+        0 15px 40px rgba(255, 255, 255, 0.25),
+        inset 0 -4px 10px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Active / Tap Effect (Smooth Press) */
+.ultimate-start-btn:active {
+    transform: scale(0.96) !important;
+    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.1) !important;
+}
+
+.ultimate-start-btn span {
+    transition: transform 0.2s;
+    display: inline-block;
+}
+
+.ultimate-start-btn:hover span {
+    transform: translateX(6px);
+}
+
+/* Light Mode Support (Inverts to Dark Button for high contrast in Light Mode) */
+body.light-mode .ultimate-start-btn {
+    background: #0f172a !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(0, 0, 0, 0.8) !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+}
+body.light-mode .ultimate-start-btn:hover {
+    background: #020617 !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3) !important;
+}
+
+
+/* Active / Tap Effect (Holographic Cyan Glow) */
+.ultimate-start-btn:active {
+    transform: scale(0.96) !important;
+    border-color: #00e5ff !important;
+    box-shadow: 
+        0 0 30px rgba(0, 229, 255, 0.4),
+        inset 0 0 15px rgba(0, 229, 255, 0.2) !important;
+}
+
+.ultimate-start-btn span {
+    transition: transform 0.2s;
+    display: inline-block;
+}
+
+.ultimate-start-btn:hover span {
+    transform: translateX(6px);
+}
+
+/* ==============================================================
+   ✨ MAGICAL COLORFUL PARTICLE TOUCH EFFECT
+============================================================== */
+.magic-particle {
+    position: fixed;
+    pointer-events: none;
+    border-radius: 50%;
+    z-index: 99999999;
+    /* Start at touch point */
+    transform: translate(-50%, -50%) scale(1);
+    animation: magicSparkle 0.6s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+    mix-blend-mode: screen; /* Gives it a glowing/magical neon look */
+}
+
+/* Light mode mein blend mode change karenge taaki colors dark bg pe bhi dikhein */
+body.light-mode .magic-particle {
+    mix-blend-mode: multiply; 
+}
+
+@keyframes magicSparkle {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+    100% {
+        /* --tx aur --ty JavaScript se aayenge (Random directions ke liye) */
+        transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0);
+        opacity: 0;
+    }
+}
 
 </style>
 </head>
@@ -1617,43 +2079,64 @@ body.light-mode .ultimate-start-btn { background: #0f172a; color: #ffffff !impor
 
 <main class="app-container fade-in" id="main-app-container">
 
-  <!-- 1. SETUP SCREEN (PREMIUM 2025 BENTO UI) -->
+    <!-- 1. SETUP SCREEN (PREMIUM 2025 BENTO UI) -->
   <div id="typing-setup-screen" class="app-screen fade-in">
     
-    <!-- Top Header: Title & Utility Icons -->
+    <!-- Top Header: Title & Utility Icons (SVG Upgrade) -->
     <div class="setup-header">
       <div class="setup-title">
         <h3>DEST Pro <span class="pro-badge">Premium</span></h3>
-        <p>Select a module to begin</p>
+        <p>Welcome back! Select a module to begin.</p>
       </div>
-      <div class="utils-group">
-        <button class="util-icon-btn" onclick="toggleLightMode()" id="mode-toggle-btn" title="Toggle Theme">🌓</button>
-        <button class="util-icon-btn" onclick="openTypingHistoryModal()" title="View History">📊</button>
-        <button class="util-icon-btn" onclick="openSettingsModal()" title="System Settings">⚙️</button>
-              <button class="util-icon-btn" onclick="openGlobalLeaderboard()" title="Global Leaderboard">🏆</button>
-              <button id="navLoginBtn" class="util-icon-btn" onclick="loginWithGoogle()" title="Sign in with Google">👤</button>
+          <div class="utils-group">
+        <button class="util-icon-btn" onclick="toggleLightMode()" id="mode-toggle-btn" title="Toggle Theme">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+        <button class="util-icon-btn" onclick="openTypingHistoryModal()" title="View History">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+        </button>
+        <button class="util-icon-btn" onclick="openSettingsModal()" title="System Settings">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </button>
+                        <button class="util-icon-btn" onclick="openGlobalLeaderboard()" title="Global Leaderboard">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7z"></path>
+            <path d="M5 20h14"></path>
+          </svg>
+        </button>
+
+
+        <button id="navLoginBtn" class="util-icon-btn" onclick="loginWithGoogle()" title="Sign in with Google">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </button>
       </div>
+
     </div>
  
-
     <!-- Modern Bento Grid System -->
     <div class="bento-grid fade-in stagger-1">
       <button class="bento-card" onclick="openTutorDashboard()">
-        <div class="bento-icon">🎓</div>
+        <div class="bento-icon">
+          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+        </div>
         <div class="bento-info">
             <span class="bento-title">Tutor</span>
             <span class="bento-desc">Learn typing</span>
         </div>
       </button>
       <button class="bento-card" onclick="typingGamesModule.showGamesDashboard()">
-        <div class="bento-icon">🎮</div>
+        <div class="bento-icon">
+          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"></rect><path d="M6 12h4M8 10v4M15 13h.01M18 11h.01"></path></svg>
+        </div>
         <div class="bento-info">
             <span class="bento-title">Games</span>
             <span class="bento-desc">Play & practice</span>
         </div>
       </button>
       <button class="bento-card full-width" onclick="DataEntryApp.openDashboard()">
-        <div class="bento-icon">📑</div>
+        <div class="bento-icon">
+          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        </div>
         <div class="bento-info">
             <span class="bento-title">Data Entry Training</span>
             <span class="bento-desc">Official spreadsheet simulation</span>
@@ -1698,6 +2181,7 @@ body.light-mode .ultimate-start-btn { background: #0f172a; color: #ffffff !impor
     </button>
 
   </div>
+
 
   <!-- 🎓 NEW: TUTOR DASHBOARD SCREEN (PREMIUM LAYOUT) -->
   <div id="tutor-dashboard-screen" class="app-screen hidden fade-in tutor-layout">
@@ -2272,19 +2756,19 @@ body.light-mode .ultimate-start-btn { background: #0f172a; color: #ffffff !impor
       <div class="input-group">
         <label>Theme Protocol</label>
         <select id="set-theme" class="search-input" onchange="applySettingsFromModal()">
-          <option value="none">🚫 No Effect (Clean UI)</option>
+          <option value="none"> No Effect (Clean UI)</option>
           <optgroup id="opt-dark" label="Dark Mode Effects">
-            <option value="obsidian">🐻‍❄️ (White)</option>
-            <option value="cyber-gold">👑  (Gold)</option>
-            <option value="matrix">📟 (Green)</option>
-            <option value="blood-moon">🩸 (Red)</option>
-            <option value="abyss">🌊 (Blue)</option>
-            <option value="solar-system">🍊 (Orange)</option>
+            <option value="obsidian">White</option>
+            <option value="cyber-gold"> Gold</option>
+            <option value="matrix"> Green</option>
+            <option value="blood-moon"> Red</option>
+            <option value="abyss">Blue</option>
+            <option value="solar-system"> Orange</option>
           </optgroup>
           <optgroup id="opt-light" label="Light Mode Effects" disabled>
-            <option value="nature">🍃(Green)</option>
-            <option value="sakura">🌸 (Pink)</option>
-            <option value="neon-purple">🟣  (Purple) </option>
+            <option value="nature">Green</option>
+            <option value="sakura">Pink</option>
+            <option value="neon-purple"> Purple </option>
           </optgroup>
         </select>
       </div>
@@ -2611,7 +3095,11 @@ function applySettings() {
     document.body.style.setProperty('--ui-font', settings.font); 
     document.body.classList.toggle('no-effects', settings.removeEffect); 
     document.body.classList.toggle('light-mode', settings.lightMode); 
-    document.getElementById('mode-toggle-btn').innerHTML = settings.lightMode ? '🌙' : '☀️';
+    // NAYA CODE:
+document.getElementById('mode-toggle-btn').innerHTML = settings.lightMode 
+    ? '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>' 
+    : '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
+
     
 
     renderDynamicBackground(settings.theme); 
@@ -4985,9 +5473,12 @@ class SpaceTyperGame {
         }
     }
 
-    saveStats() {
-        let scoreKey = `spaceTyper_bestScore_${this.difficulty}`;
-        let wpmKey = `spaceTyper_bestWpm_${this.difficulty}`;
+      saveStats() {
+        // 🔥 NAYA LOGIC
+        let userPrefix = localStorage.getItem('dest_playerName') || 'Guest';
+
+        let scoreKey = `${userPrefix}_spaceTyper_bestScore_${this.difficulty}`;
+        let wpmKey = `${userPrefix}_spaceTyper_bestWpm_${this.difficulty}`;
         
         let existingScore = parseInt(localStorage.getItem(scoreKey)) || 0;
         let existingWpm = parseInt(localStorage.getItem(wpmKey)) || 0;
@@ -5008,7 +5499,8 @@ class SpaceTyperGame {
             localStorage.setItem(wpmKey, this.wpm);
         }
         
-        let historyKey = 'spaceTyper_GameHistory';
+        // 🔥 NAYA: History key me bhi userPrefix add kar do
+        let historyKey = `${userPrefix}_spaceTyper_GameHistory`;
         let history = JSON.parse(localStorage.getItem(historyKey) || '[]');
         let acc = this.keystrokes > 0 ? Math.round((this.correctKeystrokes / this.keystrokes) * 100) : 100;
         let dateStr = new Date().toLocaleString('en-IN', {day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'});
@@ -5510,8 +6002,12 @@ class WordRushGame {
     }
 
     saveStats() {
-        let scoreKey = `wordRush_bestScore_${this.difficulty}`;
-        let wpmKey = `wordRush_bestWpm_${this.difficulty}`;
+        // 🔥 NAYA LOGIC: Current user ka naam nikalo
+        let userPrefix = localStorage.getItem('dest_playerName') || 'Guest';
+
+        // 🔥 NAYA: Key ke aage userPrefix add kar diya
+        let scoreKey = `${userPrefix}_wordRush_bestScore_${this.difficulty}`;
+        let wpmKey = `${userPrefix}_wordRush_bestWpm_${this.difficulty}`;
         
         let existingScore = parseInt(localStorage.getItem(scoreKey)) || 0;
         let existingWpm = parseInt(localStorage.getItem(wpmKey)) || 0;
@@ -5523,19 +6019,28 @@ class WordRushGame {
             let acc = this.keystrokes > 0 ? Math.round((this.correctKeystrokes / this.keystrokes) * 100) : 100;
             if(window.submitToLeaderboard) window.submitToLeaderboard('wordRush', this.score, this.wpm, acc);
             
-        } else { if(badge) badge.style.display = 'none'; }
+        } else { 
+            if(badge) badge.style.display = 'none'; 
+        }
 
-        if(this.wpm > existingWpm || existingWpm === 0) localStorage.setItem(wpmKey, this.wpm);
+        if(this.wpm > existingWpm || existingWpm === 0) {
+            localStorage.setItem(wpmKey, this.wpm);
+        }
         
-        let history = JSON.parse(localStorage.getItem('wordRush_GameHistory') || '[]');
+        // 🔥 NAYA: History save karte waqt bhi userPrefix use karo
+        let historyKey = `${userPrefix}_wordRush_GameHistory`;
+        let history = JSON.parse(localStorage.getItem(historyKey) || '[]');
         let acc = this.keystrokes > 0 ? Math.round((this.correctKeystrokes / this.keystrokes) * 100) : 100;
         let dateStr = new Date().toLocaleString('en-IN', {day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'});
+        
         history.unshift({ date: dateStr, score: this.score, wpm: this.wpm, accuracy: acc, diff: this.difficulty.toUpperCase() }); 
+        
         if(history.length > 10) history = history.slice(0, 10); 
-        localStorage.setItem('wordRush_GameHistory', JSON.stringify(history)); 
+        localStorage.setItem(historyKey, JSON.stringify(history)); 
         
         this.parent.loadPersistentStats(); 
     }
+
 
     playSound(freq, type, vol, endFreq = null) {
         if(!this.parent.soundEnabled || !this.parent.audioCtx) return;
@@ -6471,9 +6976,13 @@ class TypingRacerGame {
         modal.classList.remove('hidden'); modal.style.display = 'flex';
     }
 
-    saveStats() {
-        let scoreKey = `typingRacer_bestScore_${this.difficulty}`; 
-        let wpmKey = `typingRacer_bestWpm_${this.difficulty}`;
+     saveStats() {
+        // 🔥 NAYA LOGIC: Current user ka naam nikalo
+        let userPrefix = localStorage.getItem('dest_playerName') || 'Guest';
+
+        // 🔥 NAYA: Key ke aage userPrefix add kar diya
+        let scoreKey = `${userPrefix}_typingRacer_bestScore_${this.difficulty}`; 
+        let wpmKey = `${userPrefix}_typingRacer_bestWpm_${this.difficulty}`;
         
         let existingScore = parseInt(localStorage.getItem(scoreKey)) || 0;
         let existingWpm = parseInt(localStorage.getItem(wpmKey)) || 0;
@@ -6482,22 +6991,31 @@ class TypingRacerGame {
         if(Math.floor(this.distance) > existingScore) {
             localStorage.setItem(scoreKey, Math.floor(this.distance));
             if(badge) { badge.style.display = 'inline-block'; badge.classList.remove('hidden'); }
-                let acc = this.keystrokes > 0 ? Math.round((this.correctKeystrokes / this.keystrokes) * 100) : 100;
+            let acc = this.keystrokes > 0 ? Math.round((this.correctKeystrokes / this.keystrokes) * 100) : 100;
             if(window.submitToLeaderboard) window.submitToLeaderboard('typingRacer', Math.floor(this.distance), this.wpm, acc);
             
-        } else { if(badge) badge.style.display = 'none'; }
+        } else { 
+            if(badge) badge.style.display = 'none'; 
+        }
 
-        if(this.wpm > existingWpm || existingWpm === 0) localStorage.setItem(wpmKey, this.wpm);
+        if(this.wpm > existingWpm || existingWpm === 0) {
+            localStorage.setItem(wpmKey, this.wpm);
+        }
         
-        let history = JSON.parse(localStorage.getItem('typingRacer_GameHistory') || '[]');
+        // 🔥 NAYA: History save karte waqt bhi userPrefix use karo
+        let historyKey = `${userPrefix}_typingRacer_GameHistory`;
+        let history = JSON.parse(localStorage.getItem(historyKey) || '[]');
         let acc = this.keystrokes > 0 ? Math.round((this.correctKeystrokes / this.keystrokes) * 100) : 100;
         let dateStr = new Date().toLocaleString('en-IN', {day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'});
+        
         history.unshift({ date: dateStr, score: Math.floor(this.distance), wpm: this.wpm, accuracy: acc, diff: this.difficulty.toUpperCase() }); 
+        
         if(history.length > 10) history = history.slice(0, 10); 
-        localStorage.setItem('typingRacer_GameHistory', JSON.stringify(history)); 
+        localStorage.setItem(historyKey, JSON.stringify(history)); 
         
         this.parent.loadPersistentStats(); 
     }
+
 
     playSound(freq, type, vol, endFreq = null) {
         if(!this.parent.soundEnabled || !this.parent.audioCtx) return;
@@ -7248,8 +7766,12 @@ class KeyboardNinjaGame {
     }
 
     saveStats() {
-        let scoreKey = `keyboardNinja_bestScore_${this.difficulty}`;
-        let wpmKey = `keyboardNinja_bestWpm_${this.difficulty}`;
+        // 🔥 NAYA LOGIC: Current user ka naam nikalo
+        let userPrefix = localStorage.getItem('dest_playerName') || 'Guest';
+
+        // 🔥 NAYA: Key ke aage userPrefix add kar diya
+        let scoreKey = `${userPrefix}_keyboardNinja_bestScore_${this.difficulty}`;
+        let wpmKey = `${userPrefix}_keyboardNinja_bestWpm_${this.difficulty}`;
         
         let existingScore = parseInt(localStorage.getItem(scoreKey)) || 0;
         let existingWpm = parseInt(localStorage.getItem(wpmKey)) || 0;
@@ -7261,16 +7783,24 @@ class KeyboardNinjaGame {
             let acc = this.keystrokes > 0 ? Math.round((this.correctKeystrokes / this.keystrokes) * 100) : 100;
             if(window.submitToLeaderboard) window.submitToLeaderboard('keyboardNinja', this.score, this.wpm, acc);
             
-        } else { if(badge) badge.style.display = 'none'; }
+        } else { 
+            if(badge) badge.style.display = 'none'; 
+        }
 
-        if(this.wpm > existingWpm || existingWpm === 0) localStorage.setItem(wpmKey, this.wpm);
+        if(this.wpm > existingWpm || existingWpm === 0) {
+            localStorage.setItem(wpmKey, this.wpm);
+        }
         
-        let history = JSON.parse(localStorage.getItem('keyboardNinja_GameHistory') || '[]');
+        // 🔥 NAYA: History save karte waqt bhi userPrefix use karo
+        let historyKey = `${userPrefix}_keyboardNinja_GameHistory`;
+        let history = JSON.parse(localStorage.getItem(historyKey) || '[]');
         let acc = this.keystrokes > 0 ? Math.round((this.correctKeystrokes / this.keystrokes) * 100) : 100;
         let dateStr = new Date().toLocaleString('en-IN', {day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'});
+        
         history.unshift({ date: dateStr, score: this.score, wpm: this.wpm, accuracy: acc, diff: this.difficulty.toUpperCase() }); 
+        
         if(history.length > 10) history = history.slice(0, 10); 
-        localStorage.setItem('keyboardNinja_GameHistory', JSON.stringify(history)); 
+        localStorage.setItem(historyKey, JSON.stringify(history)); 
         
         this.parent.loadPersistentStats(); 
     }
@@ -8087,39 +8617,17 @@ class TypingSurvivorGame {
         this.audio.error();
         if(this.loopId) cancelAnimationFrame(this.loopId);
         
-        let scoreKey = `typingSurvivor_bestScore_${this.difficulty}`;
-        let wpmKey = `typingSurvivor_bestWpm_${this.difficulty}`;
-        let existingScore = parseInt(localStorage.getItem(scoreKey)) || 0;
-        let existingWpm = parseInt(localStorage.getItem(wpmKey)) || 0;
-        
         let mins = (Date.now() - this.STATE.startTime) / 60000;
         if(mins > 0) this.STATE.wpm = Math.max(0, Math.round((this.STATE.correctKeystrokes / 5) / mins));
 
-        let badge = document.getElementById('newHighScoreBadge');
-        if(this.STATE.score > existingScore) {
-            localStorage.setItem(scoreKey, this.STATE.score);
-            if(badge) { badge.style.display = 'inline-block'; badge.classList.remove('hidden'); }
-            let acc = this.STATE.keystrokes > 0 ? Math.round((this.STATE.correctKeystrokes / this.STATE.keystrokes) * 100) : 100;
-            if(window.submitToLeaderboard) window.submitToLeaderboard('typingSurvivor', this.STATE.score, this.STATE.wpm, acc);
-            
-        } else {
-            if(badge) badge.style.display = 'none';
-        }
-        if(this.STATE.wpm > existingWpm || existingWpm === 0) localStorage.setItem(wpmKey, this.STATE.wpm);
-        
-        let history = JSON.parse(localStorage.getItem('typingSurvivor_GameHistory') || '[]');
-        let acc = this.STATE.keystrokes > 0 ? Math.round((this.STATE.correctKeystrokes / this.STATE.keystrokes) * 100) : 100;
-        let dateStr = new Date().toLocaleString('en-IN', {day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'});
-        history.unshift({ date: dateStr, score: this.STATE.score, wpm: this.STATE.wpm, accuracy: acc, diff: this.difficulty.toUpperCase() });
-        if(history.length > 10) history = history.slice(0, 10);
-        localStorage.setItem('typingSurvivor_GameHistory', JSON.stringify(history));
-
-        this.parent.loadPersistentStats();
+        // 🔥 NAYA: Ab baaki games ki tarah yahan alag se function call hoga
+        this.saveStats();
 
         const resScore = document.getElementById('resScore');
         if(resScore) {
             resScore.innerText = this.STATE.score.toLocaleString();
             document.getElementById('resWpm').innerText = this.STATE.wpm;
+            let acc = this.STATE.keystrokes > 0 ? Math.round((this.STATE.correctKeystrokes / this.STATE.keystrokes) * 100) : 100;
             document.getElementById('resAcc').innerText = acc + '%';
             document.getElementById('resCombo').innerText = this.STATE.maxCombo;
             let secs = Math.floor((Date.now() - this.STATE.startTime)/1000);
@@ -8131,6 +8639,45 @@ class TypingSurvivorGame {
             const modal = document.getElementById('gameResultModal');
             if(modal) { modal.classList.remove('hidden'); modal.style.display = 'flex'; }
         }
+    }
+
+    saveStats() {
+        // 🔥 NAYA LOGIC: Current user ka naam nikalo (Isse data mix nahi hoga)
+        let userPrefix = localStorage.getItem('dest_playerName') || 'Guest';
+
+        let scoreKey = `${userPrefix}_typingSurvivor_bestScore_${this.difficulty}`;
+        let wpmKey = `${userPrefix}_typingSurvivor_bestWpm_${this.difficulty}`;
+        
+        let existingScore = parseInt(localStorage.getItem(scoreKey)) || 0;
+        let existingWpm = parseInt(localStorage.getItem(wpmKey)) || 0;
+        
+        let badge = document.getElementById('newHighScoreBadge');
+        
+        if(this.STATE.score > existingScore) {
+            localStorage.setItem(scoreKey, this.STATE.score);
+            if(badge) { badge.style.display = 'inline-block'; badge.classList.remove('hidden'); }
+            let acc = this.STATE.keystrokes > 0 ? Math.round((this.STATE.correctKeystrokes / this.STATE.keystrokes) * 100) : 100;
+            if(window.submitToLeaderboard) window.submitToLeaderboard('typingSurvivor', this.STATE.score, this.STATE.wpm, acc);
+            
+        } else {
+            if(badge) badge.style.display = 'none';
+        }
+
+        if(this.STATE.wpm > existingWpm || existingWpm === 0) {
+            localStorage.setItem(wpmKey, this.STATE.wpm);
+        }
+        
+        let historyKey = `${userPrefix}_typingSurvivor_GameHistory`;
+        let history = JSON.parse(localStorage.getItem(historyKey) || '[]');
+        let acc = this.STATE.keystrokes > 0 ? Math.round((this.STATE.correctKeystrokes / this.STATE.keystrokes) * 100) : 100;
+        let dateStr = new Date().toLocaleString('en-IN', {day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'});
+        
+        history.unshift({ date: dateStr, score: this.STATE.score, wpm: this.STATE.wpm, accuracy: acc, diff: this.difficulty.toUpperCase() });
+        
+        if(history.length > 10) history = history.slice(0, 10);
+        localStorage.setItem(historyKey, JSON.stringify(history));
+
+        this.parent.loadPersistentStats();
     }
 
     cleanup() {
@@ -8252,15 +8799,21 @@ class TypingGamesModule {
         this.exitToDashboard();
     }
 
-    loadPersistentStats() {
+        loadPersistentStats() {
+        // 🔥 NAYA: User ka naam nikal lo (agar login nahi hai toh 'Guest')
+        let userPrefix = localStorage.getItem('dest_playerName') || 'Guest';
+
         document.querySelectorAll('.game-card').forEach(card => {
             const gameKey = card.dataset.game; 
             if(!gameKey) return;
             const diffSelect = card.querySelector('.game-diff-select');
             if(!diffSelect) return;
             const diff = diffSelect.value;
-            const bestScore = localStorage.getItem(`${gameKey}_bestScore_${diff}`) || '0';
-            const bestWpm = localStorage.getItem(`${gameKey}_bestWpm_${diff}`) || '0';
+            
+            // 🔥 NAYA: Key ke aage userPrefix add kar diya
+            const bestScore = localStorage.getItem(`${userPrefix}_${gameKey}_bestScore_${diff}`) || '0';
+            const bestWpm = localStorage.getItem(`${userPrefix}_${gameKey}_bestWpm_${diff}`) || '0';
+            
             let scoreElem = card.querySelector('.stat-score');
             let wpmElem = card.querySelector('.stat-wpm');
             if(scoreElem) scoreElem.innerText = bestScore;
@@ -8269,12 +8822,16 @@ class TypingGamesModule {
         
         document.querySelectorAll('.game-diff-select').forEach(sel => {
             sel.onchange = (e) => {
+                let userPrefix = localStorage.getItem('dest_playerName') || 'Guest';
                 const pCard = e.target.closest('.game-card');
                 if(pCard) {
                     const gameKey = pCard.dataset.game;
                     const diff = e.target.value;
-                    const bScore = localStorage.getItem(`${gameKey}_bestScore_${diff}`) || '0';
-                    const bWpm = localStorage.getItem(`${gameKey}_bestWpm_${diff}`) || '0';
+                    
+                    // 🔥 NAYA: Key ke aage userPrefix add kar diya
+                    const bScore = localStorage.getItem(`${userPrefix}_${gameKey}_bestScore_${diff}`) || '0';
+                    const bWpm = localStorage.getItem(`${userPrefix}_${gameKey}_bestWpm_${diff}`) || '0';
+                    
                     let sElem = pCard.querySelector('.stat-score');
                     let wElem = pCard.querySelector('.stat-wpm');
                     if(sElem) sElem.innerText = bScore;
@@ -8889,7 +9446,11 @@ auth.onAuthStateChanged((user) => {
         localStorage.setItem('dest_playerName', user.displayName);
     } else {
         if(navLoginBtn) {
-            navLoginBtn.innerHTML = '👤';
+            
+
+// Naya Code lagao:
+navLoginBtn.innerHTML = '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
+
             navLoginBtn.title = 'Sign in with Google';
             navLoginBtn.onclick = loginWithGoogle;
         }
@@ -9180,6 +9741,55 @@ function logoutGoogle() {
   window.openGlobalLeaderboard = function() {
       window.showLeaderboard('spaceTyper');
   };
+  // ==============================================================
+// ✨ MAGICAL PARTICLE TOUCH LISTENER (MULTI-COLOR BURST)
+// ==============================================================
+document.addEventListener('pointerdown', function(e) {
+    // 1. Magical Colors ki list (Cyan, Pink, Gold, Purple, Neon Green)
+    const colors = ['#00e5ff', '#ff00cc', '#fbbf24', '#b026ff', '#a3e635'];
+    
+    // 2. Ek tap par kitne particles nikalne hain? (12 ekdum perfect hain)
+    const particleCount = 12; 
+
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'magic-particle';
+        
+        // Exact touch location
+        particle.style.left = e.clientX + 'px';
+        particle.style.top = e.clientY + 'px';
+        
+        // Random Particle Size (3px se 7px ke beech)
+        const size = Math.random() * 4 + 3;
+        particle.style.width = size + 'px';
+        particle.style.height = size + 'px';
+        
+        // Random Color and Glow
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        particle.style.background = color;
+        particle.style.boxShadow = `0 0 ${size * 2}px ${color}`; // Ussi color ka glow
+        
+        // 🚀 PHYSICS: Random 360-degree Explosion direction
+        const angle = Math.random() * Math.PI * 2; // 0 se 360 degree (radians me)
+        const distance = Math.random() * 60 + 30;  // Kitni door ud kar jayega (30px - 90px)
+        
+        const tx = Math.cos(angle) * distance;
+        const ty = Math.sin(angle) * distance;
+        
+        // CSS variables set kar diye keyframe animation ke liye
+        particle.style.setProperty('--tx', tx + 'px');
+        particle.style.setProperty('--ty', ty + 'px');
+        
+        // Screen par add karo
+        document.body.appendChild(particle);
+        
+        // 600ms baad animation khatam hone par DOM se hata do
+        setTimeout(() => {
+            particle.remove();
+        }, 600);
+    }
+});
+
 </script>
 <!-- 👤 MY ACCOUNT MODAL -->
 <div id="account-modal" class="modal-overlay hidden" onclick="if(event.target===this) document.getElementById('account-modal').classList.add('hidden')">
