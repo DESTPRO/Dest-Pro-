@@ -10926,8 +10926,8 @@ const MultiplayerEngine = {
             isDraw = true;
         }
 
-        // 🔥 RANK PENALTY SYSTEM (MINUS LOGIC)
-        let expChange = isWin ? 50 : (isDraw ? 10 : -25); // Defeat pe sidha -25!
+              // 🔥 RANK PENALTY SYSTEM (MINUS LOGIC - WITH PERMANENT SAVE)
+        let expChange = isWin ? 50 : (isDraw ? 10 : -25); 
 
         if(expLabel) { 
             if (expChange > 0) {
@@ -10935,7 +10935,6 @@ const MultiplayerEngine = {
                 expLabel.style.color = '#fbbf24';
                 expLabel.style.textShadow = '0 0 10px rgba(251,191,36,0.5)';
             } else {
-                // Red text with Skull for Minus EXP
                 expLabel.innerText = `${expChange} EXP 💀`; 
                 expLabel.style.color = '#ef4444';
                 expLabel.style.textShadow = '0 0 10px rgba(239,68,68,0.5)';
@@ -10943,12 +10942,12 @@ const MultiplayerEngine = {
             expLabel.style.display = 'block'; 
         }
 
-        if (window.tutorData) { 
-            // Save EXP but never let it go below 0
-            window.tutorData.xp = Math.max(0, (window.tutorData.xp || 0) + expChange); 
-            if (typeof window.saveTutorData === 'function') window.saveTutorData(); 
+        // 🔥 NAYA CODE: Ye line sidha permanent storage me save karegi
+        if (window.LevelEngine) { 
+            window.LevelEngine.addXP(expChange); 
         }
     },
+
 
     playAgain: function() {
         let gameToPlay = this.gameId;
@@ -11285,13 +11284,48 @@ if (typeof TypingRacerGame !== 'undefined') {
     };
 }
 // ==========================================
-// 🌟 MASTER LEVEL & EXP ENGINE
+// 🌟 MASTER LEVEL & EXP ENGINE (WITH PERMANENT AUTO-SAVE)
 // ==========================================
 window.LevelEngine = {
+    init: function() {
+        // Page load hote hi LocalStorage se purani EXP uthao
+        let savedXP = localStorage.getItem('dest_playerXP');
+        if(savedXP !== null) {
+            if(!window.tutorData) window.tutorData = {};
+            window.tutorData.xp = parseInt(savedXP);
+        }
+    },
+    
+    addXP: function(amount) {
+        // Current XP nikaalo aur usme nayi EXP jodo
+        let currentXP = 0;
+        let savedXP = localStorage.getItem('dest_playerXP');
+        if(savedXP !== null) currentXP = parseInt(savedXP);
+        else if (window.tutorData && window.tutorData.xp) currentXP = window.tutorData.xp;
+
+        let newXP = Math.max(0, currentXP + amount); // 0 se kam nahi jayegi
+        
+        // 🔥 PERMANENT SAVE IN BROWSER STORAGE
+        localStorage.setItem('dest_playerXP', newXP);
+        
+        if(!window.tutorData) window.tutorData = {};
+        window.tutorData.xp = newXP;
+        
+        // Firebase Backup (Agar function available hai)
+        if (typeof window.saveTutorData === 'function') window.saveTutorData();
+        
+        this.updateUI(); // Turant screen par update dikhao
+    },
+
     getStats: function() {
         let xp = 0;
-        // Fetch XP from Tutor Data (Updated by Tutor Missions & 1v1 Matches)
-        if(window.tutorData && window.tutorData.xp) xp = window.tutorData.xp;
+        // Hamesha LocalStorage se exact value uthao
+        let savedXP = localStorage.getItem('dest_playerXP');
+        if(savedXP !== null) {
+            xp = parseInt(savedXP);
+        } else if(window.tutorData && window.tutorData.xp) {
+            xp = window.tutorData.xp;
+        }
         
         // Smooth scaling level formula
         let level = Math.floor(Math.sqrt(xp / 50)) + 1;
@@ -11302,7 +11336,6 @@ window.LevelEngine = {
         let xpNeeded = nextLevelBaseXp - currentLevelBaseXp;
         let progress = Math.round((xpIntoLevel / xpNeeded) * 100);
 
-        // Awesome Ranks Titles
         let title = "Bronze Tier";
         if(level >= 5) title = "Silver Tier";
         if(level >= 10) title = "Gold Tier";
@@ -11316,7 +11349,6 @@ window.LevelEngine = {
     updateUI: function() {
         let stats = this.getStats();
         
-        // 1. Update Account Modal UI
         let lvlTxt = document.getElementById('acc-level-text');
         if(lvlTxt) lvlTxt.innerText = `LVL ${stats.level} - ${stats.title}`;
         
@@ -11326,15 +11358,12 @@ window.LevelEngine = {
         let bar = document.getElementById('acc-xp-bar');
         if(bar) bar.style.width = `${stats.progress}%`;
 
-        // 2. Update Nav Bar Profile Button (Dynamic Level Badge)
         const navLoginBtn = document.getElementById('navLoginBtn');
         if(navLoginBtn && (localStorage.getItem('dest_playerName') || (typeof auth !== 'undefined' && auth.currentUser))) {
             let currentDP = localStorage.getItem('dest_playerDP') || `https://api.dicebear.com/7.x/bottts/svg?seed=${localStorage.getItem('dest_playerName')||'Guest'}`;
             if (typeof auth !== 'undefined' && auth.currentUser && !localStorage.getItem('dest_playerDP')) {
                 currentDP = auth.currentUser.photoURL || currentDP;
             }
-            
-            // Injecting the Profile Pic with a tiny floating Level Badge!
             navLoginBtn.innerHTML = `
                 <div style="position:relative; display:inline-flex; align-items:center; justify-content:center;">
                     <img src="${currentDP}" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent-primary);">
@@ -11344,9 +11373,10 @@ window.LevelEngine = {
         }
     }
 };
-
-// Auto-sync UI every 2 seconds to catch EXP updates instantly!
+// Game load hote hi memory restore karo
+window.LevelEngine.init();
 setInterval(() => { if(window.LevelEngine) window.LevelEngine.updateUI(); }, 2000);
+
 
 // ==========================================
 // 🏆 OVERRIDE: FIREBASE SAVE SCORE (NOW INCLUDES LEVEL)
