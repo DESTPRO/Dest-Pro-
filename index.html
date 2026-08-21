@@ -10415,13 +10415,15 @@ window.showLeaderboard = async function(gameId = 'all') {
                 gameBadgeHtml = `<div style="color: ${meta.color}; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; margin-top: 4px; letter-spacing: 0.5px;">${meta.icon} ${meta.name}</div>`;
             }
 
-            // 🔥 NEW: Floating Level Badge on Top of Profile Picture
+                    // 🔥 NEW: Floating Level Badge (Default Level 1 agar purana data hai)
+            let playerLvl = data.level || 1; // Agar DB me level na mile toh 1 dikhao
             let dpWithLevelBadge = `
                 <div style="position:relative; display:inline-flex; align-items:center; justify-content:center; flex-shrink: 0;">
                     <img src="${dpPic}" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 2px solid #334155;">
-                    ${data.level ? `<span style="position:absolute; bottom:-4px; right:-6px; background:#fbbf24; color:#000; font-size:0.6rem; font-weight:900; padding:1px 4px; border-radius:6px; border:1px solid #000; box-shadow: 0 0 5px rgba(251,191,36,0.8);">${data.level}</span>` : ''}
+                    <span style="position:absolute; bottom:-4px; right:-6px; background:#fbbf24; color:#000; font-size:0.6rem; font-weight:900; padding:1px 4px; border-radius:6px; border:1px solid #000; box-shadow: 0 0 5px rgba(251,191,36,0.8);">${playerLvl}</span>
                 </div>
             `;
+
 
             listContainer.innerHTML += `
             <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.05); ${isMe} padding: 12px 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
