@@ -11988,6 +11988,94 @@ window.showLeaderboard = async function(gameId = 'all') {
     }
 })();
 </script>
+<!-- 🌟 EXCLUSIVE EXP REWARD PATCH (ONLY FOR LOGGED-IN USERS) -->
+<script>
+(function() {
+    console.log("Applying Exclusive EXP Reward Patch (Login Required)...");
+
+    // 1. SYSTEM LEVEL BLOCK: Agar user logged in nahi hai, toh system EXP add hi nahi karega
+    if (window.LevelEngine) {
+        const origAddXP = window.LevelEngine.addXP;
+        window.LevelEngine.addXP = function(amount) {
+            // Check if Firebase Auth is active and user is logged in
+            if (typeof auth === 'undefined' || !auth.currentUser) {
+                console.log("Guest User: EXP Reward Blocked.");
+                return; // Code yahin se wapas mud jayega, EXP nahi milegi!
+            }
+            origAddXP.call(this, amount); // Logged in hai toh normal EXP de do
+        };
+    }
+
+    // 2. SINGLE PLAYER GAMES: Modal ke andar EXP Text banayein
+    const modalContent = document.querySelector('#gameResultModal .dest-modal-content');
+    if (modalContent && !document.getElementById('resExpEarned')) {
+        const expEl = document.createElement('div');
+        expEl.id = 'resExpEarned';
+        expEl.style.cssText = 'color: #fbbf24; font-weight: 900; font-size: 1.4rem; margin-bottom: 18px; text-shadow: 0 0 15px rgba(251,191,36,0.6); display: none; font-family: "JetBrains Mono", monospace; letter-spacing: 2px; text-transform: uppercase;';
+        
+        const grid = document.querySelector('#gameResultModal .result-stats-grid');
+        if (grid) modalContent.insertBefore(expEl, grid);
+    }
+
+    const showExpOnGameOver = (GameClass) => {
+        if(!GameClass) return;
+        const origGameOver = GameClass.prototype.gameOver;
+        
+        GameClass.prototype.gameOver = function() {
+            origGameOver.call(this);
+
+            const expEl = document.getElementById('resExpEarned');
+            
+            // 🔥 UI BLOCK: Agar Guest hai toh text ko hamesha ke liye hide kar do
+            if (typeof auth === 'undefined' || !auth.currentUser) {
+                if (expEl) expEl.style.display = 'none';
+                return;
+            }
+
+            // Sirf Logged in user ke liye score calculate aur animate karo
+            let finalScore = this.score || 0;
+            if (this.distance !== undefined && isNaN(this.score)) finalScore = Math.floor(this.distance);
+            if (this.STATE && this.STATE.score !== undefined) finalScore = this.STATE.score;
+
+            let earnedXP = 0;
+            if (finalScore > 0) earnedXP = Math.floor(finalScore / 150) + 5;
+
+            if (expEl) {
+                if (earnedXP > 0) {
+                    expEl.style.animation = 'none';
+                    expEl.offsetHeight; // Reflow
+                    expEl.style.animation = 'rankPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
+                    expEl.innerText = `+${earnedXP} EXP 🌟`;
+                    expEl.style.display = 'block';
+                } else {
+                    expEl.style.display = 'none';
+                }
+            }
+        };
+    };
+
+    if(typeof SpaceTyperGame !== 'undefined') showExpOnGameOver(SpaceTyperGame);
+    if(typeof WordRushGame !== 'undefined') showExpOnGameOver(WordRushGame);
+    if(typeof TypingRacerGame !== 'undefined') showExpOnGameOver(TypingRacerGame);
+    if(typeof KeyboardNinjaGame !== 'undefined') showExpOnGameOver(KeyboardNinjaGame);
+    if(typeof TypingSurvivorGame !== 'undefined') showExpOnGameOver(TypingSurvivorGame);
+
+    // 3. 1V1 BATTLE BLOCK: 1v1 Result modal mein bhi Guest ka EXP text hide karna
+    if (typeof MultiplayerEngine !== 'undefined') {
+        const origShowResult = MultiplayerEngine.showResultModal;
+        MultiplayerEngine.showResultModal = function(oppDisconnected) {
+            origShowResult.call(this, oppDisconnected); // Modal khulne do
+            
+            // Agar Guest hai toh chupke se EXP text ko gayab kar do
+            if (typeof auth === 'undefined' || !auth.currentUser) {
+                const expLabel = document.getElementById('vs-res-exp');
+                if (expLabel) expLabel.style.display = 'none';
+            }
+        };
+    }
+
+})();
+</script>
 
 </body>
 </html>
