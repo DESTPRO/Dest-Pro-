@@ -2797,7 +2797,7 @@ body.light-mode .random-btn .vs-icon { background: rgba(255, 255, 255, 0.2) !imp
   </div>
   
 </main>
-</main>
+
 
 <!-- TYPING GAMES DASHBOARD CONTAINER -->
 <div id="typingGamesModule" class="dest-games-container hidden">
@@ -3226,6 +3226,15 @@ body.light-mode .random-btn .vs-icon { background: rgba(255, 255, 255, 0.2) !imp
 
 
 <script>
+    function getActiveUserId() {
+    if (typeof auth !== 'undefined' && auth.currentUser) {
+        return auth.currentUser.uid; // Sabse secure aur unique
+    }
+    // Fallback for non-logged in users
+    let name = localStorage.getItem('dest_playerName') || 'guest';
+    return name.replace(/\s+/g, '').toLowerCase(); 
+}
+
     // 🔥 FIREBASE SETUP
 const firebaseConfig = {
   apiKey: "AIzaSyBH0pN-sxOU1wQzlT1EqnOUO4I0GlVafsg",
@@ -4239,13 +4248,32 @@ function finishTypingTest() {
       level: document.getElementById('typing-level-sel').value.toUpperCase() 
   };
   
-  try { 
-      let history = JSON.parse(localStorage.getItem('StandaloneTypingHistory')||'[]'); 
-      history.unshift(record); 
-      if(history.length>15) history = history.slice(0,15); 
-      localStorage.setItem('StandaloneTypingHistory', JSON.stringify(history)); 
-  } catch(e) {}
-}
+    // Data Save karte waqt (Firebase)
+  if (typeof auth !== 'undefined' && auth.currentUser) {
+      let uid = auth.currentUser.uid;
+      let userDocRef = db.collection("userData").doc(uid);
+      
+      // Pehle purana data fetch karenge, naya add karenge aur wapas save kar denge
+      userDocRef.get().then((doc) => {
+          let history = doc.exists && doc.data().typingHistory ? doc.data().typingHistory : [];
+          history.unshift(record); 
+          if(history.length > 15) history = history.slice(0, 15); // Sirf last 15 record rakho
+          
+          userDocRef.set({ typingHistory: history }, { merge: true });
+      });
+  } else {
+      // GUEST USER KE LIYE LOCAL FALLBACK
+        try { 
+            let uid = getActiveUserId(); 
+            let history = JSON.parse(localStorage.getItem(`StandaloneTypingHistory_${uid}`) || '[]');
+            history.unshift(record); 
+            if(history.length>15) history = history.slice(0,15); 
+            localStorage.setItem(`StandaloneTypingHistory_${uid}`, JSON.stringify(history)); 
+        } catch(e) {}
+    }
+} // finishTypingTest() yahan khatam
+
+
 
 function showResultScreen(mainTitle, subTitle, rankLabel, rankTitle, rankColor, rankMsg, stats, isTutor) {
   hideAllScreens();
@@ -4326,16 +4354,35 @@ const TUTOR_LESSONS = [
 
 let tutorData = { completed: [], currentId: 'l1', xp: 0, streak: 0, lastDate: null, weakKeys: {}, historyStats: [] };
 
-function loadTutorData() { 
+async function loadTutorData() { 
     try { 
-        const stored = localStorage.getItem('DEST_TutorData'); 
+        let uid = getActiveUserId();
+        // 1. Pehle LocalStorage se load karo (Fast UI ke liye)
+        const stored = localStorage.getItem(`DEST_TutorData_${uid}`); 
         if(stored) tutorData = {...tutorData, ...JSON.parse(stored)}; 
+        
+        // 2. Phir Firebase se fetch karke update kar do (Cloud Sync)
+        if (typeof auth !== 'undefined' && auth.currentUser) {
+            const doc = await db.collection("userData").doc(uid).get();
+            if (doc.exists && doc.data().tutorData) {
+                tutorData = { ...tutorData, ...doc.data().tutorData };
+                // Cloud wala latest data Local me bhi save kar do
+                localStorage.setItem(`DEST_TutorData_${uid}`, JSON.stringify(tutorData));
+            }
+        }
     } catch(e) {} 
     checkStreak(); 
 }
 
 function saveTutorData() { 
-    localStorage.setItem('DEST_TutorData', JSON.stringify(tutorData)); 
+    let uid = getActiveUserId();
+    // 1. Local me save karo
+    localStorage.setItem(`DEST_TutorData_${uid}`, JSON.stringify(tutorData)); 
+    
+    // 2. Firebase pe Upload kar do!
+    if (typeof auth !== 'undefined' && auth.currentUser) {
+        db.collection("userData").doc(uid).set({ tutorData: tutorData }, { merge: true }).catch(e => console.log("Tutor Sync Error:", e));
+    }
 }
 
 function checkStreak() { 
@@ -4789,15 +4836,40 @@ const DataEntryApp = (function() {
   };
 
   
-  function loadStats() {
-    try { const saved = JSON.parse(localStorage.getItem('DE_Stats') || '{}'); if(saved.sessions) state.stats = saved; } catch(e){}
+  async function loadStats() {
+    let uid = getActiveUserId(); 
+    try { 
+        // 1. Local Load
+        const saved = JSON.parse(localStorage.getItem(`DE_Stats_${uid}`) || '{}'); 
+        if(saved.sessions) state.stats = saved; 
+        
+        // 2. Firebase Cloud Load
+        if (typeof auth !== 'undefined' && auth.currentUser) {
+            const doc = await db.collection("userData").doc(uid).get();
+            if (doc.exists && doc.data().deStats) {
+                state.stats = { ...state.stats, ...doc.data().deStats };
+                localStorage.setItem(`DE_Stats_${uid}`, JSON.stringify(state.stats));
+            }
+        }
+    } catch(e){}
+    
     document.getElementById('de-dash-acc').innerText = state.stats.bestAcc + '%';
     document.getElementById('de-dash-speed').innerText = state.stats.bestCpm;
     document.getElementById('de-dash-cells').innerText = state.stats.totalCells;
     document.getElementById('de-dash-sessions').innerText = state.stats.sessions;
   }
 
-  function saveStats() { localStorage.setItem('DE_Stats', JSON.stringify(state.stats)); }
+  function saveStats() { 
+      let uid = getActiveUserId(); 
+      
+      localStorage.setItem(`DE_Stats_${uid}`, JSON.stringify(state.stats)); 
+      
+      // Firebase Cloud Save
+      if (typeof auth !== 'undefined' && auth.currentUser) {
+          db.collection("userData").doc(uid).set({ deStats: state.stats }, { merge: true }).catch(e => console.log("DE Sync Error:", e));
+      }
+  }
+
 
     function generateDataset() {
     const type = document.getElementById('de-cfg-type').value;
@@ -5120,46 +5192,74 @@ const DataEntryApp = (function() {
     }
 
     function clearTypingHistory() {
-        if(confirm("Are you sure you want to delete all typing history?")) {
-            localStorage.removeItem('StandaloneTypingHistory');
-            renderTypingHistory(); // UI ko refresh karne ke liye
+    if(confirm("Are you sure you want to delete all typing history?")) {
+        if (typeof auth !== 'undefined' && auth.currentUser) {
+            let uid = auth.currentUser.uid;
+            db.collection("userData").doc(uid).update({
+                typingHistory: firebase.firestore.FieldValue.delete()
+            }).then(() => renderTypingHistory()).catch(e => console.log(e));
+        } else {
+            // Guest User history clear
+            let uid = getActiveUserId();
+            localStorage.removeItem(`StandaloneTypingHistory_${uid}`);
+            renderTypingHistory();
         }
     }
+}
 
-    function renderTypingHistory() {
-        const container = document.getElementById('typing-history-list-container');
-        let history = [];
+
+// NAYA FIREBASE CODE YAHAN PASTE KARO (Line 5154 par)
+async function renderTypingHistory() {
+    const container = document.getElementById('typing-history-list-container');
+    container.innerHTML = '<p style="color:var(--text-secondary); text-align:center; padding: 20px;">Fetching Data... ⏳</p>';
+    
+    let history = [];
+
+    if (typeof auth !== 'undefined' && auth.currentUser) {
+        // LogGED IN USER: Fetch from Firebase
+        let uid = auth.currentUser.uid;
         try {
-            history = JSON.parse(localStorage.getItem('StandaloneTypingHistory') || '[]');
-        } catch(e) {}
-
-        container.innerHTML = '';
-        if(history.length === 0) {
-            container.innerHTML = '<p style="color:var(--text-secondary); text-align:center; padding: 20px;">No performance history found. Take a test first!</p>';
-            return;
-        }
-
-        history.forEach(record => {
-            let div = document.createElement('div');
-            div.style.background = 'rgba(0,0,0,0.4)';
-            div.style.border = '1px solid var(--glass-border)';
-            div.style.padding = '15px';
-            div.style.marginBottom = '10px';
-            div.style.borderRadius = '12px';
-            div.innerHTML = `
-                <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-                    <strong style="color:var(--text-primary); font-size: 0.95rem;">${record.date}</strong>
-                    <span style="color:var(--text-secondary); font-size:0.85rem; font-weight: 600;">${record.level} (${record.duration})</span>
-                </div>
-                <div style="display:flex; gap:15px; font-family:'JetBrains Mono', monospace; font-size: 0.9rem;">
-                    <span style="color:var(--accent-primary);">WPM: ${record.wpm}</span>
-                    <span style="color:var(--type-correct);">Acc: ${record.accuracy}</span>
-                    <span style="color:var(--text-secondary);">KDPH: ${record.kdph}</span>
-                </div>
-            `;
-            container.appendChild(div);
-        });
+            const doc = await db.collection("userData").doc(uid).get();
+            if (doc.exists && doc.data().typingHistory) {
+                history = doc.data().typingHistory;
+            }
+        } catch(e) { console.log(e); }
+    } else {
+        // GUEST USER: Fetch from LocalStorage
+        let uid = getActiveUserId();
+        history = JSON.parse(localStorage.getItem(`StandaloneTypingHistory_${uid}`) || '[]');
     }
+
+    container.innerHTML = '';
+    if(history.length === 0) {
+        container.innerHTML = '<p style="color:var(--text-secondary); text-align:center; padding: 20px;">No performance history found. Take a test first!</p>';
+        return;
+    }
+
+    
+
+    history.forEach(record => {
+        let div = document.createElement('div');
+        div.style.background = 'rgba(0,0,0,0.4)';
+        div.style.border = '1px solid var(--glass-border)';
+        div.style.padding = '15px';
+        div.style.marginBottom = '10px';
+        div.style.borderRadius = '12px';
+        div.innerHTML = `
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                <strong style="color:var(--text-primary); font-size: 0.95rem;">${record.date}</strong>
+                <span style="color:var(--text-secondary); font-size:0.85rem; font-weight: 600;">${record.level} (${record.duration})</span>
+            </div>
+            <div style="display:flex; gap:15px; font-family:'JetBrains Mono', monospace; font-size: 0.9rem;">
+                <span style="color:var(--accent-primary);">WPM: ${record.wpm}</span>
+                <span style="color:var(--type-correct);">Acc: ${record.accuracy}</span>
+                <span style="color:var(--text-secondary);">KDPH: ${record.kdph}</span>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+}
+
     
     // ==========================================
     // 🚪 PUBLIC API EXPORTS
@@ -5929,16 +6029,16 @@ class SpaceTyperGame {
         }
     }
 
-      saveStats() {
-        // 🔥 NAYA LOGIC
-        let userPrefix = localStorage.getItem('dest_playerName') || 'Guest';
-
+            saveStats() {
+        let userPrefix = getActiveUserId();
+        if (window.LevelEngine && this.score > 0) {
+            let earnedXP = Math.floor(this.score / 150) + 5;
+            window.LevelEngine.addXP(earnedXP);
+        }
         let scoreKey = `${userPrefix}_spaceTyper_bestScore_${this.difficulty}`;
         let wpmKey = `${userPrefix}_spaceTyper_bestWpm_${this.difficulty}`;
-        
         let existingScore = parseInt(localStorage.getItem(scoreKey)) || 0;
         let existingWpm = parseInt(localStorage.getItem(wpmKey)) || 0;
-        
         let badge = document.getElementById('newHighScoreBadge');
         
         if(this.score > existingScore) {
@@ -5946,28 +6046,20 @@ class SpaceTyperGame {
             if(badge) { badge.style.display = 'inline-block'; badge.classList.remove('hidden'); }
             let acc = this.keystrokes > 0 ? Math.round((this.correctKeystrokes / this.keystrokes) * 100) : 100;
             if(window.submitToLeaderboard) window.submitToLeaderboard('spaceTyper', this.score, this.wpm, acc);
-            
         } else {
             if(badge) badge.style.display = 'none';
         }
-
         if(this.wpm > existingWpm || existingWpm === 0) {
             localStorage.setItem(wpmKey, this.wpm);
         }
-        
-        // 🔥 NAYA: History key me bhi userPrefix add kar do
         let historyKey = `${userPrefix}_spaceTyper_GameHistory`;
         let history = JSON.parse(localStorage.getItem(historyKey) || '[]');
         let acc = this.keystrokes > 0 ? Math.round((this.correctKeystrokes / this.keystrokes) * 100) : 100;
         let dateStr = new Date().toLocaleString('en-IN', {day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'});
-
-        let currentGameStat = { date: dateStr, score: this.score, wpm: this.wpm, accuracy: acc, diff: this.difficulty.toUpperCase() };
-
-        history.unshift(currentGameStat); 
-        if(history.length > 10) history = history.slice(0, 10); 
-        localStorage.setItem(historyKey, JSON.stringify(history)); 
-        
-        this.parent.loadPersistentStats(); 
+        history.unshift({ date: dateStr, score: this.score, wpm: this.wpm, accuracy: acc, diff: this.difficulty.toUpperCase() });
+        if(history.length > 10) history = history.slice(0, 10);
+        localStorage.setItem(historyKey, JSON.stringify(history));
+        this.parent.loadPersistentStats();
     }
 
     playSound(freq, type, vol, endFreq = null) {
@@ -6510,44 +6602,39 @@ class WordRushGame {
         modal.classList.remove('hidden'); modal.style.display = 'flex';
     }
 
-    saveStats() {
-        // 🔥 NAYA LOGIC: Current user ka naam nikalo
-        let userPrefix = localStorage.getItem('dest_playerName') || 'Guest';
+    
 
-        // 🔥 NAYA: Key ke aage userPrefix add kar diya
+    saveStats() {
+        let userPrefix = getActiveUserId();
+        if (window.LevelEngine && this.score > 0) {
+            let earnedXP = Math.floor(this.score / 150) + 5;
+            window.LevelEngine.addXP(earnedXP);
+        }
         let scoreKey = `${userPrefix}_wordRush_bestScore_${this.difficulty}`;
         let wpmKey = `${userPrefix}_wordRush_bestWpm_${this.difficulty}`;
-        
         let existingScore = parseInt(localStorage.getItem(scoreKey)) || 0;
         let existingWpm = parseInt(localStorage.getItem(wpmKey)) || 0;
-        
         let badge = document.getElementById('newHighScoreBadge');
+        
         if(this.score > existingScore) {
             localStorage.setItem(scoreKey, this.score);
             if(badge) { badge.style.display = 'inline-block'; badge.classList.remove('hidden'); }
             let acc = this.keystrokes > 0 ? Math.round((this.correctKeystrokes / this.keystrokes) * 100) : 100;
             if(window.submitToLeaderboard) window.submitToLeaderboard('wordRush', this.score, this.wpm, acc);
-            
-        } else { 
-            if(badge) badge.style.display = 'none'; 
+        } else {
+            if(badge) badge.style.display = 'none';
         }
-
         if(this.wpm > existingWpm || existingWpm === 0) {
             localStorage.setItem(wpmKey, this.wpm);
         }
-        
-        // 🔥 NAYA: History save karte waqt bhi userPrefix use karo
         let historyKey = `${userPrefix}_wordRush_GameHistory`;
         let history = JSON.parse(localStorage.getItem(historyKey) || '[]');
         let acc = this.keystrokes > 0 ? Math.round((this.correctKeystrokes / this.keystrokes) * 100) : 100;
         let dateStr = new Date().toLocaleString('en-IN', {day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'});
-        
-        history.unshift({ date: dateStr, score: this.score, wpm: this.wpm, accuracy: acc, diff: this.difficulty.toUpperCase() }); 
-        
-        if(history.length > 10) history = history.slice(0, 10); 
-        localStorage.setItem(historyKey, JSON.stringify(history)); 
-        
-        this.parent.loadPersistentStats(); 
+        history.unshift({ date: dateStr, score: this.score, wpm: this.wpm, accuracy: acc, diff: this.difficulty.toUpperCase() });
+        if(history.length > 10) history = history.slice(0, 10);
+        localStorage.setItem(historyKey, JSON.stringify(history));
+        this.parent.loadPersistentStats();
     }
 
 
@@ -7543,45 +7630,41 @@ class TypingRacerGame {
         modal.classList.remove('hidden'); modal.style.display = 'flex';
     }
 
-     saveStats() {
-        // 🔥 NAYA LOGIC: Current user ka naam nikalo
-        let userPrefix = localStorage.getItem('dest_playerName') || 'Guest';
-
-        // 🔥 NAYA: Key ke aage userPrefix add kar diya
-        let scoreKey = `${userPrefix}_typingRacer_bestScore_${this.difficulty}`; 
+    
+        saveStats() {
+        let userPrefix = getActiveUserId();
+        let finalScore = Math.floor(this.distance);
+        if (window.LevelEngine && finalScore > 0) {
+            let earnedXP = Math.floor(finalScore / 150) + 5;
+            window.LevelEngine.addXP(earnedXP);
+        }
+        let scoreKey = `${userPrefix}_typingRacer_bestScore_${this.difficulty}`;
         let wpmKey = `${userPrefix}_typingRacer_bestWpm_${this.difficulty}`;
-        
         let existingScore = parseInt(localStorage.getItem(scoreKey)) || 0;
         let existingWpm = parseInt(localStorage.getItem(wpmKey)) || 0;
-        
         let badge = document.getElementById('newHighScoreBadge');
-        if(Math.floor(this.distance) > existingScore) {
-            localStorage.setItem(scoreKey, Math.floor(this.distance));
+        
+        if(finalScore > existingScore) {
+            localStorage.setItem(scoreKey, finalScore);
             if(badge) { badge.style.display = 'inline-block'; badge.classList.remove('hidden'); }
             let acc = this.keystrokes > 0 ? Math.round((this.correctKeystrokes / this.keystrokes) * 100) : 100;
-            if(window.submitToLeaderboard) window.submitToLeaderboard('typingRacer', Math.floor(this.distance), this.wpm, acc);
-            
-        } else { 
-            if(badge) badge.style.display = 'none'; 
+            if(window.submitToLeaderboard) window.submitToLeaderboard('typingRacer', finalScore, this.wpm, acc);
+        } else {
+            if(badge) badge.style.display = 'none';
         }
-
         if(this.wpm > existingWpm || existingWpm === 0) {
             localStorage.setItem(wpmKey, this.wpm);
         }
-        
-        // 🔥 NAYA: History save karte waqt bhi userPrefix use karo
         let historyKey = `${userPrefix}_typingRacer_GameHistory`;
         let history = JSON.parse(localStorage.getItem(historyKey) || '[]');
         let acc = this.keystrokes > 0 ? Math.round((this.correctKeystrokes / this.keystrokes) * 100) : 100;
         let dateStr = new Date().toLocaleString('en-IN', {day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'});
-        
-        history.unshift({ date: dateStr, score: Math.floor(this.distance), wpm: this.wpm, accuracy: acc, diff: this.difficulty.toUpperCase() }); 
-        
-        if(history.length > 10) history = history.slice(0, 10); 
-        localStorage.setItem(historyKey, JSON.stringify(history)); 
-        
-        this.parent.loadPersistentStats(); 
+        history.unshift({ date: dateStr, score: finalScore, wpm: this.wpm, accuracy: acc, diff: this.difficulty.toUpperCase() });
+        if(history.length > 10) history = history.slice(0, 10);
+        localStorage.setItem(historyKey, JSON.stringify(history));
+        this.parent.loadPersistentStats();
     }
+
 
 
     playSound(freq, type, vol, endFreq = null) {
@@ -8378,44 +8461,38 @@ class KeyboardNinjaGame {
         modal.classList.remove('hidden'); modal.style.display = 'flex';
     }
 
-    saveStats() {
-        // 🔥 NAYA LOGIC: Current user ka naam nikalo
-        let userPrefix = localStorage.getItem('dest_playerName') || 'Guest';
-
-        // 🔥 NAYA: Key ke aage userPrefix add kar diya
+    
+            saveStats() {
+        let userPrefix = getActiveUserId();
+        if (window.LevelEngine && this.score > 0) {
+            let earnedXP = Math.floor(this.score / 150) + 5;
+            window.LevelEngine.addXP(earnedXP);
+        }
         let scoreKey = `${userPrefix}_keyboardNinja_bestScore_${this.difficulty}`;
         let wpmKey = `${userPrefix}_keyboardNinja_bestWpm_${this.difficulty}`;
-        
         let existingScore = parseInt(localStorage.getItem(scoreKey)) || 0;
         let existingWpm = parseInt(localStorage.getItem(wpmKey)) || 0;
-        
         let badge = document.getElementById('newHighScoreBadge');
+        
         if(this.score > existingScore) {
             localStorage.setItem(scoreKey, this.score);
             if(badge) { badge.style.display = 'inline-block'; badge.classList.remove('hidden'); }
             let acc = this.keystrokes > 0 ? Math.round((this.correctKeystrokes / this.keystrokes) * 100) : 100;
             if(window.submitToLeaderboard) window.submitToLeaderboard('keyboardNinja', this.score, this.wpm, acc);
-            
-        } else { 
-            if(badge) badge.style.display = 'none'; 
+        } else {
+            if(badge) badge.style.display = 'none';
         }
-
         if(this.wpm > existingWpm || existingWpm === 0) {
             localStorage.setItem(wpmKey, this.wpm);
         }
-        
-        // 🔥 NAYA: History save karte waqt bhi userPrefix use karo
         let historyKey = `${userPrefix}_keyboardNinja_GameHistory`;
         let history = JSON.parse(localStorage.getItem(historyKey) || '[]');
         let acc = this.keystrokes > 0 ? Math.round((this.correctKeystrokes / this.keystrokes) * 100) : 100;
         let dateStr = new Date().toLocaleString('en-IN', {day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'});
-        
-        history.unshift({ date: dateStr, score: this.score, wpm: this.wpm, accuracy: acc, diff: this.difficulty.toUpperCase() }); 
-        
-        if(history.length > 10) history = history.slice(0, 10); 
-        localStorage.setItem(historyKey, JSON.stringify(history)); 
-        
-        this.parent.loadPersistentStats(); 
+        history.unshift({ date: dateStr, score: this.score, wpm: this.wpm, accuracy: acc, diff: this.difficulty.toUpperCase() });
+        if(history.length > 10) history = history.slice(0, 10);
+        localStorage.setItem(historyKey, JSON.stringify(history));
+        this.parent.loadPersistentStats();
     }
 
     playSound(freq, type, vol, endFreq = null) {
@@ -9346,16 +9423,17 @@ class TypingSurvivorGame {
         }
     }
 
-    saveStats() {
-        // 🔥 NAYA LOGIC: Current user ka naam nikalo (Isse data mix nahi hoga)
-        let userPrefix = localStorage.getItem('dest_playerName') || 'Guest';
-
+    
+        saveStats() {
+        let userPrefix = getActiveUserId();
+        if (window.LevelEngine && this.STATE.score > 0) {
+            let earnedXP = Math.floor(this.STATE.score / 150) + 5;
+            window.LevelEngine.addXP(earnedXP);
+        }
         let scoreKey = `${userPrefix}_typingSurvivor_bestScore_${this.difficulty}`;
         let wpmKey = `${userPrefix}_typingSurvivor_bestWpm_${this.difficulty}`;
-        
         let existingScore = parseInt(localStorage.getItem(scoreKey)) || 0;
         let existingWpm = parseInt(localStorage.getItem(wpmKey)) || 0;
-        
         let badge = document.getElementById('newHighScoreBadge');
         
         if(this.STATE.score > existingScore) {
@@ -9363,27 +9441,22 @@ class TypingSurvivorGame {
             if(badge) { badge.style.display = 'inline-block'; badge.classList.remove('hidden'); }
             let acc = this.STATE.keystrokes > 0 ? Math.round((this.STATE.correctKeystrokes / this.STATE.keystrokes) * 100) : 100;
             if(window.submitToLeaderboard) window.submitToLeaderboard('typingSurvivor', this.STATE.score, this.STATE.wpm, acc);
-            
         } else {
             if(badge) badge.style.display = 'none';
         }
-
         if(this.STATE.wpm > existingWpm || existingWpm === 0) {
             localStorage.setItem(wpmKey, this.STATE.wpm);
         }
-        
         let historyKey = `${userPrefix}_typingSurvivor_GameHistory`;
         let history = JSON.parse(localStorage.getItem(historyKey) || '[]');
         let acc = this.STATE.keystrokes > 0 ? Math.round((this.STATE.correctKeystrokes / this.STATE.keystrokes) * 100) : 100;
         let dateStr = new Date().toLocaleString('en-IN', {day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'});
-        
         history.unshift({ date: dateStr, score: this.STATE.score, wpm: this.STATE.wpm, accuracy: acc, diff: this.difficulty.toUpperCase() });
-        
         if(history.length > 10) history = history.slice(0, 10);
         localStorage.setItem(historyKey, JSON.stringify(history));
-
         this.parent.loadPersistentStats();
     }
+
 
     cleanup() {
         this.STATE.isPlaying = false;
@@ -9512,7 +9585,7 @@ class TypingGamesModule {
 
         loadPersistentStats() {
         // 🔥 NAYA: User ka naam nikal lo (agar login nahi hai toh 'Guest')
-        let userPrefix = localStorage.getItem('dest_playerName') || 'Guest';
+        let userPrefix = getActiveUserId();
 
         document.querySelectorAll('.game-card').forEach(card => {
             const gameKey = card.dataset.game; 
@@ -9533,7 +9606,7 @@ class TypingGamesModule {
         
         document.querySelectorAll('.game-diff-select').forEach(sel => {
             sel.onchange = (e) => {
-                let userPrefix = localStorage.getItem('dest_playerName') || 'Guest';
+                let userPrefix = getActiveUserId();
                 const pCard = e.target.closest('.game-card');
                 if(pCard) {
                     const gameKey = pCard.dataset.game;
@@ -9756,28 +9829,28 @@ if(window.loadMiniLeaderboards) window.loadMiniLeaderboards();
                         }
                     }, 100); 
                 };
-                   } else {
+                       } else {
             this.isTutorMode = false;
         }
         
         this.activeGameInstance.start();
-        setTimeout(() => this.forceFocus(), 600); // <-- YEH LINE YAHAN AAYEGI
+        setTimeout(() => this.forceFocus(), 600); 
+    } // <-- Yeh purana bracket sirf 'if' ko band kar raha hai
+
+} // ✅ NAYA BRACKET: Yeh 'startGame' function ko band karega! Ise zaroor lagao!
+
+    // 🔥 forceFocus aur exitToDashboard CLASS KE ANDAR HONE CHAHIYE
+    forceFocus() {
+        const input = document.getElementById('hiddenGameInput');
+        if(input) {
+            input.focus();
+            setTimeout(() => input.focus(), 500); 
+        }
     }
-}
 
-// 🔥 NAYA FUNCTION YAHAN AAYEGA (exitToDashboard se theek upar)
-forceFocus() {
-    const input = document.getElementById('hiddenGameInput');
-    if(input) {
-        input.focus();
-        setTimeout(() => input.focus(), 500); // 500ms baad firse retry
-    }
-}
 
-// 🔥 FIX 4: Screen freeze fix (force hides the black canvas area properly)
-exitToDashboard() {
-    if(this.tutorCheckInterval) {
-
+    exitToDashboard() {
+        if(this.tutorCheckInterval) {
             clearInterval(this.tutorCheckInterval);
             this.tutorCheckInterval = null;
         }
@@ -9815,8 +9888,8 @@ exitToDashboard() {
             this.showGamesDashboard();
         }
     }
-}
 
+} 
 window.typingGamesModule = new TypingGamesModule();
 // =========================================================
 // 🚀 THE REAL BULLETPROOF BUTTON FIX (KILLS OLD LISTENERS)
@@ -10126,25 +10199,26 @@ function loginWithGoogle() {
         const user = result.user;
         localStorage.setItem('dest_playerName', user.displayName);
         alert("Welcome, " + user.displayName + "! 🚀");
+        window.location.reload(); // <-- YEH NAYI LINE ADD KARO
     }).catch((error) => {
-        console.error("Login Error: ", error.message);
-        alert("Login Failed: " + error.message);
+        // ...
     });
 }
 
 function logoutGoogle() {
     auth.signOut().then(() => {
         localStorage.removeItem('dest_playerName');
+        localStorage.removeItem('dest_playerDP');
+        document.getElementById('account-modal').classList.add('hidden');
         alert("Logged out successfully!");
-    }).catch((error) => {
-        console.error("Logout Error: ", error);
+        window.location.reload(); // <-- YEH NAYI LINE ADD KARO
     });
 }
 
 // 🔥 NAV BAR DP CLICK & ACCOUNT MODAL LOGIC
 let selectedDPBase64 = null; // Compress hui image yahan save hogi
 
-auth.onAuthStateChanged((user) => {
+auth.onAuthStateChanged(async (user) => {
     const navLoginBtn = document.getElementById('navLoginBtn');
     
     if (user) {
@@ -10162,18 +10236,33 @@ auth.onAuthStateChanged((user) => {
             };
         }
         localStorage.setItem('dest_playerName', user.displayName);
+
+        // 🔥 MAGIC FIX: LOGIN HOTE HI CLOUD SE LEVEL/XP & STATS SYNC KARO
+        try {
+            const doc = await db.collection("userData").doc(user.uid).get();
+            if (doc.exists) {
+                const data = doc.data();
+                if (data.tutorData) {
+                    window.tutorData = { ...window.tutorData, ...data.tutorData };
+                    localStorage.setItem(`DEST_TutorData_${user.uid}`, JSON.stringify(window.tutorData));
+                }
+                if (data.deStats && window.DataEntryApp) {
+                    localStorage.setItem(`DE_Stats_${user.uid}`, JSON.stringify(data.deStats));
+                }
+            }
+            // Sync hone ke baad UI par Naya Level dikhao
+            if(window.LevelEngine) window.LevelEngine.updateUI();
+        } catch(e) { console.log("Login Sync Error:", e); }
+
     } else {
         if(navLoginBtn) {
-            
-
-// Naya Code lagao:
-navLoginBtn.innerHTML = '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
-
+            navLoginBtn.innerHTML = '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
             navLoginBtn.title = 'Sign in with Google';
             navLoginBtn.onclick = loginWithGoogle;
         }
     }
 });
+
 
 // 🔥 IMAGE AUTO-COMPRESS (Canvas Logic)
 window.handleDPSelect = function(e) {
@@ -10281,6 +10370,7 @@ function logoutGoogle() {
 }
 
 </script>
+
 <!-- Isko body ke bilkul end me rakho, kisi div ke andar nahi -->
 <input type="text" id="hiddenGameInput" style="position: fixed; top: 0; left: 0; width: 0; height: 0; opacity: 0; pointer-events: none; z-index: 9999;">
 <!-- 🏆 GLOBAL LEADERBOARD MODAL -->
@@ -11615,6 +11705,289 @@ window.showLeaderboard = async function(gameId = 'all') {
     </div>
   </div>
 </div>
+<!-- 🚀 MASTER BUG FIX PATCH (Paste this just above </body>) 🚀 -->
+<script>
+(function() {
+    console.log("Applying Master Bug Fixes...");
+
+    // 🔥 1. PERFORMANCE FIX: Game Loops mein DOM Lag theek karna
+    // Ye code har frame par score update hone se rokega, jisse FPS drop/hang nahi hoga.
+    const optimizeHUD = (GameClass) => {
+        if(!GameClass) return;
+        const origUpdate = GameClass.prototype.updateHUD;
+        GameClass.prototype.updateHUD = function() {
+            if(!this.hudElements) {
+                this.hudElements = {
+                    score: document.getElementById('liveScore'),
+                    lives: document.getElementById('liveLives'),
+                    combo: document.getElementById('liveCombo'),
+                    wpm: document.getElementById('liveWpm')
+                };
+                this.lastRendered = { score: -1, lives: -1, combo: -1, wpm: -1 };
+            }
+
+            let currentScore = this.score !== undefined ? this.score : Math.floor(this.distance || 0);
+            let currentLives = this.lives;
+            let currentCombo = this.combo;
+            let mins = (Date.now() - this.startTime) / 60000;
+            if(mins > 0) this.wpm = Math.max(0, Math.round((this.correctKeystrokes / 5) / mins));
+            let currentWpm = this.wpm;
+
+            if(this.lastRendered.score !== currentScore && this.hudElements.score) {
+                this.hudElements.score.innerText = currentScore;
+                this.lastRendered.score = currentScore;
+            }
+            if(this.lastRendered.lives !== currentLives && this.hudElements.lives) {
+                this.hudElements.lives.innerText = '❤️ '.repeat(Math.max(0, currentLives));
+                this.lastRendered.lives = currentLives;
+            }
+            if(this.lastRendered.combo !== currentCombo && this.hudElements.combo) {
+                this.hudElements.combo.innerText = currentCombo + 'x';
+                this.lastRendered.combo = currentCombo;
+            }
+            if(this.lastRendered.wpm !== currentWpm && this.hudElements.wpm) {
+                this.hudElements.wpm.innerText = currentWpm;
+                this.lastRendered.wpm = currentWpm;
+            }
+        };
+    };
+
+    if(typeof SpaceTyperGame !== 'undefined') optimizeHUD(SpaceTyperGame);
+    if(typeof WordRushGame !== 'undefined') optimizeHUD(WordRushGame);
+    if(typeof TypingRacerGame !== 'undefined') optimizeHUD(TypingRacerGame);
+    if(typeof KeyboardNinjaGame !== 'undefined') optimizeHUD(KeyboardNinjaGame);
+
+    // 🔥 2. GAME LOOP FIX: Pause/Resume karne par game double speed se bhagne lagta tha, wo fix ho gaya
+    const fixGameLoop = (GameClass) => {
+        if(!GameClass) return;
+        const origResume = GameClass.prototype.resume;
+        GameClass.prototype.resume = function() {
+            if(this.loopReq) cancelAnimationFrame(this.loopReq); 
+            origResume.call(this);
+        };
+    };
+    if(typeof SpaceTyperGame !== 'undefined') fixGameLoop(SpaceTyperGame);
+    if(typeof WordRushGame !== 'undefined') fixGameLoop(WordRushGame);
+    if(typeof TypingRacerGame !== 'undefined') fixGameLoop(TypingRacerGame);
+    if(typeof KeyboardNinjaGame !== 'undefined') fixGameLoop(KeyboardNinjaGame);
+    
+    // Survivor game ke paas loopId hai loopReq ki jagah
+    if(typeof TypingSurvivorGame !== 'undefined') {
+        const origResumeTS = TypingSurvivorGame.prototype.resume;
+        TypingSurvivorGame.prototype.resume = function() {
+            if(this.loopId) cancelAnimationFrame(this.loopId);
+            origResumeTS.call(this);
+        };
+    }
+
+    // 🔥 3. MOBILE KEYBOARD FIX: Gboard auto-correct ki wajah se typing break ho rahi thi
+    const hiddenInputs = ['hidden-focus-input', 'game-hidden-input', 'hiddenGameInput'];
+    hiddenInputs.forEach(id => {
+        let el = document.getElementById(id);
+        if(el) {
+            el.setAttribute('autocomplete', 'off');
+            el.setAttribute('autocorrect', 'off');
+            el.setAttribute('autocapitalize', 'off');
+            el.setAttribute('spellcheck', 'false');
+        }
+    });
+
+    // 🔥 4. MEMORY LEAK FIX: Game se exit karne ke baad bhi background mein keys press hone wala glitch theek ho gaya
+    if(window.typingGamesModule) {
+        const origExit = window.typingGamesModule.exitToDashboard;
+        window.typingGamesModule.exitToDashboard = function(forceSilent = false) {
+            if(this.activeGameInstance && typeof this.activeGameInstance.keydownBind === 'function') {
+                window.removeEventListener('keydown', this.activeGameInstance.keydownBind);
+            }
+            origExit.call(this, forceSilent);
+        };
+    }
+})();
+</script>
+<!-- ⚔️ 1V1 PLAY AGAIN ANIMATION FIX -->
+<script>
+(function() {
+    console.log("Applying 1v1 Play Again Fix...");
+
+    if (typeof MultiplayerEngine !== 'undefined') {
+        MultiplayerEngine.playAgain = function() {
+            let gameToPlay = this.gameId;
+            const vsModal = document.getElementById('vs-result-modal');
+            if(vsModal) vsModal.classList.add('hidden');
+            
+            this.cleanup(); // Clean old match data
+            
+            // Go to dashboard silently
+            if (window.typingGamesModule) window.typingGamesModule.exitToDashboard(true);
+            
+            setTimeout(() => { 
+                // 🔥 THE FIX: Forcefully open the matchmaking modal overlay 
+                // before searching for a new opponent
+                document.body.classList.add('modal-open');
+                
+                const challengeModal = document.getElementById('vs-challenge-modal');
+                if (challengeModal) challengeModal.classList.remove('hidden');
+                
+                const gamesGrid = document.getElementById('vs-games-grid');
+                if (gamesGrid) gamesGrid.style.display = 'none'; // Hide game selection
+                
+                // Start finding opponent
+                if(typeof proceedToMatchmaking === 'function') proceedToMatchmaking(gameToPlay); 
+            }, 500);
+        };
+    }
+})();
+</script>
+<!-- 🚀 1v1 EXIT ROUTING FIX -->
+<script>
+(function() {
+    console.log("Applying 1v1 Exit Routing Fix...");
+
+    if (typeof MultiplayerEngine !== 'undefined') {
+        
+        // Fix 1: "EXIT ARENA" dabane par ab seedha Main Menu (Bento Grid) par jayega
+        const origCloseResultAndExit = MultiplayerEngine.closeResultAndExit;
+        MultiplayerEngine.closeResultAndExit = function() {
+            origCloseResultAndExit.call(this); // Purana cleanup chalega
+            
+            // Single Player dashboard ko hide karke Main Menu show karega
+            if(window.typingGamesModule) {
+                window.typingGamesModule.hideGamesDashboard();
+            }
+        };
+
+        // Fix 2: "PLAY AGAIN" dabane par matchmaking background mein Single Player screen nahi aayegi
+        const origPlayAgain = MultiplayerEngine.playAgain;
+        MultiplayerEngine.playAgain = function() {
+            origPlayAgain.call(this); // Purana Play Again logic chalega
+            
+            // Background ko cleanly Main Menu par set kar dega
+            if(window.typingGamesModule) {
+                window.typingGamesModule.hideGamesDashboard();
+            }
+        };
+    }
+})();
+</script>
+<!-- 🎨 THEME PARTITION UNLOCKER PATCH (V2 - BUG FIXED) -->
+<script>
+(function() {
+    console.log("Unlocking All Themes (Error Free)...");
+
+    const themeSelect = document.getElementById('set-theme');
+    const optDark = document.getElementById('opt-dark');
+    const optLight = document.getElementById('opt-light');
+
+    if (themeSelect && optDark && optLight) {
+        // 1. Saare options ko nikal lo
+        const allOptions = Array.from(themeSelect.querySelectorAll('option'));
+        
+        // 2. Ek dummy Safe Box banao
+        const hiddenSafeBox = document.createElement('div');
+        hiddenSafeBox.style.display = 'none';
+        document.body.appendChild(hiddenSafeBox);
+        
+        // 3. Optgroups (Partitions) ko Safe Box mein chhipa do 
+        // Taaki internal system ko ye mil jayein aur "null" error crash na ho
+        hiddenSafeBox.appendChild(optDark);
+        hiddenSafeBox.appendChild(optLight);
+        
+        // 4. Ab saare options wapas direct select box mein daal do (enabled mode mein)
+        allOptions.forEach(opt => {
+            opt.disabled = false;
+            themeSelect.appendChild(opt);
+        });
+    }
+
+    // 5. Toggle Mode Bug Fix: Theme gayab nahi hogi
+    if (typeof window.toggleLightMode === 'function' && typeof window.applySettingsFromModal === 'function') {
+        const originalToggle = window.toggleLightMode;
+        
+        window.toggleLightMode = function() {
+            // Button dabane se pehle current theme ka backup le lo
+            const currentTheme = document.getElementById('set-theme').value;
+            
+            // Original system chalne do (jo mode switch karega)
+            originalToggle.call(this);
+            
+            // System ko theme reset karne se roko aur purani theme wapas apply kardo!
+            if(currentTheme && currentTheme !== 'none') {
+                document.getElementById('set-theme').value = currentTheme;
+                window.applySettingsFromModal(); // Ye original settings ko update kar dega
+            }
+        };
+    }
+})();
+</script>
+<!-- ⚡ ULTRA-LIGHTWEIGHT FADE THEME PATCH (ZERO LAG) -->
+<script>
+(function() {
+    console.log("Applying Ultra-Lightweight Fade Theme Animation...");
+
+    // 1. Heavy animations (Blur/Scale) hata kar sirf Colors aur Opacity rakhi hai
+    const style = document.createElement('style');
+    style.innerHTML = `
+        /* Har element par sirf 0.3s ka fast aur smooth color transition */
+        body, .app-container, .bento-card, .stat-card, .search-input, 
+        .btn, .util-icon-btn, .setup-header, .config-card, .typing-box, 
+        .game-card, .tutor-hero-card, .tutor-lesson-card, .modal-box {
+            transition: background-color 0.3s ease-out, border-color 0.3s ease-out, 
+                        color 0.3s ease-out, box-shadow 0.3s ease-out !important;
+            /* Heavy properties ko zabardasti block kar diya taaki lag na ho */
+            transform: none !important;
+            filter: none !important;
+        }
+        
+        /* Background Container sirf Opacity par fade hoga (GPU Accelerated) */
+        #dynamic-bg-container {
+            transition: opacity 0.3s ease-out !important;
+        }
+    `;
+    document.head.appendChild(style);
+
+    // 2. Override the Theme Switcher with Lightweight Logic
+    if (typeof window.applySettings === 'function') {
+        window.applySettings = function() {
+            const bgContainer = document.getElementById('dynamic-bg-container');
+            
+            // A. Sirf purane background particles ko fade-out (hide) karo
+            if (bgContainer) {
+                bgContainer.style.opacity = '0';
+            }
+
+            // B. 100 milliseconds wait karo, fir Colors change kardo
+            setTimeout(() => {
+                // Background me Colors aur Theme swap kar do (CSS transition isko smooth banayega)
+                document.body.setAttribute('data-theme', settings.theme); 
+                document.body.style.setProperty('--ui-font', settings.font); 
+                document.body.classList.toggle('no-effects', settings.removeEffect); 
+                document.body.classList.toggle('light-mode', settings.lightMode); 
+                
+                // Update Sun/Moon Icon
+                const btn = document.getElementById('mode-toggle-btn');
+                if(btn) {
+                    btn.innerHTML = settings.lightMode 
+                    ? '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>' 
+                    : '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
+                }
+
+                // Naye background particles (stars/matrix) generate kar lo
+                if (typeof renderDynamicBackground === 'function') {
+                    renderDynamicBackground(settings.theme);
+                }
+                
+                // C. Naye particles ko wapas Fade-in (show) kar do
+                requestAnimationFrame(() => {
+                    setTimeout(() => {
+                        if (bgContainer) bgContainer.style.opacity = '1';
+                    }, 50); // Ekdum halka delay taaki rendering atak na jaye
+                });
+                
+            }, 100); // 100ms ka fast delay
+        };
+    }
+})();
+</script>
 
 </body>
 </html>
