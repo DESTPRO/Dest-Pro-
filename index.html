@@ -3052,7 +3052,7 @@ body.light-mode .random-btn .vs-icon { background: rgba(255, 255, 255, 0.2) !imp
   <div class="modal-box" style="max-width: 480px;">
     <div class="flex-between mb-2">
       <h3 style="color:var(--text-primary);font-size:1.4rem;font-weight:800;">1v1 <span style="color:#ef4444;">BATTLE ARENA</span></h3>
-    <button class="btn btn-outline btn-sm" style="margin-top: 25px;" onclick="cancelMatchmaking()">Cancel Search</button>
+    <button class="btn btn-outline btn-sm" style="margin-top: 25px;" onclick="cancelMatchmaking()">back</button>
 
     </div>
     <p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom: 20px;">Select a game mode to challenge a random opponent globally.</p>
@@ -12148,6 +12148,60 @@ window.showLeaderboard = async function(gameId = 'all') {
                 }
             });
         });
+    }
+})();
+</script>
+<!-- 🌟 1V1 EXP DISPLAY GUARANTEE PATCH -->
+<script>
+(function() {
+    console.log("Applying 1v1 EXP Display Guarantee...");
+
+    if (typeof MultiplayerEngine !== 'undefined') {
+        const origShowResult = MultiplayerEngine.showResultModal;
+
+        MultiplayerEngine.showResultModal = function(oppDisconnected) {
+            // 1. Purana logic chalne do
+            origShowResult.call(this, oppDisconnected);
+
+            const expLabel = document.getElementById('vs-res-exp');
+
+            // 2. Auth Check (Guest ko nahi dikhana hai)
+            if (typeof auth === 'undefined' || !auth.currentUser) {
+                if (expLabel) expLabel.style.display = 'none';
+                return;
+            }
+
+            // 3. Logged-in User ke liye Forcefully EXP dikhao aur Animate karo
+            if (expLabel) {
+                // Animation reset (taaki baar-baar chal sake)
+                expLabel.style.animation = 'none';
+                expLabel.offsetHeight; // Reflow trick
+
+                // Calculate Win/Loss/Draw
+                let isWin = false; let isDraw = false;
+                if (this.myStatus === 'surrendered' || this.myStatus === 'dead') { isWin = false; }
+                else if (oppDisconnected || this.oppStatus === 'surrendered' || this.oppStatus === 'dead') { isWin = true; }
+                else if (this.myScore > this.oppScore) { isWin = true; }
+                else if (this.myScore === this.oppScore) { isDraw = true; }
+
+                let expChange = isWin ? 50 : (isDraw ? 10 : -25);
+
+                // Styling and Text
+                if (expChange > 0) {
+                    expLabel.innerHTML = `+${expChange} EXP 🌟`;
+                    expLabel.style.color = '#fbbf24';
+                    expLabel.style.textShadow = '0 0 15px rgba(251,191,36,0.8)';
+                } else {
+                    expLabel.innerHTML = `${expChange} EXP 💀`;
+                    expLabel.style.color = '#ef4444';
+                    expLabel.style.textShadow = '0 0 15px rgba(239,68,68,0.8)';
+                }
+
+                // Force Display and Animation
+                expLabel.style.setProperty('display', 'block', 'important');
+                expLabel.style.animation = 'rankPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
+            }
+        };
     }
 })();
 </script>
