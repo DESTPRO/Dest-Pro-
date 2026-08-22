@@ -11315,12 +11315,23 @@ if (typeof TypingRacerGame !== 'undefined') {
     };
 }
 // ==========================================
-// 🌟 MASTER LEVEL & EXP ENGINE (WITH PERMANENT AUTO-SAVE)
+// 🌟 MASTER LEVEL & EXP ENGINE (MULTI-ACCOUNT FIX)
 // ==========================================
 window.LevelEngine = {
+    // 🔥 NEW: Har account ke liye ek Unique Memory Key banayega
+    getKey: function() {
+        let uid = "guest";
+        if (typeof auth !== 'undefined' && auth.currentUser) {
+            uid = auth.currentUser.uid;
+        } else if (localStorage.getItem('dest_playerName')) {
+            uid = localStorage.getItem('dest_playerName').replace(/\s+/g, '').toLowerCase();
+        }
+        return 'dest_playerXP_' + uid;
+    },
+
     init: function() {
-        // Page load hote hi LocalStorage se purani EXP uthao
-        let savedXP = localStorage.getItem('dest_playerXP');
+        // Sirf usi account ki memory load karo jo login hai
+        let savedXP = localStorage.getItem(this.getKey());
         if(savedXP !== null) {
             if(!window.tutorData) window.tutorData = {};
             window.tutorData.xp = parseInt(savedXP);
@@ -11328,39 +11339,39 @@ window.LevelEngine = {
     },
     
     addXP: function(amount) {
-        // Current XP nikaalo aur usme nayi EXP jodo
         let currentXP = 0;
-        let savedXP = localStorage.getItem('dest_playerXP');
-        if(savedXP !== null) currentXP = parseInt(savedXP);
-        else if (window.tutorData && window.tutorData.xp) currentXP = window.tutorData.xp;
-
-        let newXP = Math.max(0, currentXP + amount); // 0 se kam nahi jayegi
+        let savedXP = localStorage.getItem(this.getKey());
         
-        // 🔥 PERMANENT SAVE IN BROWSER STORAGE
-        localStorage.setItem('dest_playerXP', newXP);
+        if(savedXP !== null) {
+            currentXP = parseInt(savedXP);
+        } else if (window.tutorData && window.tutorData.xp) {
+            currentXP = window.tutorData.xp;
+        }
+
+        let newXP = Math.max(0, currentXP + amount);
+        
+        // 🔥 PERMANENT SAVE (Specific to this user's ID)
+        localStorage.setItem(this.getKey(), newXP);
         
         if(!window.tutorData) window.tutorData = {};
         window.tutorData.xp = newXP;
         
-        // Firebase Backup (Agar function available hai)
         if (typeof window.saveTutorData === 'function') window.saveTutorData();
         
-        this.updateUI(); // Turant screen par update dikhao
+        this.updateUI();
     },
 
     getStats: function() {
         let xp = 0;
-        // Hamesha LocalStorage se exact value uthao
-        let savedXP = localStorage.getItem('dest_playerXP');
+        let savedXP = localStorage.getItem(this.getKey());
+        
         if(savedXP !== null) {
             xp = parseInt(savedXP);
         } else if(window.tutorData && window.tutorData.xp) {
             xp = window.tutorData.xp;
         }
         
-        // Smooth scaling level formula
         let level = Math.floor(Math.sqrt(xp / 50)) + 1;
-        
         let currentLevelBaseXp = Math.pow(level - 1, 2) * 50;
         let nextLevelBaseXp = Math.pow(level, 2) * 50;
         let xpIntoLevel = xp - currentLevelBaseXp;
@@ -11404,13 +11415,17 @@ window.LevelEngine = {
         }
     }
 };
-// Game load hote hi memory restore karo
-window.LevelEngine.init();
-setInterval(() => { if(window.LevelEngine) window.LevelEngine.updateUI(); }, 2000);
 
+// 🔥 FIX: Loop me hamesha check karega ki kaunsa user login hai
+setInterval(() => { 
+    if(window.LevelEngine) { 
+        window.LevelEngine.init(); 
+        window.LevelEngine.updateUI(); 
+    } 
+}, 2000);
 
 // ==========================================
-// 🏆 OVERRIDE: FIREBASE SAVE SCORE (NOW INCLUDES LEVEL)
+// 🏆 OVERRIDE: FIREBASE SAVE SCORE (LEVEL FIX)
 // ==========================================
 window.submitToLeaderboard = async function(gameId, score, wpm, accuracy) {
     if(score <= 0) return;
@@ -11433,6 +11448,13 @@ window.submitToLeaderboard = async function(gameId, score, wpm, accuracy) {
             const existingData = docSnap.data();
             if (score <= existingData.score) return; 
         }
+        
+        // Hamesha current level ko nikal kar database mein bhejega
+        let currentLevel = 1;
+        if(window.LevelEngine) {
+            currentLevel = window.LevelEngine.getStats().level;
+        }
+
         await scoreRef.set({
             name: playerName,
             score: Number(score),
@@ -11440,7 +11462,7 @@ window.submitToLeaderboard = async function(gameId, score, wpm, accuracy) {
             accuracy: Number(accuracy),
             uid: userId,
             photoURL: userDP,
-            level: window.LevelEngine.getStats().level, // 🔥 LEVEL PUSHED TO FIREBASE!
+            level: currentLevel, // 🔥 LEVEL PROPERLY SAVED!
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
         if(window.loadMiniLeaderboards) window.loadMiniLeaderboards();
@@ -11448,7 +11470,7 @@ window.submitToLeaderboard = async function(gameId, score, wpm, accuracy) {
 };
 
 // ==========================================
-// 🏆 OVERRIDE: GLOBAL LEADERBOARD (NOW DISPLAYS LEVEL BADGES)
+// 🏆 OVERRIDE: GLOBAL LEADERBOARD (BADGE 100% VISIBLE FIX)
 // ==========================================
 window.showLeaderboard = async function(gameId = 'all') {
     const oldModal = document.getElementById('globalLeaderboardModal');
@@ -11507,16 +11529,24 @@ window.showLeaderboard = async function(gameId = 'all') {
                 gameBadgeHtml = `<div style="color: ${meta.color}; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; margin-top: 4px; letter-spacing: 0.5px;">${meta.icon} ${meta.name}</div>`;
             }
 
-            // 🔥 NEW: LEVEL BADGE HTML INJECTED NEXT TO NAME
-            let playerLevelBadge = data.level ? `<span style="background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.4); font-size: 0.55rem; padding: 2px 4px; border-radius: 4px; margin-left: 6px; font-weight: 900; vertical-align: middle; box-shadow: 0 0 5px rgba(251,191,36,0.2);">LVL ${data.level}</span>` : '';
+            // 🔥 100% WORKING LEVEL BADGE LOGIC (With Z-Index Check to prevent hiding)
+            let playerLvl = data.level ? data.level : 1; 
+            let dpWithLevelBadge = `
+                <div style="position:relative; display:inline-flex; align-items:center; justify-content:center; flex-shrink: 0;">
+                    <img src="${dpPic}" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 2px solid #334155;">
+                    <span style="position:absolute; bottom:-4px; right:-6px; background:#fbbf24; color:#000; font-size:0.6rem; font-weight:900; padding:1px 4px; border-radius:6px; border:1px solid #000; box-shadow: 0 0 5px rgba(251,191,36,0.8); z-index: 10;">${playerLvl}</span>
+                </div>
+            `;
 
             listContainer.innerHTML += `
             <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.05); ${isMe} padding: 12px 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
                 <div style="display: flex; align-items: center; gap: 10px; width: 65%;">
                     <div style="font-weight: 900; width: 25px; text-align: center; ${rankStyle}">${medal}</div>
-                    <img src="${dpPic}" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 2px solid #334155; flex-shrink: 0;">
+                    
+                    ${dpWithLevelBadge}
+                    
                     <div style="overflow: hidden; text-align: left;">
-                        <div style="color: #ffffff; font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center;">${data.name} ${playerLevelBadge}</div>
+                        <div style="color: #ffffff; font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${data.name}</div>
                         <div style="color: #94a3b8; font-size: 0.75rem;">Acc: <span style="color:var(--type-correct);">${data.accuracy}%</span></div>
                         ${gameBadgeHtml}
                     </div>
@@ -11530,6 +11560,7 @@ window.showLeaderboard = async function(gameId = 'all') {
         });
     } catch (e) { console.error(e); listContainer.innerHTML = '<div style="text-align:center; padding:20px; color:#ff3333;">Network Error.</div>'; }
 };
+
 
 </script>
 <!-- 👤 MY ACCOUNT MODAL -->
