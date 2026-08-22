@@ -12076,6 +12076,81 @@ window.showLeaderboard = async function(gameId = 'all') {
 
 })();
 </script>
+<!-- 🔒 1V1 LOGIN RESTRICTION PATCH -->
+<script>
+(function() {
+    console.log("Applying 1v1 Login Restriction...");
+
+    // 1. Intercept the 1v1 Modal Open Function
+    if (typeof window.openChallengeModal === 'function') {
+        const origOpenChallengeModal = window.openChallengeModal;
+        
+        window.openChallengeModal = function() {
+            // Check if user is NOT logged in (Guest)
+            if (typeof auth === 'undefined' || !auth.currentUser) {
+                
+                // Show a Premium Toast Notification
+                const toast = document.createElement('div');
+                toast.innerHTML = '⚠️ <b style="letter-spacing:1px;">LOGIN REQUIRED</b><br><span style="font-size:0.8rem; color:#94a3b8;">Please Sign In with Google to enter the Arena!</span>';
+                toast.style.cssText = 'position:fixed; top:20px; left:50%; transform:translateX(-50%); background:rgba(2, 6, 23, 0.95); border:1px solid #ef4444; color:#fff; padding:15px 25px; border-radius:12px; z-index:9999999; box-shadow:0 10px 30px rgba(239, 68, 68, 0.4); text-align:center; animation:elegantSlideUp 0.3s forwards;';
+                document.body.appendChild(toast);
+                
+                // Auto-remove the toast after 3 seconds
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    toast.style.transition = 'opacity 0.3s';
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+                
+                // Highlight the Login Button in Nav Bar to guide the user
+                const loginBtn = document.getElementById('navLoginBtn');
+                if(loginBtn) {
+                    loginBtn.style.boxShadow = '0 0 20px #ef4444, inset 0 0 10px #ef4444';
+                    loginBtn.style.borderColor = '#ef4444';
+                    loginBtn.style.color = '#ef4444';
+                    
+                    // Reset styling after 3 seconds
+                    setTimeout(() => {
+                        loginBtn.style.boxShadow = '';
+                        loginBtn.style.borderColor = '';
+                        loginBtn.style.color = '';
+                    }, 3000);
+                }
+                
+                return; // Stop the 1v1 modal from opening!
+            }
+            
+            // If logged in, open the 1v1 Modal normally
+            origOpenChallengeModal.call(this);
+        };
+    }
+
+    // 2. Visually update the 1v1 Card Text based on Auth State in real-time
+    if (typeof auth !== 'undefined') {
+        auth.onAuthStateChanged((user) => {
+            // Find the 1v1 Bento Card
+            const vsCards = document.querySelectorAll('button[onclick="openChallengeModal()"]');
+            
+            vsCards.forEach(card => {
+                const desc = card.querySelector('.bento-desc');
+                if (desc) {
+                    if (user) {
+                        // Logged In -> Show normal text
+                        desc.innerHTML = 'Online Multiplayer';
+                        desc.style.color = 'var(--text-secondary)';
+                        desc.style.fontWeight = 'normal';
+                    } else {
+                        // Guest -> Show locked text in RED
+                        desc.innerHTML = ' Login Required';
+                        desc.style.color = '#ef4444';
+                        desc.style.fontWeight = 'bold';
+                    }
+                }
+            });
+        });
+    }
+})();
+</script>
 
 </body>
 </html>
