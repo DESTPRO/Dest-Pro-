@@ -11425,7 +11425,7 @@ setInterval(() => {
 }, 2000);
 
 // ==========================================
-// 🏆 OVERRIDE: FIREBASE SAVE SCORE (LEVEL FIX)
+// 🏆 OVERRIDE: FIREBASE SAVE SCORE (LEVEL SYNC FIX)
 // ==========================================
 window.submitToLeaderboard = async function(gameId, score, wpm, accuracy) {
     if(score <= 0) return;
@@ -11442,19 +11442,29 @@ window.submitToLeaderboard = async function(gameId, score, wpm, accuracy) {
     }
 
     try {
-        const scoreRef = db.collection("leaderboards").doc(gameId).collection("scores").doc(userId);
-        const docSnap = await scoreRef.get();
-        if (docSnap.exists) {
-            const existingData = docSnap.data();
-            if (score <= existingData.score) return; 
-        }
-        
-        // Hamesha current level ko nikal kar database mein bhejega
+        // Hamesha current level nikal lo
         let currentLevel = 1;
         if(window.LevelEngine) {
             currentLevel = window.LevelEngine.getStats().level;
         }
 
+        const scoreRef = db.collection("leaderboards").doc(gameId).collection("scores").doc(userId);
+        const docSnap = await scoreRef.get();
+        
+        if (docSnap.exists) {
+            const existingData = docSnap.data();
+            if (score <= existingData.score) {
+                // 🔥 THE FIX: Agar High Score nahi bhi bana, tab bhi LEVEL update kar do!
+                await scoreRef.update({ 
+                    level: currentLevel, 
+                    photoURL: userDP, 
+                    name: playerName 
+                }).catch(()=>{}); 
+                return; // Bas update karke wapas aa jao, score mat badlo
+            }
+        }
+
+        // Agar Naya High Score bana hai, toh poora data fresh save karo
         await scoreRef.set({
             name: playerName,
             score: Number(score),
@@ -11462,9 +11472,10 @@ window.submitToLeaderboard = async function(gameId, score, wpm, accuracy) {
             accuracy: Number(accuracy),
             uid: userId,
             photoURL: userDP,
-            level: currentLevel, // 🔥 LEVEL PROPERLY SAVED!
+            level: currentLevel,
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
+        
         if(window.loadMiniLeaderboards) window.loadMiniLeaderboards();
     } catch (e) { console.error("Error saving score: ", e); }
 };
