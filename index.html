@@ -12540,6 +12540,79 @@ window.showLeaderboard = async function(gameId = 'all') {
     }
 })();
 </script>
+<!-- 🌟 ULTIMATE LEADERBOARD SYNC PATCH (100% FIX FOR ALL GAMES) 🌟 -->
+<script>
+(function() {
+    console.log("Applying Ultimate Profile & Level Sync...");
+
+    // 1. Ye function 5 ke 5 games me user ka Level, Name aur DP automatically match karega
+    window.forceGlobalProfileSync = function() {
+        let uid = null;
+        let playerName = localStorage.getItem('dest_playerName') || "Anonymous Ninja";
+        let userDP = localStorage.getItem('dest_playerDP') || `https://api.dicebear.com/7.x/bottts/svg?seed=${playerName}`;
+        let currentLevel = 1;
+
+        // User ki correct ID nikalna
+        if (typeof auth !== 'undefined' && auth.currentUser) {
+            uid = auth.currentUser.uid;
+            playerName = localStorage.getItem('dest_playerName') || auth.currentUser.displayName || "Anonymous Ninja";
+            if (!localStorage.getItem('dest_playerDP') && auth.currentUser.photoURL) {
+                userDP = auth.currentUser.photoURL;
+            }
+        } else {
+            uid = "guest_" + playerName.replace(/\s+/g, '').toLowerCase();
+        }
+
+        // Correct Level nikalna
+        if (window.LevelEngine) {
+            currentLevel = window.LevelEngine.getStats().level;
+        }
+
+        if (!uid) return;
+
+        const games = ['spaceTyper', 'wordRush', 'typingRacer', 'keyboardNinja', 'typingSurvivor'];
+        
+        // Har game ke database mein jao aur update maro
+        games.forEach(game => {
+            const scoreRef = db.collection("leaderboards").doc(game).collection("scores").doc(uid);
+            scoreRef.get().then(doc => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    // Agar DB mein thoda bhi mismatch hai (purana level/DP hai), toh theek kar do
+                    if (data.level !== currentLevel || data.name !== playerName || data.photoURL !== userDP) {
+                        scoreRef.update({
+                            level: currentLevel,
+                            name: playerName,
+                            photoURL: userDP
+                        }).catch(e => {});
+                    }
+                }
+            }).catch(e => {});
+        });
+    };
+
+    // 2. App Start hote hi 2 second baad background mein data sync kar do
+    setTimeout(window.forceGlobalProfileSync, 2000);
+
+    // 3. Jab bhi user XP kamaye aur Level Up ho, toh instantly sab jagah sync kardo
+    if (window.LevelEngine) {
+        const oldAddXP = window.LevelEngine.addXP;
+        window.LevelEngine.addXP = function(amount) {
+            oldAddXP.call(this, amount);
+            window.forceGlobalProfileSync(); // Background sync on level up
+        };
+    }
+
+    // 4. Jab user apna account edit kare (Name/DP change), tab bhi update kar do
+    if (typeof window.saveAccountDetails === 'function') {
+        const oldSaveAcc = window.saveAccountDetails;
+        window.saveAccountDetails = async function() {
+            await oldSaveAcc.call(this);
+            window.forceGlobalProfileSync(); // Background sync on profile edit
+        };
+    }
+})();
+</script>
 
 </body>
 </html>
