@@ -12843,102 +12843,86 @@ body:not(.light-mode) {
 
 
 </style>
-<!-- 🎓 TUTOR EXP TO GLOBAL LEVEL SYNC FIX 🎓 -->
+<!-- 🌟 MASTER TUTOR FIX: DATA SYNC & EXP ROUTING 🌟 -->
 <script>
 (function() {
-    console.log("Applying Tutor EXP Sync Fix...");
+    console.log("Applying Ultimate Tutor Data & EXP Sync Fix...");
 
-    if (typeof window.saveTutorData === 'function') {
-        const originalSaveTutorData = window.saveTutorData;
-        let isRoutingXP = false; // Infinite loop rokne ke liye lock
-
-        window.saveTutorData = function() {
-            if (!isRoutingXP && window.LevelEngine && window.tutorData) {
-                
-                // 1. LevelEngine se asli Global XP uthao
-                let currentGlobalXP = 0;
-                let savedXPStr = localStorage.getItem(window.LevelEngine.getKey());
-                if (savedXPStr !== null) {
-                    currentGlobalXP = parseInt(savedXPStr);
+    // =================================================================
+    // 1. FIX THE REFERENCE BREAK (The "Refresh Reset" Bug)
+    // Ye code ensure karega ki Firebase se aane wala data aur internal engine 
+    // hamesha ek hi object memory share karein.
+    // =================================================================
+    if (window.tutorData) {
+        const internalTutorDataRef = window.tutorData;
+        
+        Object.defineProperty(window, 'tutorData', {
+            get: function() { return internalTutorDataRef; },
+            set: function(newValue) {
+                if (newValue && typeof newValue === 'object') {
+                    // Naya object banane ki jagah, purane internal object ko hi update karenge
+                    Object.keys(internalTutorDataRef).forEach(key => delete internalTutorDataRef[key]);
+                    Object.assign(internalTutorDataRef, newValue);
                 }
-
-                // 2. Check karo ki kya Tutor ne chup-chap XP badhayi hai?
-                if (window.tutorData.xp > currentGlobalXP) {
-                    
-                    // Kitni XP nayi kamayi hai
-                    let newlyEarnedXP = window.tutorData.xp - currentGlobalXP;
-                    
-                    isRoutingXP = true; // Lock laga do
-                    
-                    // 3. Tutor ki XP wapas normal karo taaki Master Engine usko theek se jodh sake
-                    window.tutorData.xp = currentGlobalXP;
-                    
-                    // 4. Master Engine ke andar XP daalo (Ye animation, sync aur save sab khud handle karega)
-                    window.LevelEngine.addXP(newlyEarnedXP);
-                    
-                    isRoutingXP = false; // Lock hata do
-                    return; // addXP ne already save kar diya hai, toh yahin se wapas mud jao
-                }
-            }
-            
-            // Baki cheezon (lessons clear hone) ke liye normal save function chalao
-            originalSaveTutorData.apply(this, arguments);
-        };
-    }
-})();
-</script>
-<!-- 🔒 STRICT LOGIN CHECK FOR EXP (TUTOR & GAMES) 🔒 -->
-<script>
-(function() {
-    console.log("Applying Strict Login Check for EXP...");
-
-    // 1. TUTOR EXP KO SIRF LOGGED-IN USERS KE LIYE SYNC KARO
-    if (typeof window.saveTutorData === 'function') {
-        const originalSaveTutorData = window.saveTutorData;
-        let isRoutingXP = false; 
-
-        window.saveTutorData = function() {
-            // 🔥 AUTH CHECK: Check karo ki user logged in hai ya guest hai
-            const isLoggedIn = (typeof auth !== 'undefined' && auth.currentUser);
-
-            // Agar logged in hai, tabhi XP ko Global Level Engine me bhejo
-            if (isLoggedIn && !isRoutingXP && window.LevelEngine && window.tutorData) {
-                let currentGlobalXP = 0;
-                let savedXPStr = localStorage.getItem(window.LevelEngine.getKey());
-                if (savedXPStr !== null) {
-                    currentGlobalXP = parseInt(savedXPStr);
-                }
-
-                if (window.tutorData.xp > currentGlobalXP) {
-                    let newlyEarnedXP = window.tutorData.xp - currentGlobalXP;
-                    isRoutingXP = true;
-                    
-                    window.tutorData.xp = currentGlobalXP; 
-                    window.LevelEngine.addXP(newlyEarnedXP); // Send to Global Level
-                    
-                    isRoutingXP = false;
-                    return; 
-                }
-            }
-            
-            // Agar Guest hai, ya routing complete ho chuki hai, toh local save chalne do
-            // Taaki guest kam se kam next lesson unlock kar sake
-            originalSaveTutorData.apply(this, arguments);
-        };
+            },
+            configurable: true
+        });
     }
 
-    // 2. MASTER LEVEL ENGINE KO BHI GUESTS KE LIYE 100% BLOCK KARO
+    // =================================================================
+    // 2. FIX THE EXP ROUTING (Intercept LocalStorage)
+    // Internal engine private save use karta hai, isliye hum seedha Storage ko intercept karenge
+    // =================================================================
+    const origSetItem = localStorage.setItem;
+    window.isRoutingXP = false;
+
+    localStorage.setItem = function(key, value) {
+        origSetItem.apply(this, arguments); // Data normally save hone do
+
+        // Agar Tutor data save ho raha hai
+        if (key.startsWith('DEST_TutorData_')) {
+            try {
+                let savedData = JSON.parse(value);
+                let newTutorXP = savedData.xp || 0;
+
+                if (window.LevelEngine && !window.isRoutingXP) {
+                    let globalXP = 0;
+                    let rawGlobal = localStorage.getItem(window.LevelEngine.getKey());
+                    if (rawGlobal !== null) globalXP = parseInt(rawGlobal);
+
+                    // Agar Tutor ne XP badhayi hai, toh usko Global Engine me transfer karo
+                    if (newTutorXP > globalXP) {
+                        let earned = newTutorXP - globalXP;
+
+                        // 🔒 STRICT AUTH CHECK: Sirf logged-in users ko XP milegi
+                        if (typeof auth !== 'undefined' && auth.currentUser) {
+                            window.isRoutingXP = true;
+                            
+                            // Global XP add karo (Ye Level up, Badge aur Sync khud karega)
+                            window.LevelEngine.addXP(earned);
+                            
+                            window.isRoutingXP = false;
+                        } else {
+                            // Agar guest hai, toh XP reset kardo (No free EXP!)
+                            console.log("Guest User: EXP Blocked.");
+                            window.tutorData.xp = globalXP; 
+                            origSetItem.call(localStorage, key, JSON.stringify(window.tutorData));
+                        }
+                    }
+                }
+            } catch(e) { console.error("Tutor EXP Sync Error:", e); }
+        }
+    };
+
+    // =================================================================
+    // 3. MASTER LEVEL ENGINE AUTH LOCK
+    // Games ya kisi aur jagah se bhi guest ko XP nahi milni chahiye
+    // =================================================================
     if (window.LevelEngine) {
         const origAddXP = window.LevelEngine.addXP;
         window.LevelEngine.addXP = function(amount) {
-            
-            // Agar login nahi hai toh seedha return mar do (No XP for Guests!)
-            if (typeof auth === 'undefined' || !auth.currentUser) {
-                console.log("Guest User Detected: EXP Reward Blocked 🚫");
-                return; 
-            }
-            
-            // Logged in hai toh normally XP de do
+            // Guest block
+            if (typeof auth === 'undefined' || !auth.currentUser) return; 
             origAddXP.call(this, amount);
         };
     }
