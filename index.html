@@ -12613,6 +12613,236 @@ window.showLeaderboard = async function(gameId = 'all') {
     }
 })();
 </script>
+<!-- 👑 PREMIUM ROYAL THEME & FULL-SCREEN TABS OVERRIDE 👑 -->
+<style>
+/* 1. REPLACE PURE BLACK WITH ROYAL MIDNIGHT NAVY */
+:root, body[data-theme="obsidian"], body[data-theme="none"] {
+    --bg-base: #020617 !important; /* Deep Midnight Blue instead of Black */
+    --bg-card: rgba(15, 23, 42, 0.5) !important;
+    --glass-border: rgba(255, 255, 255, 0.08) !important;
+}
+
+body:not(.light-mode) {
+    background-color: #020617 !important;
+    /* Royal Ambient Glow (Blue & Gold) */
+    background-image: 
+        radial-gradient(circle at 10% 10%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 90% 90%, rgba(212, 175, 55, 0.12) 0%, transparent 50%) !important;
+    background-attachment: fixed !important;
+}
+
+/* 2. PREMIUM GAME CARDS (ROYAL GLASS TABS) */
+.game-card {
+    background: linear-gradient(150deg, rgba(30, 41, 59, 0.7) 0%, rgba(2, 6, 23, 0.95) 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.15) !important;
+    border-radius: 24px !important;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s, border-color 0.3s !important;
+}
+
+/* Subtle Gold Reflection Inside Cards */
+.game-card::after {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(circle at top left, rgba(212, 175, 55, 0.08) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+.game-card:hover, .game-card:active {
+    transform: translateY(-5px) scale(1.02) !important;
+    border-color: rgba(212, 175, 55, 0.4) !important; /* Gold Border Glow */
+    box-shadow: 0 25px 50px rgba(0,0,0,0.8), 0 0 30px rgba(212, 175, 55, 0.15) !important;
+}
+
+/* Card Typography Polish */
+.game-card h3 {
+    font-family: 'Sora', sans-serif !important;
+    font-size: 1.6rem !important;
+    background: linear-gradient(to right, #ffffff, #94a3b8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 1px;
+}
+
+.game-card-tag {
+    background: rgba(212, 175, 55, 0.1) !important;
+    border: 1px solid rgba(212, 175, 55, 0.3) !important;
+    color: #fbbf24 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.1) !important;
+    padding: 6px 10px !important;
+}
+
+/* 3. MOBILE: FULL-SCREEN TABS EXPERIENCE */
+@media (max-width: 768px) {
+    .dest-games-container {
+        padding: 0 !important; /* Remove side gaps */
+        margin: 0 !important;
+        width: 100% !important;
+        max-width: 100vw !important;
+    }
+    .games-header {
+        padding: 25px 15px 15px !important;
+        margin-bottom: 5px !important;
+        background: linear-gradient(to bottom, rgba(2,6,23,0.95), transparent);
+    }
+    .games-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 20px !important;
+        padding: 0 12px 40px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    .game-card {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 25px 20px !important;
+        border-radius: 20px !important;
+    }
+    
+    /* Play Button Upgrade */
+    .dest-btn-primary.play-game-btn {
+        background: linear-gradient(90deg, #0f172a, #1e293b) !important;
+        border: 1px solid rgba(212, 175, 55, 0.5) !important;
+        color: #fbbf24 !important;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.4), inset 0 0 15px rgba(212, 175, 55, 0.15) !important;
+        border-radius: 12px !important;
+        padding: 16px !important;
+        font-size: 1.05rem !important;
+        letter-spacing: 2px !important;
+        transition: 0.2s !important;
+    }
+    .dest-btn-primary.play-game-btn:active {
+        background: linear-gradient(90deg, #1e293b, #fbbf24) !important;
+        color: #000 !important;
+        box-shadow: 0 0 25px rgba(251,191,36,0.5) !important;
+    }
+}
+
+/* 4. FIX MODAL BACKGROUND (Leaderboard White/Grey Issue) */
+#leaderboard-modal .modal-box, 
+#globalLeaderboardModal .dest-modal-content {
+    background: linear-gradient(145deg, #0f172a 0%, #020617 100%) !important;
+    border: 1px solid rgba(212, 175, 55, 0.4) !important;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.8), 0 0 50px rgba(212, 175, 55, 0.15) !important;
+}
+#leaderboard-modal h3, 
+#globalLeaderboardModal h2 {
+    color: #fff !important;
+}
+</style>
+<!-- ⚡ SIRF MODE TOGGLE (INSTANT BLINK) - NO EXTRA DESIGN ⚡ -->
+<style id="pure-blink-style">
+    /* Flash Parda */
+    #mode-flash-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 9999999;
+        opacity: 0;
+        pointer-events: none;
+        background: #ffffff;
+        transition: opacity 0.3s ease-out;
+    }
+    
+    /* Jab mode change ho raha ho toh bakwaas lag rokne ke liye */
+    .kill-all-transitions, .kill-all-transitions * {
+        transition: none !important;
+        animation: none !important;
+    }
+</style>
+
+<script>
+(function() {
+    // 1. Overlay DOM mein dalo
+    let flashOverlay = document.getElementById('mode-flash-overlay');
+    if (!flashOverlay) {
+        flashOverlay = document.createElement('div');
+        flashOverlay.id = 'mode-flash-overlay';
+        document.body.appendChild(flashOverlay);
+    }
+
+    // 2. Sirf Mode Button ko Override karo (Bina kisi variable ko chhede)
+    if (typeof window.toggleLightMode === 'function' && !window.toggleLightMode.hasBlinkPatch) {
+        
+        const originalToggleFunction = window.toggleLightMode;
+        
+        window.toggleLightMode = function() {
+            // Check current mode to decide flash color
+            const isLightNow = document.body.classList.contains('light-mode');
+            
+            // Flash color set karo (Dark ja rahe toh black flash, Light ja rahe toh white flash)
+            flashOverlay.style.background = isLightNow ? '#000000' : '#ffffff';
+            
+            // INSTANT FLASH (0 ms delay)
+            flashOverlay.style.transition = 'none';
+            flashOverlay.style.opacity = '1';
+            
+            // Lag rokne ke liye saari animations band karo
+            document.body.classList.add('kill-all-transitions');
+
+            // 30 mili-second ka pause taaki screen ekdum se flash ho
+            setTimeout(() => {
+                // Tumhara asali original function chalao (Isse 'settings' wala koi error nahi aayega)
+                originalToggleFunction.apply(this, arguments);
+
+                // Flash ko fade-out karo
+                requestAnimationFrame(() => {
+                    document.body.classList.remove('kill-all-transitions');
+                    flashOverlay.style.transition = 'opacity 0.4s ease-out';
+                    flashOverlay.style.opacity = '0';
+                });
+            }, 30);
+        };
+        
+        window.toggleLightMode.hasBlinkPatch = true;
+    }
+})();
+</script>
+<!-- 🎮 GAME CARDS BACKGROUND IMAGE PATCH (LEFT SIDE CLEAR FIX) 🎮 -->
+<style id="game-cards-bg-patch">
+    /* 1. Image physically shink ki gayi hai aur right mein align ki gayi hai */
+    .game-card {
+        /* Pehla 100% gradient ke liye, doosra '55% 100%' image ko right me chota karne ke liye */
+        background-size: 100% 100%, 55% 100% !important; 
+        background-position: center left, center right !important;
+        background-repeat: no-repeat !important;
+    }
+
+    /* ==========================================
+       🌙 DARK MODE: Left side Solid Dark (Clear Text)
+       ========================================== */
+    
+    /* 1. Space Typer */
+    body:not(.light-mode) .game-card[data-game="spaceTyper"] {
+        background-image: linear-gradient(to right, rgba(2, 6, 23, 1) 45%, rgba(15, 23, 42, 0.4) 100%), 
+        url('1000071842.png')!important;
+    }
+    /* 2. Word Rush */
+    body:not(.light-mode) .game-card[data-game="wordRush"] {
+        background-image: linear-gradient(to right, rgba(2, 6, 23, 1) 45%, rgba(15, 23, 42, 0.4) 100%), 
+            url('1000071855.png') !important;
+    }
+    /* 3. Typing Racer */
+    body:not(.light-mode) .game-card[data-game="typingRacer"] {
+        background-image: linear-gradient(to right, rgba(2, 6, 23, 1) 45%, rgba(15, 23, 42, 0.4) 100%), 
+        url('1000071856.png') !important;
+    }
+    /* 4. Keyboard Ninja */
+    body:not(.light-mode) .game-card[data-game="keyboardNinja"] {
+        background-image: linear-gradient(to right, rgba(2, 6, 23, 1) 45%, rgba(15, 23, 42, 0.4) 100%), 
+        url('1000071858.png') !important;
+    }
+    /* 5. Typing Survivor */
+    body:not(.light-mode) .game-card[data-game="typingSurvivor"] {
+        background-image: linear-gradient(to right, rgba(2, 6, 23, 1) 45%, rgba(15, 23, 42, 0.4) 100%), 
+        url('1000071859.png') !important;
+    }
+
+
+</style>
 
 </body>
 </html>
