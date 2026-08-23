@@ -12928,80 +12928,46 @@ body:not(.light-mode) {
 
 
 
-<!-- 🚀 ULTIMATE TYPING ASSESSMENT HISTORY FIX (PASTE JUST ABOVE </body>) 🚀 -->
-<script id="ultimate-assessment-history-fix">
+<!-- 🚀 ULTIMATE TYPING ASSESSMENT HISTORY (BUBBLE BYPASS) PATCH 🚀 -->
+<script id="ultimate-assessment-history-bypass">
 (function() {
-    console.log("Applying Ultimate Typing Assessment History Fix...");
+    console.log("Applying Ultimate History Bypass Patch...");
 
-    // 1. Force Instant Local Save on Test Completion
-    const originalShowResult = window.showResultScreen;
-    
-    window.showResultScreen = function(mainTitle, subTitle, rankLabel, rankTitle, rankColor, rankMsg, stats, isTutor) {
-        // Run original UI logic
-        if(originalShowResult) originalShowResult.apply(this, arguments);
+    let lastSavedTime = 0;
 
-        // ONLY save if it is the Main Standard Test (Not Tutor, Not Game)
-        if (isTutor === false && !stats.isGame) {
-            
-            // Get correct User ID safely
-            let uid = 'guest';
-            if (typeof auth !== 'undefined' && auth.currentUser) {
-                uid = auth.currentUser.uid;
-            } else if (localStorage.getItem('dest_playerName')) {
-                uid = localStorage.getItem('dest_playerName').replace(/\s+/g, '').toLowerCase();
+    // 1. THE DOM WATCHER: This bypasses the security bubble by watching the screen directly
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.attributeName === 'class') {
+                const target = mutation.target;
+                
+                // When the result screen becomes visible
+                if (!target.classList.contains('hidden')) {
+                    const titleElement = document.getElementById('result-main-title');
+                    
+                    // Verify it's the Main Assessment Test (Not a Game or Tutor)
+                    if (titleElement && titleElement.innerText.toUpperCase() === "ASSESSMENT COMPLETE") {
+                        
+                        // Prevent double-saving from rapid DOM changes
+                        if (Date.now() - lastSavedTime < 2000) return; 
+                        lastSavedTime = Date.now();
+
+                        saveTestHistoryLocally();
+                    }
+                }
             }
+        });
+    });
 
-            let historyKey = `StandaloneTypingHistory_${uid}`;
-            let history = JSON.parse(localStorage.getItem(historyKey) || '[]');
+    // Attach the watcher to the result screen
+    const resultScreen = document.getElementById('typing-result-screen');
+    if (resultScreen) {
+        observer.observe(resultScreen, { attributes: true });
+    }
 
-            // Grab UI Settings
-            const durVal = document.getElementById('typing-duration-sel')?.value;
-            const durationStr = durVal == 0 ? 'No Limit' : (durVal ? durVal + ' min' : '5 min');
-            const levelStr = document.getElementById('typing-level-sel')?.value.toUpperCase() || 'AVERAGE';
-
-            // Create New Record
-            const newRecord = {
-                date: new Date().toLocaleString('en-IN', {dateStyle:'short', timeStyle:'short'}),
-                wpm: stats.wpm,
-                accNum: stats.acc,
-                accuracy: stats.acc + '%',
-                kdph: stats.kdph,
-                duration: durationStr,
-                level: levelStr
-            };
-
-            // Prevent double-saving the exact same record if clicked twice
-            if (history.length > 0 && history[0].wpm === newRecord.wpm && history[0].date === newRecord.date) {
-                return; 
-            }
-
-            // Add to top and LIMIT to EXACTLY 10 records
-            history.unshift(newRecord);
-            if (history.length > 10) {
-                history = history.slice(0, 10);
-            }
-
-            // 🔥 INSTANT LOCAL SAVE - GUARANTEES IT SHOWS UP IMMEDIATELY
-            localStorage.setItem(historyKey, JSON.stringify(history));
-
-            // Push to Firebase in background without making the user wait
-            if (typeof auth !== 'undefined' && auth.currentUser) {
-                db.collection("userData").doc(uid).set({ typingHistory: history }, { merge: true }).catch(()=>{});
-            }
-        }
-    };
-
-    // 2. Override the History Modal to Load INSTANTLY from Local Storage
-    window.openTypingHistoryModal = function() {
-        // Hide all screens & show history
-        document.querySelectorAll('.app-screen').forEach(s => s.classList.add('hidden'));
-        document.body.classList.remove('tutor-active');
-        document.getElementById('typing-history-screen').classList.remove('hidden');
-
-        const container = document.getElementById('typing-history-list-container');
-        container.innerHTML = '';
-
-        // Get correct User ID safely
+    // 2. The Extraction & Instant Save Logic
+    function saveTestHistoryLocally() {
+        // Find exactly who is playing
         let uid = 'guest';
         if (typeof auth !== 'undefined' && auth.currentUser) {
             uid = auth.currentUser.uid;
@@ -13012,7 +12978,58 @@ body:not(.light-mode) {
         let historyKey = `StandaloneTypingHistory_${uid}`;
         let history = JSON.parse(localStorage.getItem(historyKey) || '[]');
 
-        // Enforce 10 record limit just in case
+        // Grab data straight from the UI elements
+        const wpm = document.getElementById('res-val-1').innerText;
+        const accStr = document.getElementById('res-val-2').innerText; // e.g., "95%"
+        const kdph = document.getElementById('res-val-3').innerText;
+
+        const durVal = document.getElementById('typing-duration-sel').value;
+        const durationStr = durVal == 0 ? 'No Limit' : durVal + ' min';
+        const levelStr = document.getElementById('typing-level-sel').value.toUpperCase();
+
+        const newRecord = {
+            date: new Date().toLocaleString('en-IN', {dateStyle:'short', timeStyle:'short'}),
+            wpm: parseInt(wpm) || 0,
+            accNum: parseInt(accStr) || 0,
+            accuracy: accStr,
+            kdph: parseInt(kdph) || 0,
+            duration: durationStr,
+            level: levelStr
+        };
+
+        // Add to top and LIMIT to EXACTLY 10 records
+        history.unshift(newRecord);
+        if (history.length > 10) history = history.slice(0, 10);
+
+        // 🔥 INSTANT LOCAL SAVE (Guarantees the history modal works instantly)
+        localStorage.setItem(historyKey, JSON.stringify(history));
+
+        // Push to Firebase quietly in the background
+        if (typeof auth !== 'undefined' && auth.currentUser) {
+            db.collection("userData").doc(uid).set({ typingHistory: history }, { merge: true }).catch(()=>{});
+        }
+    }
+
+    // 3. Force the History Button to read INSTANTLY from Local Storage
+    window.openTypingHistoryModal = function() {
+        document.querySelectorAll('.app-screen').forEach(s => s.classList.add('hidden'));
+        document.body.classList.remove('tutor-active');
+        document.getElementById('typing-history-screen').classList.remove('hidden');
+
+        const container = document.getElementById('typing-history-list-container');
+        container.innerHTML = '';
+
+        let uid = 'guest';
+        if (typeof auth !== 'undefined' && auth.currentUser) {
+            uid = auth.currentUser.uid;
+        } else if (localStorage.getItem('dest_playerName')) {
+            uid = localStorage.getItem('dest_playerName').replace(/\s+/g, '').toLowerCase();
+        }
+
+        let historyKey = `StandaloneTypingHistory_${uid}`;
+        let history = JSON.parse(localStorage.getItem(historyKey) || '[]');
+
+        // Enforce 10 limits just in case
         if (history.length > 10) {
             history = history.slice(0, 10);
             localStorage.setItem(historyKey, JSON.stringify(history));
@@ -13041,7 +13058,7 @@ body:not(.light-mode) {
         });
     };
 
-    // 3. Fix the Purge Button to clear both Local and Firebase
+    // 4. Update the Purge Button to delete everywhere
     window.clearTypingHistory = function() {
         if(confirm("Are you sure you want to delete all typing test history?")) {
             let uid = 'guest';
@@ -13051,10 +13068,8 @@ body:not(.light-mode) {
                 uid = localStorage.getItem('dest_playerName').replace(/\s+/g, '').toLowerCase();
             }
 
-            // Clear Local
             localStorage.removeItem(`StandaloneTypingHistory_${uid}`);
 
-            // Clear Firebase
             if (typeof auth !== 'undefined' && auth.currentUser) {
                 db.collection("userData").doc(uid).update({
                     typingHistory: firebase.firestore.FieldValue.delete()
@@ -13065,6 +13080,7 @@ body:not(.light-mode) {
             window.openTypingHistoryModal();
         }
     };
+
 })();
 </script>
 
