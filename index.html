@@ -12841,93 +12841,227 @@ body:not(.light-mode) {
         url('1000071859.png') !important;
     }
 
+<!-- 🛠️ LIGHT MODE MODALS & TEXT VISIBILITY FIX 🛠️ -->
+<style id="light-mode-visibility-fix">
+    /* 1. Modal Background - Force White/Platinum in Light Mode */
+    body.light-mode .modal-box,
+    body.light-mode .dest-modal-content,
+    body.light-mode .pause-menu-box {
+        background: #ffffff !important;
+        background-image: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%) !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.08), inset 0 2px 10px rgba(255, 255, 255, 1) !important;
+    }
 
+    /* 2. Headings (e.g., "System Settings", "My Account") */
+    body.light-mode .modal-box h2,
+    body.light-mode .modal-box h3,
+    body.light-mode .dest-modal-content h2,
+    body.light-mode .dest-modal-content h3 {
+        color: #0f172a !important; /* Deep Navy Text */
+        text-shadow: none !important;
+        font-weight: 800 !important;
+    }
+
+    /* 3. Input Labels (e.g., "THEME PROTOCOL", "AUDIO LEVEL") */
+    body.light-mode .input-group label,
+    body.light-mode .toggle-row label {
+        color: #475569 !important; /* Slate Gray */
+        font-weight: 800 !important;
+        text-shadow: none !important;
+    }
+
+    /* 4. Dropdowns & Text Inputs */
+    body.light-mode .search-input {
+        background: #f1f5f9 !important;
+        color: #0f172a !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.03) !important;
+        font-weight: 600 !important;
+    }
+    body.light-mode .search-input:focus {
+        background: #ffffff !important;
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important;
+    }
+    body.light-mode .search-input option,
+    body.light-mode .search-input optgroup {
+        background: #ffffff !important;
+        color: #0f172a !important;
+    }
+
+    /* 5. Close Button (X) */
+    body.light-mode .btn-outline {
+        color: #334155 !important;
+        border-color: #cbd5e1 !important;
+        background: rgba(0,0,0,0.03) !important;
+    }
+    body.light-mode .btn-outline:hover {
+        background: #e2e8f0 !important;
+        color: #0f172a !important;
+        border-color: #94a3b8 !important;
+    }
+
+    /* 6. Fix Toggle Line Divider */
+    body.light-mode .toggle-row {
+        border-bottom: 1px solid #e2e8f0 !important;
+    }
 </style>
-<!-- 🌟 MASTER TUTOR FIX: DATA SYNC & EXP ROUTING 🌟 -->
+<!-- 🌟 LIGHT MODE UI MERGE FIX (SUPER PRIORITY) 🌟 -->
+<style id="light-mode-ultimate-fix">
+    /* 1. Force CSS Variables to be Bright in Light Mode (Overrides Royal Theme) */
+    html body.light-mode,
+    html body.light-mode[data-theme="none"],
+    html body.light-mode[data-theme="obsidian"] {
+        --bg-base: #f1f5f9 !important;
+        --bg-card: #ffffff !important;
+        --glass-border: rgba(0, 0, 0, 0.1) !important;
+        --text-primary: #0f172a !important;
+        --text-secondary: #475569 !important;
+    }
+
+    /* 2. Explicitly force White Background on ALL Modals */
+    html body.light-mode .modal-box,
+    html body.light-mode .dest-modal-content,
+    html body.light-mode #settings-modal .modal-box,
+    html body.light-mode #account-modal .modal-box {
+        background-color: #ffffff !important;
+        background: #ffffff !important;
+        background-image: none !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.1) !important;
+    }
+
+    /* 3. Main Titles & Text (Deep Navy for High Contrast) */
+    html body.light-mode .modal-box h3,
+    html body.light-mode .modal-box h2,
+    html body.light-mode .dest-modal-content h2 {
+        color: #0f172a !important;
+        text-shadow: none !important;
+        font-weight: 800 !important;
+    }
+
+    /* 4. Labels (e.g., THEME PROTOCOL) */
+    html body.light-mode .input-group label,
+    html body.light-mode .toggle-row label {
+        color: #475569 !important;
+        text-shadow: none !important;
+        font-weight: 800 !important;
+        letter-spacing: 1px !important;
+    }
+
+    /* 5. Fix Divider Lines & Dropdowns */
+    html body.light-mode .toggle-row {
+        border-bottom: 1px solid #e2e8f0 !important;
+    }
+    html body.light-mode .search-input {
+        background: #f8fafc !important;
+        color: #0f172a !important;
+        border: 1px solid #cbd5e1 !important;
+        font-weight: 600 !important;
+    }
+    html body.light-mode .search-input:focus {
+        background: #ffffff !important;
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+    }
+
+    /* 6. Close Button (X) */
+    html body.light-mode .modal-box .btn-outline.btn-sm {
+        background: #f1f5f9 !important;
+        color: #0f172a !important;
+        border-color: #cbd5e1 !important;
+    }
+    html body.light-mode .modal-box .btn-outline.btn-sm:hover {
+        background: #e2e8f0 !important;
+    }
+</style>
+
+
+<!-- 🏆 ULTIMATE TUTOR FIX: REFRESH DATA & EXP SYNC 🏆 -->
 <script>
 (function() {
-    console.log("Applying Ultimate Tutor Data & EXP Sync Fix...");
+    console.log("Applying Ultimate Tutor & EXP Fix...");
 
-    // =================================================================
-    // 1. FIX THE REFERENCE BREAK (The "Refresh Reset" Bug)
-    // Ye code ensure karega ki Firebase se aane wala data aur internal engine 
-    // hamesha ek hi object memory share karein.
-    // =================================================================
-    if (window.tutorData) {
-        const internalTutorDataRef = window.tutorData;
+    // ==========================================
+    // 1. FIX REFRESH BUG (Instantly load correct data on startup)
+    // ==========================================
+    // Original function ko override kar rahe hain taaki refresh karte hi
+    // Firebase ke load hone ka wait na karna pade, direct cache se ID mil jaye.
+    window.getActiveUserId = function() {
+        if (typeof auth !== 'undefined' && auth.currentUser) {
+            localStorage.setItem('dest_cached_uid', auth.currentUser.uid);
+            return auth.currentUser.uid;
+        }
+        // Cache se UID uthao taaki page refresh hote hi data load ho jaye
+        let cachedUid = localStorage.getItem('dest_cached_uid');
+        if (cachedUid) return cachedUid;
         
-        Object.defineProperty(window, 'tutorData', {
-            get: function() { return internalTutorDataRef; },
-            set: function(newValue) {
-                if (newValue && typeof newValue === 'object') {
-                    // Naya object banane ki jagah, purane internal object ko hi update karenge
-                    Object.keys(internalTutorDataRef).forEach(key => delete internalTutorDataRef[key]);
-                    Object.assign(internalTutorDataRef, newValue);
-                }
-            },
-            configurable: true
+        let name = localStorage.getItem('dest_playerName') || 'guest';
+        return name.replace(/\s+/g, '').toLowerCase(); 
+    };
+
+    // Firebase Auth se UID cache mein save karo
+    if (typeof auth !== 'undefined') {
+        auth.onAuthStateChanged(user => {
+            if (user) localStorage.setItem('dest_cached_uid', user.uid);
+            else localStorage.removeItem('dest_cached_uid');
         });
     }
 
-    // =================================================================
-    // 2. FIX THE EXP ROUTING (Intercept LocalStorage)
-    // Internal engine private save use karta hai, isliye hum seedha Storage ko intercept karenge
-    // =================================================================
-    const origSetItem = localStorage.setItem;
-    window.isRoutingXP = false;
+    // ==========================================
+    // 2. FIX EXP & FIREBASE SYNC BUG (Intercept LocalStorage)
+    // ==========================================
+    const originalSetItem = localStorage.setItem;
+    window._isSyncingXP = false;
 
+    // Jab bhi internal engine Tutor ka data save karega, hum yahan usko catch kar lenge!
     localStorage.setItem = function(key, value) {
-        origSetItem.apply(this, arguments); // Data normally save hone do
+        originalSetItem.apply(this, arguments); // Pehle normally save hone do
 
-        // Agar Tutor data save ho raha hai
         if (key.startsWith('DEST_TutorData_')) {
             try {
-                let savedData = JSON.parse(value);
-                let newTutorXP = savedData.xp || 0;
+                let tutorData = JSON.parse(value);
+                
+                // A. AUTOMATIC FIREBASE CLOUD BACKUP
+                if (typeof auth !== 'undefined' && auth.currentUser) {
+                    db.collection("userData").doc(auth.currentUser.uid).set({ tutorData: tutorData }, { merge: true }).catch(e=>{});
+                }
 
-                if (window.LevelEngine && !window.isRoutingXP) {
-                    let globalXP = 0;
-                    let rawGlobal = localStorage.getItem(window.LevelEngine.getKey());
-                    if (rawGlobal !== null) globalXP = parseInt(rawGlobal);
-
-                    // Agar Tutor ne XP badhayi hai, toh usko Global Engine me transfer karo
-                    if (newTutorXP > globalXP) {
-                        let earned = newTutorXP - globalXP;
-
-                        // 🔒 STRICT AUTH CHECK: Sirf logged-in users ko XP milegi
-                        if (typeof auth !== 'undefined' && auth.currentUser) {
-                            window.isRoutingXP = true;
-                            
-                            // Global XP add karo (Ye Level up, Badge aur Sync khud karega)
-                            window.LevelEngine.addXP(earned);
-                            
-                            window.isRoutingXP = false;
-                        } else {
-                            // Agar guest hai, toh XP reset kardo (No free EXP!)
-                            console.log("Guest User: EXP Blocked.");
-                            window.tutorData.xp = globalXP; 
-                            origSetItem.call(localStorage, key, JSON.stringify(window.tutorData));
-                        }
+                // B. SYNC EXP TO GLOBAL LEVEL SYSTEM (Only for logged in users)
+                if (window.LevelEngine && typeof auth !== 'undefined' && auth.currentUser && !window._isSyncingXP) {
+                    let globalKey = window.LevelEngine.getKey();
+                    let globalXP = parseInt(localStorage.getItem(globalKey)) || 0;
+                    
+                    // Agar nayi XP mili hai, toh usko Global Profile mein add kar do
+                    if (tutorData.xp > globalXP) {
+                        let newlyEarnedXP = tutorData.xp - globalXP;
+                        
+                        window._isSyncingXP = true; // Lock lagao (taaki loop na bane)
+                        window.LevelEngine.addXP(newlyEarnedXP); // 💥 Epic Level Up Animation Trigger Hoga!
+                        window._isSyncingXP = false; // Lock hatao
                     }
                 }
-            } catch(e) { console.error("Tutor EXP Sync Error:", e); }
+            } catch(e) { console.error("Tutor Save Hook Error:", e); }
         }
     };
 
-    // =================================================================
-    // 3. MASTER LEVEL ENGINE AUTH LOCK
-    // Games ya kisi aur jagah se bhi guest ko XP nahi milni chahiye
-    // =================================================================
+    // ==========================================
+    // 3. SECURITY: NO EXP FOR GUESTS
+    // ==========================================
     if (window.LevelEngine) {
         const origAddXP = window.LevelEngine.addXP;
         window.LevelEngine.addXP = function(amount) {
-            // Guest block
-            if (typeof auth === 'undefined' || !auth.currentUser) return; 
+            if (typeof auth === 'undefined' || !auth.currentUser) {
+                console.log("Guest User: EXP Blocked.");
+                return; // Guest user ko EXP aur Level Up nahi milega
+            }
             origAddXP.call(this, amount);
         };
     }
 })();
 </script>
+
 
 </body>
 </html>
