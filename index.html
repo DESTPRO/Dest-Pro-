@@ -12928,6 +12928,158 @@ body:not(.light-mode) {
 
 
 
+<!-- 🚀 MAIN TYPING TEST HISTORY & 10-RECORD LIMIT FIX (PASTE JUST ABOVE </body>) 🚀 -->
+<script id="main-typing-history-fix">
+(function() {
+    console.log("Applying Main Typing Test History & 10-Record Limit Fix...");
+
+    // 1. Intercept test completion to guarantee instant saving (max 10 records)
+    const origShowResultScreen = window.showResultScreen;
+    window.showResultScreen = function(mainTitle, subTitle, rankLabel, rankTitle, rankColor, rankMsg, stats, isTutor) {
+        
+        // Sirf Standard Typing Test ko track karo (Games aur Tutor ko ignore karo)
+        if (isTutor === false && !stats.isGame) {
+            let uid = typeof window.getActiveUserId === 'function' ? window.getActiveUserId() : 'guest';
+            if (typeof auth !== 'undefined' && auth.currentUser) uid = auth.currentUser.uid;
+
+            let historyKey = `StandaloneTypingHistory_${uid}`;
+            let history = JSON.parse(localStorage.getItem(historyKey) || '[]');
+
+            // UI se settings uthao
+            const durationEl = document.getElementById('typing-duration-sel');
+            const levelEl = document.getElementById('typing-level-sel');
+            const durationStr = (durationEl && durationEl.value == 0) ? 'No Limit' : (durationEl ? durationEl.value + ' min' : '5 min');
+            const levelStr = levelEl ? levelEl.value.toUpperCase() : 'AVERAGE';
+
+            const record = {
+                date: new Date().toLocaleString('en-IN', {dateStyle:'short', timeStyle:'short'}),
+                wpm: stats.wpm,
+                accNum: stats.acc,
+                accuracy: stats.acc + '%',
+                kdph: stats.kdph,
+                duration: durationStr,
+                level: levelStr
+            };
+
+            // Array ke start mein naya record dalo
+            history.unshift(record);
+
+            // 🔥 THE FIX: Sirf pichhle 10 tests ki history rakho, baaki auto-delete!
+            if(history.length > 10) {
+                history = history.slice(0, 10);
+            }
+
+            // Instant Local Storage Save (Isse empty screen wala bug theek ho jayega)
+            localStorage.setItem(historyKey, JSON.stringify(history));
+
+            // Background Cloud Sync (Taki online device change karne par bhi data rahe)
+            if (typeof auth !== 'undefined' && auth.currentUser) {
+                db.collection("userData").doc(auth.currentUser.uid).set({ typingHistory: history }, { merge: true }).catch(e => console.log("History Sync Error:", e));
+            }
+        }
+
+        // Original screen dikhao
+        origShowResultScreen.apply(this, arguments);
+    };
+
+    // 2. Override the History Modal to instantly load the local data without waiting
+    window.openTypingHistoryModal = function() {
+        
+        // Hide all other screens
+        document.querySelectorAll('.app-screen').forEach(screen => {
+            screen.classList.add('hidden');
+        });
+        document.body.classList.remove('tutor-active');
+
+        // Show History Screen
+        document.getElementById('typing-history-screen').classList.remove('hidden');
+
+        const container = document.getElementById('typing-history-list-container');
+        container.innerHTML = '<p style="color:var(--text-secondary); text-align:center; padding: 20px;">Fetching Data... ⏳</p>';
+
+        let uid = typeof window.getActiveUserId === 'function' ? window.getActiveUserId() : 'guest';
+        if (typeof auth !== 'undefined' && auth.currentUser) uid = auth.currentUser.uid;
+
+        let historyKey = `StandaloneTypingHistory_${uid}`;
+        
+        // 🔥 INSTANT LOAD FROM CACHE (Zero Delay)
+        let localHistory = JSON.parse(localStorage.getItem(historyKey) || '[]');
+
+        function drawHistory(historyArray) {
+            container.innerHTML = '';
+
+            // Ek baar aur ensure karo ki strictly 10 hi dikhein
+            if(historyArray.length > 10) historyArray = historyArray.slice(0, 10);
+
+            if(historyArray.length === 0) {
+                container.innerHTML = '<p style="color:var(--text-secondary); text-align:center; padding: 20px;">No performance history found. Take a test first!</p>';
+                return;
+            }
+
+            historyArray.forEach(record => {
+                let div = document.createElement('div');
+                div.style.background = 'rgba(0,0,0,0.4)';
+                div.style.border = '1px solid var(--glass-border)';
+                div.style.padding = '15px';
+                div.style.marginBottom = '10px';
+                div.style.borderRadius = '12px';
+                div.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                        <strong style="color:var(--text-primary); font-size: 0.95rem;">${record.date}</strong>
+                        <span style="color:var(--text-secondary); font-size:0.85rem; font-weight: 600;">${record.level} (${record.duration})</span>
+                    </div>
+                    <div style="display:flex; gap:15px; font-family:'JetBrains Mono', monospace; font-size: 0.9rem;">
+                        <span style="color:var(--accent-primary);">WPM: ${record.wpm}</span>
+                        <span style="color:var(--type-correct);">Acc: ${record.accuracy}</span>
+                        <span style="color:var(--text-secondary);">KDPH: ${record.kdph}</span>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Render UI instantly
+        drawHistory(localHistory);
+
+        // Background Cloud Fetch fallback to keep devices perfectly synced
+        if (typeof auth !== 'undefined' && auth.currentUser) {
+            db.collection("userData").doc(uid).get().then(doc => {
+                if (doc.exists && doc.data().typingHistory) {
+                    let cloudHistory = doc.data().typingHistory;
+                    if(cloudHistory.length > 10) cloudHistory = cloudHistory.slice(0, 10);
+                    
+                    // Update cache and refresh UI if cloud has different data
+                    if (JSON.stringify(cloudHistory) !== JSON.stringify(localHistory)) {
+                        localStorage.setItem(historyKey, JSON.stringify(cloudHistory));
+                        drawHistory(cloudHistory);
+                    }
+                }
+            }).catch(e => console.log(e));
+        }
+    };
+
+    // 3. Purge (Clear) Button Fix
+    window.clearTypingHistory = function() {
+        if(confirm("Are you sure you want to delete all typing test history?")) {
+            let uid = typeof window.getActiveUserId === 'function' ? window.getActiveUserId() : 'guest';
+            if (typeof auth !== 'undefined' && auth.currentUser) uid = auth.currentUser.uid;
+
+            let historyKey = `StandaloneTypingHistory_${uid}`;
+            localStorage.removeItem(historyKey);
+
+            if (typeof auth !== 'undefined' && auth.currentUser) {
+                db.collection("userData").doc(uid).update({
+                    typingHistory: firebase.firestore.FieldValue.delete()
+                }).catch(e => console.log(e));
+            }
+            
+            // Redraw Screen (Will show empty message immediately)
+            window.openTypingHistoryModal();
+        }
+    };
+
+})();
+</script>
 
 
 
