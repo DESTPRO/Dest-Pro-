@@ -247,11 +247,18 @@ body.focus-mode-active #aura-glow-layer {
 body:not(.focus-mode-active) .t-char.correct{color:var(--type-correct);text-shadow:0 0 12px rgba(163,230,53,.4);}
 body:not(.focus-mode-active) .t-char.incorrect {
     color: var(--type-error) !important;
-    background-color: transparent !important; /* Background hata diya */
-    text-shadow: none !important; /* Clean look ke liye glow hata diya */
+    background-color: transparent !important;
+    text-shadow: none !important;
     border-radius: 0 !important;
-    border-bottom: 2px solid var(--type-error); /* Optional: Agar aap chaho toh sirf ek red underline de sakte ho, warna ise hata dena */
+    
+    /* ⚡ Asli Fix: Border hata kar text-decoration lagaya */
+    border-bottom: none !important; 
+    text-decoration: underline !important;
+    text-decoration-color: var(--type-error) !important;
+    text-decoration-thickness: 3px !important;
+    text-underline-offset: 6px !important;
 }
+
 
 /* ==============================================================
    🎯 BUTTER SMOOTH FOCUS MODE (MONKEYTYPE KILLER)
@@ -316,29 +323,44 @@ body.focus-mode-active .t-char.active {
     color: #64748b !important; 
 }
 
-/* 🚀 UNIVERSAL BUTTER SMOOTH GLIDING CARET */
+/* 🚀 THE ULTIMATE GLIDING CARET CSS (THIN PROFESSIONAL CARET) */
 #smooth-caret {
     position: absolute;
-    width: 2px; 
-    background: var(--type-primary);
-    border-radius: 4px;
-    box-shadow: none; 
-   transition: left 0.05s linear, top 0.1s ease-out;
+    top: 0 !important;  
+    left: 0 !important; 
+    width: 2px !important;  /* ⚡ Width fixed to 2px for professional look */
+    background-color: var(--type-primary) !important;
+    border-radius: 2px !important; 
+    z-index: 2 !important;  /* Cursor always above text */
+    margin-top: 0px !important; /* Managed precisely via JS */
+    margin-left: 0 !important; 
+    
+    will-change: transform, height, opacity !important;
+    transition: transform 0.12s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+    animation: premiumBlink 0.8s infinite alternate cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
 
-    pointer-events: none;
-    z-index: 1; 
-    opacity: 1;
-    will-change: left, top; 
-    animation: smoothBlink 1s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+/* For Focus Mode, ensure cursor looks exactly the same thin line */
+body.focus-mode-active #smooth-caret {
+    width: 2px !important; 
+    background-color: var(--type-primary) !important;
+    z-index: 2 !important; 
+    margin-top: 0px !important; 
 }
-@keyframes smoothBlink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
-}
+
+/* Stops blinking when the user is actively typing */
 body.is-typing #smooth-caret {
-    animation: none;
-    opacity: 1;
+    animation: none !important;
+    opacity: 1 !important;
+    transition: transform 0.12s cubic-bezier(0.25, 0.8, 0.25, 1) !important; 
 }
+
+/* Smooth blinking animation */
+@keyframes premiumBlink {
+    0% { opacity: 0.9; }
+    100% { opacity: 0.2; }
+}
+
 
 .typing-flash-overlay{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:flex;justify-content:center;align-items:center;z-index:10;border-radius:16px;cursor:pointer;transition:opacity .3s ease,visibility .3s ease;}
 .typing-flash-overlay.hidden{opacity:0;visibility:hidden;}
@@ -1403,11 +1425,18 @@ body:not(.focus-mode-active) .t-char.correct {
 /* 2. Galat type kiye hue letters ka background aur glow hatane ke liye */
 body:not(.focus-mode-active) .t-char.incorrect {
     color: var(--type-error) !important;
-    background-color: transparent !important; 
-    text-shadow: none !important; 
+    background-color: transparent !important;
+    text-shadow: none !important;
     border-radius: 0 !important;
-    border-bottom: 2px solid var(--type-error) !important; 
+    
+    /* ⚡ Asli Fix Yahan Aayega */
+    border-bottom: none !important; 
+    text-decoration: underline !important;
+    text-decoration-color: var(--type-error) !important;
+    text-decoration-thickness: 3px !important;
+    text-underline-offset: 6px !important;
 }
+
 
 /* 3. Typing box ka dabba (background, border, shadow) hatane ke liye */
 .typing-box {
@@ -1495,10 +1524,12 @@ body.focus-mode-active .typing-box,
     animation: premiumBlink 0.8s infinite alternate cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
+/* NAYA CODE (Sirf opacity animate hogi) */
 @keyframes premiumBlink {
-    0% { opacity: 0.35; transform: scale(1); }
-    100% { opacity: 0.15; transform: scale(0.95); }
+    0% { opacity: 0.9; }
+    100% { opacity: 0.2; }
 }
+
 /* =========================================================
    🎯 FOCUS MODE CARET (Perfect Size & Alignment)
 ========================================================= */
@@ -1531,16 +1562,16 @@ body.focus-mode-active .typing-box {
 }
 
 /* 2. Cursor ko text ke upar aane se rokne ke liye */
+/* 🎯 FOCUS MODE CARET FIX (Perfect Alignment) */
 body.focus-mode-active #smooth-caret {
-    width: 3px !important;         /* 4px thoda zyada mota tha, 3px perfect rahega */
-    height: 1.2em !important;      
-    margin-top: 4px !important;    
-    margin-left: -1px !important;  
-    
+    width: 2px !important;         /* Cursor 2px ki patli line rahega */
     background-color: var(--type-primary) !important;
+    z-index: 2 !important;         /* Text ke upar, ekdum clear dikhega */
     
-    /* MAGIC FIX: Cursor ko text ke peeche bhej diya taaki text kabhi na chhupe */
-    z-index: -1 !important; 
+    /* ⚡ ASLI FIX: Faltu margins aur height hata diye taaki JavaScript apna exact size laga sake */
+    margin-top: 0px !important;    
+    margin-left: 0px !important;  
+    height: auto; 
 }
 
 /* 3. Text ko hamesha upar aur clear rakhne ke liye */
@@ -2184,36 +2215,7 @@ body.light-mode .ultimate-start-btn:hover {
     transform: translateX(6px);
 }
 
-/* ==============================================================
-   ✨ MAGICAL COLORFUL PARTICLE TOUCH EFFECT
-============================================================== */
-.magic-particle {
-    position: fixed;
-    pointer-events: none;
-    border-radius: 50%;
-    z-index: 99999999;
-    /* Start at touch point */
-    transform: translate(-50%, -50%) scale(1);
-    animation: magicSparkle 0.6s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
-    mix-blend-mode: screen; /* Gives it a glowing/magical neon look */
-}
 
-/* Light mode mein blend mode change karenge taaki colors dark bg pe bhi dikhein */
-body.light-mode .magic-particle {
-    mix-blend-mode: multiply; 
-}
-
-@keyframes magicSparkle {
-    0% {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 1;
-    }
-    100% {
-        /* --tx aur --ty JavaScript se aayenge (Random directions ke liye) */
-        transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0);
-        opacity: 0;
-    }
-}
 /* ⚔️ 1v1 MODAL STYLES (PREMIUM FIX) */
 .modal-game-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
@@ -2271,6 +2273,258 @@ body.light-mode .vs-icon { background: #f1f5f9; }
 /* 🔥 YEH LINE FIX KAREGI UGLE WHITE DABBE KO 🔥 */
 body.light-mode .random-btn .vs-icon { background: rgba(255, 255, 255, 0.2) !important; color: #ffffff !important; }
 
+/* =========================================================
+   🛠️ FIX: HIDE KEYBOARD & HANDS IN ASSESSMENT MODE ONLY
+========================================================= */
+body:not(.tutor-active) #kb-visual,
+body:not(.tutor-active) .hands-wrapper {
+    display: none !important;
+}/* =========================================================
+   🚀 FIX: EXPAND TYPING BOX FULL SCREEN IN ASSESSMENT MODE
+========================================================= */
+/* Desktop / PC */
+body:not(.tutor-active):not(.focus-mode-active) .typing-box {
+    height: 55vh !important;
+    min-height: 350px !important;
+}
+
+/* Mobile Portrait (Khade phone me) */
+@media (max-width: 768px) {
+    body:not(.tutor-active):not(.focus-mode-active) .typing-box {
+        height: 60vh !important;
+        min-height: 300px !important;
+    }
+}
+
+/* Mobile Landscape (Lete hue phone me) */
+@media (max-height: 600px) and (orientation: landscape) {
+    body:not(.tutor-active):not(.focus-mode-active) .typing-box {
+        height: 50vh !important;
+        min-height: 180px !important;
+    }
+}
+/* 🎯 BIG, BOLD & CLEAR MONOSPACE FONT (REAL EXAM FEEL) */
+
+/* 1. Typing Box - Bada Size aur Mota Font */
+.typing-box, 
+body.focus-mode-active .typing-box {
+    font-family: 'Courier New', Courier, monospace !important;
+    font-size: 2.2rem !important; /* ⚡ Font size kafi bada kar diya */
+    font-weight: bold !important; /* ⚡ Font ko ekdum mota (thick) kar diya */
+    line-height: 1.8 !important;  /* Lines ke beech perfect gap */
+    letter-spacing: 0px !important; 
+    word-spacing: 0px !important;
+}
+
+/* 2. Har letter forcefully BOLD hoga */
+.t-char {
+    font-family: 'Courier New', Courier, monospace !important;
+    font-weight: bold !important; /* ⚡ Har single letter mota dikhega */
+}
+
+/* 3. Space Character Fix */
+.t-space {
+    display: inline-block !important; /* ⚡ 'inline' ki jagah wapas 'inline-block' kar diya */
+    width: auto !important; 
+    white-space: pre !important; 
+    vertical-align: baseline !important; /* ⚡ Baseline lock kar di taaki neeche na gire */
+}
+
+/* 4. Words ke beech ka extra margin zero */
+.t-word,
+body.focus-mode-active .t-word {
+    margin-right: 0 !important;   
+    margin-bottom: 0 !important;  
+    display: inline-block !important; 
+}
+
+/* 📱 5. Mobile Screen Fix (Mobile par bhi patla na dikhe) */
+@media (max-width: 768px) {
+    .typing-box, 
+    body.focus-mode-active .typing-box {
+        font-size: 1.8rem !important; /* Mobile par bhi size badha diya */
+        line-height: 2 !important;
+    }
+}
+/* ☀️ LIGHT MODE FIX FOR TUTOR DASHBOARD */
+body.light-mode .tutor-hero-card {
+    background: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
+}
+
+body.light-mode .tutor-stat-box {
+    background: #f8fafc !important;
+    border-color: #e2e8f0 !important;
+}
+
+body.light-mode .tutor-progress-text {
+    text-shadow: none !important;
+    color: #0f172a !important; /* Dark text for visibility */
+}
+
+body.light-mode .tutor-progress-bg {
+    stroke: rgba(0, 0, 0, 0.05) !important; /* Progress ring track color */
+}
+
+/* XP aur Accuracy numbers ke shadows clear karna */
+body.light-mode .xp-badge {
+    text-shadow: none !important;
+    color: #d97706 !important; /* Darker amber/gold for light mode */
+}
+body.light-mode #tutor-avg-acc {
+    text-shadow: none !important;
+}
+
+/* Main Menu Button fix inside Tutor Card */
+body.light-mode .tutor-hero-card .btn-outline {
+    background: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
+    color: #334155 !important;
+    box-shadow: none !important;
+}
+body.light-mode .tutor-hero-card .btn-outline:hover {
+    background: #e2e8f0 !important;
+    color: #0f172a !important;
+}
+
+/* ☀️ LIGHT MODE FIX FOR TUTOR SUMMARY / RESULT CARD */
+body.light-mode #res-rank-box {
+    background: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
+}
+
+body.light-mode #res-rank-label {
+    color: #64748b !important;
+}
+
+body.light-mode #res-rank-msg {
+    color: #334155 !important;
+}
+/* 🛑 GALTI WALI RED LINE KA SIMPLE & CLEAN FIX (SIRF LINE) */
+
+body:not(.focus-mode-active) .t-char.incorrect,
+body.focus-mode-active .t-char.incorrect,
+body.light-mode .t-char.incorrect,
+body:not(.focus-mode-active) .t-space.incorrect,
+body.focus-mode-active .t-space.incorrect,
+body.light-mode .t-space.incorrect {
+    /* Saare dabbe (blocks) aur purane borders hata diye */
+    background: transparent !important; 
+    border-bottom: none !important; 
+    
+    /* ⚡ Dono (Letters aur Space) par exact same patli red line */
+    text-decoration: underline !important;
+    text-decoration-color: #ef4444 !important;
+    text-decoration-thickness: 3px !important;
+    text-underline-offset: 4px !important;
+}
+/* 🖐️ LIGHT MODE HAND SHADOW FIX */
+body.light-mode .v-hand {
+    /* 60% black ko hatakar sirf 10% black (halka grey) kar diya */
+    filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.1)) !important; 
+}
+/* 🛑 HIDE LIVE STATS (WPM, ACC, ERR) FROM TYPING SCREEN */
+#test-stats-row .live-stats {
+    display: none !important;
+}
+
+/* Iske baad Focus Mode aur Timer wale buttons ko right side set karne ke liye (Optional) */
+#test-stats-row {
+    justify-content: flex-end !important;
+}
+/* 🎮 PREMIUM CUSTOM BACKGROUND IMAGE SETUP (DARK MODE) */
+
+body:not(.light-mode) {
+    /* Teri nayi image yahan set ho rahi hai */
+    background-image: url('1000073227.png') !important;
+    
+    /* Image ko poori screen par stretch karne ke liye */
+    background-size: cover !important;
+    
+    /* Image ko center mein rakhne ke liye */
+    background-position: center center !important;
+    
+    /* Scroll karne par image apni jagah fix rahegi (Gaming feel) */
+    background-attachment: fixed !important;
+    background-repeat: no-repeat !important;
+    
+    /* Fallback color agar image load hone mein 1 second lage */
+    background-color: #0a0a16 !important; 
+}
+
+/* Purane solid colors aur gradients ko transparent kar rahe hain taaki image clear dikhe */
+body:not(.light-mode) #dynamic-bg-container {
+    background-color: transparent !important;
+    background-image: none !important;
+}
+
+/* App ke main dabbe ko halka sa 'Glass' (translucent) bana rahe hain 
+   taaki background ka keyboard aur WPM meter peechhe se chamke */
+body:not(.light-mode) .app-container {
+    background: rgba(15, 23, 42, 0.65) !important;
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.1) !important;
+}
+/* ☀️ LIGHT MODE: PREMIUM BACKGROUND & ZERO BLUR GLASS ☀️ */
+
+/* 1. Set Light Mode Background Image */
+html body.light-mode {
+    background-color: #f8fafc !important;
+    /* ⚡ YAHAN TERI LIGHT MODE IMAGE LAGA DI HAI ⚡ */
+    background-image: url('1000073226.png') !important;
+    background-size: cover !important;
+    background-position: center center !important;
+    background-attachment: fixed !important;
+    background-repeat: no-repeat !important;
+}
+
+/* Faltu background particles ko hide kiya taaki image clear rahe */
+html body.light-mode #dynamic-bg-container {
+    display: none !important;
+}
+
+/* 2. Main App Container: Zero Blur, Halka White Tint */
+html body.light-mode .app-container,
+html body.light-mode.no-effects .app-container {
+    background: rgba(255, 255, 255, 0.35) !important; /* Ekdum patla white sheesha */
+    backdrop-filter: none !important; /* ⚡ BLUR COMPLETELY REMOVED */
+    -webkit-backdrop-filter: none !important;
+    border: 1px solid rgba(255, 255, 255, 0.6) !important;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* 3. Cards & Inputs: Zero Blur aur clean look */
+html body.light-mode .bento-card, 
+html body.light-mode .search-input {
+    background: rgba(255, 255, 255, 0.45) !important; /* Halka frosted white */
+    backdrop-filter: none !important; /* ⚡ ZERO BLUR */
+    -webkit-backdrop-filter: none !important;
+    border: 1px solid rgba(255, 255, 255, 0.8) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03) !important;
+}
+
+/* 4. Assessment Settings Box (Faltu dabba gayab) */
+html body.light-mode .config-card {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* 5. Start Assessment Button (Solid White & Crisp) */
+html body.light-mode .ultimate-start-btn {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05) !important;
+}
 
 </style>
     <!-- 📱 MOBILE FIX: SINGLE COLUMN GAME GRID -->
@@ -2301,6 +2555,134 @@ body.light-mode .random-btn .vs-icon { background: rgba(255, 255, 255, 0.2) !imp
             }
         }
     </style>
+<!-- 🛑 ASSESSMENT SETTINGS BOX REMOVAL FIX 🛑 -->
+<style id="remove-config-box">
+    /* Faltu bahari dabbe ko 100% invisible karna */
+    html body:not(.light-mode) .app-screen .config-card {
+        background: transparent !important;
+        background-color: transparent !important;
+        background-image: none !important;
+        border: none !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+</style>
+<!-- ☀️ LIGHT MODE: DATA ENTRY & INTERNAL MODULES FIX ☀️ -->
+<style id="light-mode-modules-clean">
+    /* 1. Practice Configuration Box (Muddy grey background ko clean white glass banaya) */
+    html body.light-mode div[style*="var(--bg-card)"] {
+        background: rgba(255, 255, 255, 0.45) !important; /* Clean patla white tint */
+        border: 1px solid rgba(255, 255, 255, 0.8) !important;
+        backdrop-filter: none !important; /* ⚡ ZERO BLUR */
+        -webkit-backdrop-filter: none !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.03) !important;
+    }
+
+    /* 2. Dropdown Menus (Search Inputs ko white aur clean kiya) */
+    html body.light-mode .search-input {
+        background: rgba(255, 255, 255, 0.8) !important;
+        color: #0f172a !important; /* Dark text for readability */
+        border: 1px solid rgba(0, 0, 0, 0.15) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+
+    /* 3. Begin Skill Test Button (Solid White & Black Text like Main Menu) */
+    html body.light-mode .de-btn-main {
+        background: #ffffff !important; /* Solid White */
+        color: #000000 !important; /* Black Text */
+        border: 1px solid rgba(0, 0, 0, 0.1) !important;
+        font-weight: 900 !important;
+        text-shadow: none !important; /* Faltu kaali shadow hata di */
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08), inset 0 -3px 8px rgba(0,0,0,0.05) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+    
+    html body.light-mode .de-btn-main:hover {
+        background: #f8fafc !important;
+        transform: translateY(-2px) !important;
+    }
+    
+    /* 4. Text Labels Fix (Ensure no dark shadows on text in light mode) */
+    html body.light-mode h4,
+    html body.light-mode .input-group label {
+        color: #334155 !important;
+        text-shadow: none !important;
+        font-weight: 700 !important;
+    }
+</style>
+<!-- ☀️ ABSOLUTE FORCE: BEGIN SKILL TEST TEXT FIX ☀️ -->
+<style id="ultimate-btn-text-fix">
+    /* Button aur uske andar ke har text/span ko force white karna */
+    html body.light-mode .de-btn-main,
+    html body.light-mode .de-btn-main *,
+    html body.light-mode .de-panel button,
+    html body.light-mode .de-panel .btn {
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important; /* Yeh kisi bhi ziddi color ko override kar dega */
+        text-shadow: none !important;
+        opacity: 1 !important;
+        font-weight: 900 !important;
+        letter-spacing: 2px !important;
+    }
+    
+    /* Button ka background wapas premium dark ensure karna */
+    html body.light-mode .de-btn-main {
+        background: #0f172a !important; 
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+    }
+</style>
+<!-- 🌙 DARK MODE: NEW BACKGROUND & ZERO BLUR FIX 🌙 -->
+<style id="dark-mode-zero-blur">
+    /* 1. Set Dark Mode Background Image */
+    html body:not(.light-mode) {
+        background-color: #020617 !important;
+        /* ⚡ YAHAN NAYI DARK IMAGE LAGA DI HAI ⚡ */
+        background-image: url('1000073283.png') !important;
+        background-size: cover !important;
+        background-position: center center !important;
+        background-attachment: fixed !important;
+        background-repeat: no-repeat !important;
+    }
+
+    /* 2. Main App Container: Zero Blur, Halka Dark Tint */
+    html body:not(.light-mode) .app-container,
+    html body:not(.light-mode).no-effects .app-container {
+        background: rgba(2, 6, 23, 0.4) !important; /* Halka kaala tint taaki text clear rahe */
+        backdrop-filter: none !important; /* ⚡ BLUR COMPLETELY REMOVED */
+        -webkit-backdrop-filter: none !important;
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    }
+
+    /* 3. Cards & Inner Modules: Zero Blur */
+    html body:not(.light-mode) .bento-card, 
+    html body:not(.light-mode) .search-input,
+    html body:not(.light-mode) .de-stat-card,
+    html body:not(.light-mode) .de-panel,
+    html body:not(.light-mode) .tutor-hero-card,
+    html body:not(.light-mode) .tutor-stat-box,
+    html body:not(.light-mode) .tutor-lesson-card {
+        background: rgba(255, 255, 255, 0.03) !important; /* Ekdum patla white tint */
+        backdrop-filter: none !important; /* ⚡ ZERO BLUR */
+        -webkit-backdrop-filter: none !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.15) !important; /* Halka 3D edge glow */
+    }
+
+    /* 4. Assessment Settings Box (Hawa mein float karne ke liye) */
+    html body:not(.light-mode) .config-card {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+</style>
 
 </head>
 <body>
@@ -2469,10 +2851,11 @@ body.light-mode .random-btn .vs-icon { background: rgba(255, 255, 255, 0.2) !imp
         </div>
         
         <div class="tutor-stats-grid">
-            <div class="tutor-stat-box">
-                <div style="font-size:0.7rem; color:var(--text-secondary); text-transform:uppercase; letter-spacing:1px;">Experience</div>
-                <div class="xp-badge" id="tutor-xp-text">0 XP</div>
-            </div>
+         <div class="tutor-stat-box">
+    <div style="font-size:0.7rem; color:var(--text-secondary); text-transform:uppercase; letter-spacing:1px;">Mastery Points</div>
+    <div class="xp-badge" id="tutor-xp-text" style="color: #00ffcc; text-shadow: 0 0 10px rgba(0,255,204,0.4);">0 MP</div>
+</div>
+
             <div class="tutor-stat-box">
                 <div style="font-size:0.7rem; color:var(--text-secondary); text-transform:uppercase; letter-spacing:1px;">Accuracy</div>
                 <div style="font-size:1.4rem; font-weight:800; color:var(--type-correct);" id="tutor-avg-acc">--%</div>
@@ -2646,7 +3029,7 @@ body.light-mode .random-btn .vs-icon { background: rgba(255, 255, 255, 0.2) !imp
     </div>
     <!-- Tutor Results Actions -->
     <div id="result-actions-tutor" class="flex-row fade-in stagger-2 hidden">
-      <button class="btn btn-outline" style="flex:1;padding:14px;" onclick="openTutorDashboard()">🎓 Back to Roadmap</button>
+      <button class="btn btn-outline" style="flex:1;padding:14px;" onclick="openTutorDashboard()">Back</button>
       <button class="btn btn-success" id="btn-tutor-next" style="flex:2;padding:14px;font-size:0.9rem;text-transform:uppercase;letter-spacing:1px;" onclick="startNextTutorLesson()">Next Lesson →</button>
     </div>
     
@@ -3700,21 +4083,40 @@ function updateSmoothCaret() {
         const activeIndex = Math.min(charIndex, charactersInfo.length - 1); 
         const activeEl = charactersInfo[activeIndex]?.el; 
         const caret = document.getElementById('smooth-caret');
+        const typingBox = document.getElementById('typing-passage-box');
         
-        if(activeEl && caret) { 
+        if(activeEl && caret && typingBox) { 
+            // ⚡ The most accurate way to find position relative to the container
+            const boxRect = typingBox.getBoundingClientRect();
+            const charRect = activeEl.getBoundingClientRect();
+            
+            let targetX = 0;
+            // Height logic based on mode
+            let isFocus = document.body.classList.contains('focus-mode-active');
+            let heightSize = isFocus ? 0.65 : 0.85; 
+
+            // Calculate precise X and Y coordinates (adjusted for container scroll & padding)
+            let targetY = (charRect.top - boxRect.top) + typingBox.scrollTop;
+            
+            // Adjust vertical centering of cursor
+            let yOffset = activeEl.offsetHeight * (isFocus ? 0.15 : 0.075);
+            targetY += yOffset;
+
             if(charIndex >= charactersInfo.length) { 
-                caret.style.left = (activeEl.offsetLeft + activeEl.offsetWidth + 1) + 'px'; 
-                caret.style.width = '10px'; /* Test khatam hone par default size */
+                // Typing finished - stick to the right of the last character
+                targetX = (charRect.left - boxRect.left) + typingBox.scrollLeft + activeEl.offsetWidth; 
             } else { 
-                // Ye 2 lines magic karengi!
-                caret.style.left = (activeEl.offsetLeft) + 'px'; 
-                caret.style.width = (activeEl.offsetWidth) + 'px'; /* Letter ki exact width le lega! */
+                // Normal typing - stick exactly to the left edge of current character
+                targetX = (charRect.left - boxRect.left) + typingBox.scrollLeft; 
             } 
-            caret.style.top = (activeEl.offsetTop + activeEl.offsetHeight * 0.075) + 'px'; 
-            caret.style.height = (activeEl.offsetHeight * 0.85) + 'px'; 
+            
+            // ⚡ Apply GPU Hardware Accelerated Translate exactly
+            caret.style.transform = `translate3d(${targetX}px, ${targetY}px, 0)`;
+            caret.style.height = `${activeEl.offsetHeight * heightSize}px`; 
         }
     }
 }
+
 
 // =========================================================
 // ⛶ FULL SCREEN TOGGLE FUNCTION
@@ -3869,7 +4271,7 @@ function prepareActiveScreenUI(text, isUntimed = false) {
   hideAllScreens();
   
   document.getElementById('typing-active-screen').classList.remove('hidden');
-  document.getElementById('typing-flash-overlay').classList.remove('hidden');
+  document.getElementById('typing-flash-overlay').classList.add('hidden');
   
   document.querySelectorAll('.kb-key').forEach(k => { k.classList.remove('hit-correct','hit-wrong','tutor-highlight'); });
   document.querySelectorAll('.v-finger').forEach(f => { f.classList.remove('tutor-highlight'); });
@@ -3884,7 +4286,7 @@ function prepareActiveScreenUI(text, isUntimed = false) {
           document.getElementById('test-stats-row').classList.remove('hidden');
       }
       
-      document.getElementById('btn-submit-early').innerText = "🚪 Exit Practice"; 
+      document.getElementById('btn-submit-early').innerText = "Submit early"; 
       document.getElementById('tutor-live-progress').style.width = "0%"; 
       document.getElementById('tutor-coach-panel').classList.remove('hidden');
   } else {
@@ -3906,14 +4308,23 @@ function prepareActiveScreenUI(text, isUntimed = false) {
   buildProTypingUI(text); 
   typingTestActive = true;
   
+  // ⚡ YAHAN HAI ASLI FIX: Browser ko paint karne ka time dena taaki cursor size 100% accurate aaye
+  requestAnimationFrame(() => {
+      updateSmoothCaret();
+      setTimeout(updateSmoothCaret, 40);
+  });
+  
   const hiddenInput = document.getElementById('hidden-focus-input'); 
   hiddenInput.oninput = handleMobileFriendlyInput; 
   hiddenInput.onkeydown = handlePhysicalKeydown;
   document.getElementById('typing-passage-box').scrollTop = 0;
   
   if(isTutorMode) updateTutorKeyHighlight();
-  setTimeout(() => focusTypingInput(), 100);
+  
+  focusTypingInput();
 }
+
+
 
 function buildProTypingUI(text) {
   const typingBox = document.getElementById('typing-passage-box'); 
@@ -4408,7 +4819,7 @@ function openTutorDashboard() {
     hideAllScreens(); 
     document.getElementById('tutor-dashboard-screen').classList.remove('hidden');
     
-    document.getElementById('tutor-xp-text').innerText = tutorData.xp + " XP";
+    document.getElementById('tutor-xp-text').innerText = tutorData.xp + " MP";
     let avgAcc = tutorData.historyStats.length > 0 ? Math.round(tutorData.historyStats.reduce((a,b)=>a+b.acc,0)/tutorData.historyStats.length) : 0;
     document.getElementById('tutor-avg-acc').innerText = avgAcc > 0 ? avgAcc + "%" : "--%";
     
@@ -4558,7 +4969,7 @@ function processTutorLessonResult(netWPM, accuracy, kdph, timeElapsed) {
     let msg = ""; let rankColor = "#a3e635"; let rankTitle = "LESSON CLEARED!";
     
     if (passed) {
-        msg = `Target Met! +${lesson.xp} XP earned.\nNext level unlocked.`; 
+        msg = `Target Met! +${lesson.xp} MP earned.\nNext level unlocked.`; 
         document.getElementById('btn-tutor-next').classList.remove('hidden');
         if(!tutorData.completed.includes(lesson.id) && lesson.id !== 'drill_temp') { 
             tutorData.completed.push(lesson.id); 
@@ -9975,14 +10386,12 @@ function processTutorGameResult(lesson, passed, score) {
     
     showResultScreen("Tutor Mission Over", lesson.title, "Status", rankTitle, rankColor, msg, { isGame: true, score: score, lives: "-", wordsHit: "-", wordsMissed: "-" }, true);
 }
-// =========================================================
-// 🚀 GLOBAL KEYBOARD SHORTCUTS (ENTER & SHIFT+ENTER)
-// =========================================================
+// ==========================================
+// 🚀 FIXED GLOBAL KEYBOARD SHORTCUTS (ENTER & SHIFT+ENTER)
+// ==========================================
 document.addEventListener('keydown', function(e) {
-    // Agar input fields me type kar rahe hain (custom text wagerah), toh block na ho
     if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
-        // Hidden focus inputs me shortcuts allow karne hain
-        if(e.target.id !== 'hidden-focus-input' && e.target.id !== 'hiddenGameInput' && e.target.id !== 'game-hidden-input') {
+        if(e.target.id !== 'hidden-focus-input' && e.target.id !== 'game-hidden-input' && e.target.id !== 'hiddenGameInput') {
             return; 
         }
     }
@@ -9993,29 +10402,30 @@ document.addEventListener('keydown', function(e) {
         // 1. TYPING & TUTOR RESULT SCREEN
         const typingResultScreen = document.getElementById('typing-result-screen');
         if (typingResultScreen && !typingResultScreen.classList.contains('hidden')) {
-            e.preventDefault(); // Default enter press ko roko
+            e.preventDefault(); 
             
+            const nextBtn = document.getElementById('btn-tutor-next');
+            const isTutorActive = typeof isTutorMode !== 'undefined' && isTutorMode;
+
             if (isShift) {
-                // 🔥 SHIFT + ENTER -> RESTART CURRENT LESSON / TEST
-                if (typeof isTutorMode !== 'undefined' && isTutorMode && typeof tutorData !== 'undefined') {
+                // 🔄 SHIFT + ENTER -> RESTART LESSON / TEST
+                if (isTutorActive && typeof tutorData !== 'undefined') {
                     startSpecificTutorLesson(tutorData.currentId);
                 } else if (typeof initializeTypingTest === 'function') {
                     initializeTypingTest();
                 }
             } else {
-                // 🔥 ENTER -> NEXT LESSON
-                const nextBtn = document.getElementById('btn-tutor-next');
-                if (typeof isTutorMode !== 'undefined' && isTutorMode && nextBtn && !nextBtn.classList.contains('hidden')) {
+                // ⚡ SIRF ENTER -> NEXT LESSON (Agar Tutor mode mein Next button available hai)
+                if (isTutorActive && nextBtn && !nextBtn.classList.contains('hidden')) {
                     if (typeof startNextTutorLesson === 'function') startNextTutorLesson();
                 } else if (typeof resetAppToSetup === 'function') {
-                    // Normal mode me Enter dabane pe wapas Dashboard
                     resetAppToSetup();
                 }
             }
             return;
         }
 
-        // 2. ACTIVE TYPING SCREEN (RESTART ONLY)
+        // 2. ACTIVE TYPING SCREEN (RESTART VIA SHIFT + ENTER ONLY)
         const typingActiveScreen = document.getElementById('typing-active-screen');
         if (typingActiveScreen && !typingActiveScreen.classList.contains('hidden')) {
             if (isShift) {
@@ -10029,44 +10439,22 @@ document.addEventListener('keydown', function(e) {
             return;
         }
 
-        // 3. GAME RESULT MODAL (ARCADE GAMES)
+        // 3. GAME RESULT MODAL
         const gameResultModal = document.getElementById('gameResultModal');
         if (gameResultModal && !gameResultModal.classList.contains('hidden') && gameResultModal.style.display !== 'none') {
             e.preventDefault();
             if (isShift) {
-                // SHIFT + ENTER -> RESTART GAME
                 const playAgainBtn = document.getElementById('playAgainBtn');
                 if(playAgainBtn) playAgainBtn.click();
             } else {
-                // ENTER -> GO BACK TO GAMES
                 const backBtn = document.getElementById('backToGamesBtn');
                 if(backBtn) backBtn.click();
             }
             return;
         }
-        
-        // 4. ACTIVE GAME ARENA (RESTART ONLY)
-        const activeGameArena = document.getElementById('activeGameArena');
-        if (activeGameArena && !activeGameArena.classList.contains('hidden') && activeGameArena.style.display !== 'none') {
-            if (isShift) {
-                e.preventDefault();
-                if(window.typingGamesModule && window.typingGamesModule.activeGameInstance) {
-                    let diff = window.typingGamesModule.activeGameInstance.difficulty;
-                    let gameClass = window.typingGamesModule.activeGameInstance.constructor.name;
-                    let gameKey = 'spaceTyper';
-                    if (gameClass === 'WordRushGame') gameKey = 'wordRush';
-                    else if (gameClass === 'TypingRacerGame') gameKey = 'typingRacer';
-                    else if (gameClass === 'KeyboardNinjaGame') gameKey = 'keyboardNinja';
-                    else if (gameClass === 'TypingSurvivorGame') gameKey = 'typingSurvivor';
-                    
-                    window.typingGamesModule.exitToDashboard();
-                    setTimeout(() => window.typingGamesModule.startGame(gameKey, diff), 150);
-                }
-            }
-            return;
-        }
     }
 });
+
            // ==========================================
     // 🏆 GLOBAL LEADERBOARD LOGIC (SINGLE ULTIMATE BEST SCORE)
     // ==========================================
@@ -10589,54 +10977,7 @@ window.showLeaderboard = async function(gameId = 'all') {
   window.openGlobalLeaderboard = function() {
       window.showLeaderboard('spaceTyper');
   };
-  // ==============================================================
-// ✨ MAGICAL PARTICLE TOUCH LISTENER (MULTI-COLOR BURST)
-// ==============================================================
-document.addEventListener('pointerdown', function(e) {
-    // 1. Magical Colors ki list (Cyan, Pink, Gold, Purple, Neon Green)
-    const colors = ['#00e5ff', '#ff00cc', '#fbbf24', '#b026ff', '#a3e635'];
-    
-    // 2. Ek tap par kitne particles nikalne hain? (12 ekdum perfect hain)
-    const particleCount = 12; 
 
-    for (let i = 0; i < particleCount; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'magic-particle';
-        
-        // Exact touch location
-        particle.style.left = e.clientX + 'px';
-        particle.style.top = e.clientY + 'px';
-        
-        // Random Particle Size (3px se 7px ke beech)
-        const size = Math.random() * 4 + 3;
-        particle.style.width = size + 'px';
-        particle.style.height = size + 'px';
-        
-        // Random Color and Glow
-        const color = colors[Math.floor(Math.random() * colors.length)];
-        particle.style.background = color;
-        particle.style.boxShadow = `0 0 ${size * 2}px ${color}`; // Ussi color ka glow
-        
-        // 🚀 PHYSICS: Random 360-degree Explosion direction
-        const angle = Math.random() * Math.PI * 2; // 0 se 360 degree (radians me)
-        const distance = Math.random() * 60 + 30;  // Kitni door ud kar jayega (30px - 90px)
-        
-        const tx = Math.cos(angle) * distance;
-        const ty = Math.sin(angle) * distance;
-        
-        // CSS variables set kar diye keyframe animation ke liye
-        particle.style.setProperty('--tx', tx + 'px');
-        particle.style.setProperty('--ty', ty + 'px');
-        
-        // Screen par add karo
-        document.body.appendChild(particle);
-        
-        // 600ms baad animation khatam hone par DOM se hata do
-        setTimeout(() => {
-            particle.remove();
-        }, 600);
-    }
-});
 // ==========================================
 // ⚔️ 1v1 CHALLENGE LOGIC (WITH SPIN ANIMATION)
 // ==========================================
@@ -11405,10 +11746,9 @@ if (typeof TypingRacerGame !== 'undefined') {
     };
 }
 // ==========================================
-// 🌟 MASTER LEVEL & EXP ENGINE (MULTI-ACCOUNT FIX)
+// 🌟 MASTER LEVEL & EXP ENGINE (DECOUPLED FROM TUTOR)
 // ==========================================
 window.LevelEngine = {
-    // 🔥 NEW: Har account ke liye ek Unique Memory Key banayega
     getKey: function() {
         let uid = "guest";
         if (typeof auth !== 'undefined' && auth.currentUser) {
@@ -11420,46 +11760,19 @@ window.LevelEngine = {
     },
 
     init: function() {
-        // Sirf usi account ki memory load karo jo login hai
-        let savedXP = localStorage.getItem(this.getKey());
-        if(savedXP !== null) {
-            if(!window.tutorData) window.tutorData = {};
-            window.tutorData.xp = parseInt(savedXP);
-        }
+        // Init is now decoupled
     },
     
     addXP: function(amount) {
-        let currentXP = 0;
-        let savedXP = localStorage.getItem(this.getKey());
-        
-        if(savedXP !== null) {
-            currentXP = parseInt(savedXP);
-        } else if (window.tutorData && window.tutorData.xp) {
-            currentXP = window.tutorData.xp;
-        }
-
+        let currentXP = parseInt(localStorage.getItem(this.getKey())) || 0;
         let newXP = Math.max(0, currentXP + amount);
         
-        // 🔥 PERMANENT SAVE (Specific to this user's ID)
         localStorage.setItem(this.getKey(), newXP);
-        
-        if(!window.tutorData) window.tutorData = {};
-        window.tutorData.xp = newXP;
-        
-        if (typeof window.saveTutorData === 'function') window.saveTutorData();
-        
         this.updateUI();
     },
 
     getStats: function() {
-        let xp = 0;
-        let savedXP = localStorage.getItem(this.getKey());
-        
-        if(savedXP !== null) {
-            xp = parseInt(savedXP);
-        } else if(window.tutorData && window.tutorData.xp) {
-            xp = window.tutorData.xp;
-        }
+        let xp = parseInt(localStorage.getItem(this.getKey())) || 0;
         
         let level = Math.floor(Math.sqrt(xp / 50)) + 1;
         let currentLevelBaseXp = Math.pow(level - 1, 2) * 50;
@@ -11505,6 +11818,7 @@ window.LevelEngine = {
         }
     }
 };
+
 
 // 🔥 FIX: Loop me hamesha check karega ki kaunsa user login hai
 setInterval(() => { 
@@ -12865,8 +13179,7 @@ body:not(.light-mode) {
         color: #0f172a !important;
     }
 </style>
-
-<!-- 🏆 ULTIMATE TUTOR FIX: REFRESH DATA & EXP SYNC 🏆 -->
+<!-- 🏆 TUTOR FIREBASE SYNC (WITHOUT GLOBAL EXP LINK) 🏆 -->
 <script>
 (function() {
     window.getActiveUserId = function() {
@@ -12888,25 +13201,15 @@ body:not(.light-mode) {
     }
 
     const originalSetItem = localStorage.setItem;
-    window._isSyncingXP = false;
 
     localStorage.setItem = function(key, value) {
         originalSetItem.apply(this, arguments);
+        // Sirf Firebase sync karega, Global XP mein add NAHI karega
         if (key.startsWith('DEST_TutorData_')) {
             try {
                 let tutorData = JSON.parse(value);
                 if (typeof auth !== 'undefined' && auth.currentUser) {
                     db.collection("userData").doc(auth.currentUser.uid).set({ tutorData: tutorData }, { merge: true }).catch(e=>{});
-                }
-                if (window.LevelEngine && typeof auth !== 'undefined' && auth.currentUser && !window._isSyncingXP) {
-                    let globalKey = window.LevelEngine.getKey();
-                    let globalXP = parseInt(localStorage.getItem(globalKey)) || 0;
-                    if (tutorData.xp > globalXP) {
-                        let newlyEarnedXP = tutorData.xp - globalXP;
-                        window._isSyncingXP = true;
-                        window.LevelEngine.addXP(newlyEarnedXP);
-                        window._isSyncingXP = false;
-                    }
                 }
             } catch(e) {}
         }
