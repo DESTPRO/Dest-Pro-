@@ -2683,6 +2683,49 @@ html body.light-mode .ultimate-start-btn {
         -webkit-backdrop-filter: none !important;
     }
 </style>
+<!-- ❌ MODAL CROSS BUTTON VISIBILITY FIX ❌ -->
+<style id="modal-close-fix">
+    /* Cross button ko zabardasti White aur clear banana */
+    html body .close, 
+    html body .close-btn, 
+    html body .modal-close,
+    html body button[class*="close"] {
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important; /* Kisi bhi ziddi color ko hatane ke liye */
+        opacity: 1 !important; /* Transparent hone se rokna */
+        font-size: 24px !important;
+        font-weight: bold !important;
+        
+        /* Button ko ek mast 3D Frosted dabba banana */
+        background: rgba(255, 255, 255, 0.1) !important; 
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border-radius: 8px !important;
+        width: 36px !important;
+        height: 36px !important;
+        
+        /* 'X' ko dabbe ke ekdum center mein set karna */
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+        line-height: 1 !important;
+        backdrop-filter: blur(4px) !important;
+        -webkit-backdrop-filter: blur(4px) !important;
+        transition: all 0.2s ease !important;
+    }
+
+    /* Hover/Touch karne par Red (Premium Danger feel) */
+    html body .close:hover, 
+    html body .close-btn:hover, 
+    html body .modal-close:hover,
+    html body button[class*="close"]:hover {
+        background: #ff4d4d !important;
+        color: #ffffff !important;
+        border-color: #ff4d4d !important;
+        box-shadow: 0 4px 15px rgba(255, 77, 77, 0.4) !important;
+        transform: scale(1.05) !important;
+    }
+</style>
 
 </head>
 <body>
